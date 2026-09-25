@@ -1,0 +1,61 @@
+# Every push to main that passes the checks becomes a release tag (vX.Y.Z).
+#
+# - If package.json's version has no tag yet (you bumped it by hand for a minor or
+#   major release), that version is tagged as-is.
+# - Otherwise the patch number is bumped, committed as "Release vX.Y.Z", and tagged.
+#
+# Consumers (polarize.tech, joshuaanderton.ca, the audio-projects monorepo) each run a
+# `polarize-ui` workflow that polls for new tags, updates their pin, runs their own
+# checks and deploys. Nothing here needs a token for another repo.
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - name: Design checks
+        run: python3 dev_check.py
+      - name: Generated files are current
+        run: python3 build_css.py --check && python3 shadcn/build_shadcn.py --check
+      - name: Types
+        run: npx tsc -p .
+      - name: Storybook builds
+        run: npx storybook build --quiet
+
+      - name: Tag the release
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git describe --tags --exact-match HEAD >/dev/null 2>&1; then
+            echo "HEAD is already tagged $(git describe --tags --exact-match HEAD)"; exit 0
+          fi
+          version=$(node -p "require('./package.json').version")
+          if git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
+            version=$(npm version patch --no-git-tag-version | sed 's/^v//')
+            git commit -am "Release v$version"
+          fi
+          git tag "v$version"
+          git push origin HEAD:main "v$version"
+          echo "Released v$version" >> "$GITHUB_STEP_SUMMARY"

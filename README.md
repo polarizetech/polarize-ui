@@ -79,6 +79,26 @@ Wiring a zero-build page in: [`INTEGRATION.md`](INTEGRATION.md). React projects:
 [`shadcn/SHADCN.md`](shadcn/SHADCN.md). Background and design decisions:
 [`CLAUDE.md`](CLAUDE.md).
 
+## Releases and consumers
+
+Every push to `main` that passes the checks is tagged automatically
+(`.github/workflows/release.yml`): the patch number goes up by one, unless you bumped
+`package.json`'s version yourself (for a minor or major release), in which case that
+version is tagged.
+
+Each consuming repo runs a `polarize-ui` workflow hourly (or on demand from its Actions
+tab) that moves its pin to the newest tag, runs its own checks, and commits + deploys
+only if they pass:
+
+| repo | pin | gate before it commits |
+|---|---|---|
+| polarizetech/polarize.tech | `design/` submodule | `check_design.py`, `validate_posts.py` |
+| joshuaanderton/joshuaanderton.ca | `package.json` git dependency | `tsc -b && vite build`, then the Pages deploy |
+| polarizetech/audio-projects | `tools/design` submodule | `tools/design/dev_check.py` |
+
+A breaking change fails the consumer's gate, so nothing is pushed there and GitHub
+emails you about the failed run.
+
 ## Checks
 
 ```bash
