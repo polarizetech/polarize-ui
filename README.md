@@ -10,7 +10,11 @@ the label can never be hidden.
   `<body class="ui">`; no build step, no CDN.
 - **`design.js`** — custom elements: `<ui-tier>` (an always-visible evidence badge),
   `<ui-note>` / `<ui-docs>` (explanations in a documentation drawer), tooltips.
-- **`shadcn/`** — a generated shadcn/ui theme and a React `<Tier>` for Vite + React projects.
+- **`shadcn/`** — the generated shadcn/ui theme (from `tokens.json`) and the React `<Tier>`.
+- **`src/`** — the React library: shadcn/ui components (restyled to the type rules), `<Tier>`,
+  `<Note>` + `<DocsProvider>` (the documentation drawer, replacing `<ui-note>`/`<ui-docs>`),
+  `<Hint>`, `<Value>`, `<Readout>`, `<Display>`/`<Label>`/`<Standfirst>`, and visx charts —
+  `<LineChart>`, `<BarChart>`, `<Waveform>`.
 - **`fonts/`, `icons/`** — self-hosted Instrument Serif, Inter, IBM Plex Mono, Literata (OFL)
   and a Phosphor icon sprite (MIT).
 
@@ -28,6 +32,20 @@ npm run storybook        # http://localhost:6006
 Use the Theme toolbar to switch between `instrument` (default), `polarize`, and the classic
 light/dark themes. The MCP add-on (`@storybook/addon-mcp`) lets coding agents discover the
 components and their stories.
+
+## React
+
+```tsx
+import "@polarizetech/polarize-ui/react.css"   // Tailwind v4 + theme + fonts
+import { LineChart, Tier, Note, DocsProvider } from "@polarizetech/polarize-ui/react"
+```
+
+Needs a Vite + Tailwind v4 setup and an `@` → `src` alias (see `.storybook/main.ts`). The
+package ships TypeScript source for now; there is no compiled build yet.
+
+Chart rules, carried from the zero-build `tools/chart`: a threshold is drawn on the axes it
+judges; a log axis says so in its label and refuses a non-positive domain; decimation is
+printed on the panel; colour is a theme token, never a literal.
 
 ## Using it from another repo
 
