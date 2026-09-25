@@ -107,6 +107,12 @@ Releases follow [Semantic Versioning](https://semver.org/). While the version is
 **Not covered:** exact colour values and spacing (a tweak is a patch release, not a breaking
 change), the stories, the build scripts, and anything under `.storybook/` or `.github/`.
 
+Removing or renaming anything in the public API always produces a breaking bump:
+`scripts/api_surface.py` lists that surface, and the release workflow compares it with the
+previous release. What was removed is listed at the top of the release notes. Changes it
+cannot see, such as a prop's type or a component's behaviour, have to be marked by whoever
+makes them, and the contributor guidance ([`AGENTS.md`](AGENTS.md)) requires it.
+
 Every push to `main` is released automatically by
 [`.github/workflows/release.yml`](.github/workflows/release.yml), which applies these rules:
 a commit whose subject has `!:` (for example `refactor!: rename Label to Eyebrow`) or a

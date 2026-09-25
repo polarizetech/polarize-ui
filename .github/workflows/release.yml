@@ -3,8 +3,11 @@
 # Versioning (see README § Versioning — this workflow is what enforces it):
 #   · package.json's version has no tag yet → that version is released as-is
 #     (set it by hand for any release you want to number yourself).
-#   · otherwise, commits since the last tag decide the bump:
-#       a breaking change — a subject like "refactor!: …" or a "BREAKING CHANGE:" line —
+#   · otherwise the bump is decided since the last tag:
+#       anything REMOVED from the public surface (scripts/api_surface.py: exports, ui-*
+#         classes, CSS variables, token keys, custom elements, entry points) is breaking,
+#         whether or not the commit says so;
+#       so is a commit marked "refactor!: …" or with a "BREAKING CHANGE:" line —
 #         bumps MINOR while below 1.0.0, MAJOR from 1.0.0 on;
 #       from 1.0.0 on, a "feat: …" subject bumps MINOR;
 #       anything else bumps PATCH.
@@ -59,12 +62,29 @@ jobs:
           current=$(node -p "require('./package.json').version")
           if ! git rev-parse -q --verify "refs/tags/v$current" >/dev/null; then
             version=$current; reason="package.json set by hand"
+            # A hand-set version may not be smaller than what a removal requires.
+            last=$(git describe --tags --abbrev=0)
+            removed=$(python3 scripts/api_surface.py --removed "$last")
+            if [ -n "$removed" ]; then
+              IFS=. read -r lM lm _ <<< "${last#v}"; IFS=. read -r nM nm _ <<< "$version"
+              if { [ "$lM" = 0 ] && [ "$nM" = 0 ] && [ "$nm" = "$lm" ]; } || { [ "$lM" != 0 ] && [ "$nM" = "$lM" ]; }; then
+                echo "::error::v$version removes public API since $last but is not a breaking bump:"; echo "$removed"
+                echo "Set package.json to the next minor (below 1.0) or major version, or restore what was removed."; exit 1
+              fi
+              { echo "### Removed from the public API since $last"; echo '```'; echo "$removed"; echo '```'; } > removed.md
+            fi
           else
             last=$(git describe --tags --abbrev=0)
             log=$(git log "$last"..HEAD --format='%s%n%b')
             major=${current%%.*}
-            if echo "$log" | grep -qE '^[a-z]+(\([^)]*\))?!:|^BREAKING CHANGE:'; then
-              level=$([ "$major" = 0 ] && echo minor || echo major); reason="breaking change since $last"
+            # Anything removed from the public surface (exports, ui-* classes, CSS variables,
+            # token keys, custom elements, package entry points) is breaking, marked or not.
+            removed=$(python3 scripts/api_surface.py --removed "$last")
+            if [ -n "$removed" ]; then
+              level=$([ "$major" = 0 ] && echo minor || echo major); reason="public API removed since $last"
+              { echo "### Removed from the public API since $last"; echo '```'; echo "$removed"; echo '```'; } > removed.md
+            elif echo "$log" | grep -qE '^[a-z]+(\([^)]*\))?!:|^BREAKING CHANGE:'; then
+              level=$([ "$major" = 0 ] && echo minor || echo major); reason="breaking change marked since $last"
             elif [ "$major" != 0 ] && echo "$log" | grep -qE '^feat(\([^)]*\))?:'; then
               level=minor; reason="feature since $last"
             else
@@ -89,7 +109,11 @@ jobs:
           if ! git diff --quiet package.json; then git commit -qam "Release v$V"; fi
           git tag "v$V"
           git push origin HEAD:main "v$V"
-          gh release create "v$V" --title "v$V" --generate-notes --verify-tag
+          if [ -f removed.md ]; then
+            gh release create "v$V" --title "v$V" --generate-notes --verify-tag --notes-file removed.md
+          else
+            gh release create "v$V" --title "v$V" --generate-notes --verify-tag
+          fi
 
       - uses: actions/upload-pages-artifact@v3
         with:

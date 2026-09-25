@@ -1,5 +1,44 @@
 # CLAUDE.md — design
 
+> ## ⛔ READ FIRST: this is a PUBLIC, VERSIONED library (since 2026-09-25)
+>
+> Every push to `main` is released automatically (`.github/workflows/release.yml`). The
+> result is tagged, published on the Releases page, and deployed as the live Storybook.
+> People outside Polarize may be pinned to a tag, and so are polarize.tech,
+> joshuaanderton.ca and the audio-projects monorepo (they update themselves daily). The
+> README makes them a promise: **a patch release never breaks anything.** An unmarked
+> breaking change breaks that promise for everyone. So, before you commit:
+>
+> 1. **Is it breaking?** It is if a consumer's existing code could stop working or change
+>    meaning. That includes **renaming or removing** an export, a prop, a `ui-*` class or
+>    modifier, a CSS variable, a `tokens.json` key, a custom element or attribute, or a
+>    `package.json` entry point. It also includes **changing a prop's type or making it
+>    required**, and **changing what an existing prop or class does** (for example a
+>    layout change that moves content).
+> 2. **If it is breaking, mark the commit.** Either write `!:` in the subject, e.g.
+>    `refactor!: rename Label to Eyebrow`, or add a `BREAKING CHANGE: <what and how to
+>    migrate>` line to the body. Say in the body how to migrate. That text is what a user
+>    reads in the release notes.
+> 3. **Prefer not breaking.** Add the new name and keep the old one working (alias,
+>    re-export, duplicate class) with a `@deprecated` comment. Remove it in a later,
+>    marked release.
+> 4. **Adding is never breaking:** a new export, prop (optional), class, variable or
+>    token is a patch.
+>
+> **What the automation catches, and what it does not.** `scripts/api_surface.py` lists
+> the public surface. The release workflow compares it with the last tag, and **any
+> removal or rename forces a breaking bump** even when the commit is unmarked. A
+> hand-set `package.json` version that is too small for a removal fails the release.
+> It **cannot** see changed prop types, changed signatures or changed behaviour. Those
+> depend entirely on step 2.
+>
+> **Also:** don't push work in progress to `main` (it ships). Don't move or delete tags
+> (consumers are pinned to them). Don't edit the Releases page to say something different
+> from what shipped. Full rules for users: `README.md` § Versioning.
+>
+> After a breaking release, check the consumers' daily `polarize-ui` workflow runs. A
+> failed run means that repo needs a migration commit. It is not something to retry.
+
 > ## ⭐ THE DEFAULT IS **INSTRUMENT** (2026-08-19)
 >
 > Set at the operator's request after the `attend-to-send` briefing page: *"require other projects
