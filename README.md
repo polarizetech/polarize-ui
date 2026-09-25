@@ -39,17 +39,32 @@ components and their stories.
 
 ## React
 
-```tsx
-import "@polarizetech/polarize-ui/react.css"   // Tailwind v4 + theme + fonts
-import { LineChart, Tier, Note, DocsProvider } from "@polarizetech/polarize-ui/react"
+In an app that already runs Vite + Tailwind v4:
+
+```bash
+yarn add github:polarizetech/polarize-ui#v0.4.0
 ```
 
-Needs a Vite + Tailwind v4 setup and an `@` → `src` alias (see `.storybook/main.ts`). The
-package ships TypeScript source for now; there is no compiled build yet.
+```css
+/* your app's main stylesheet */
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@polarizetech/polarize-ui/theme.css";
+@source "../node_modules/@polarizetech/polarize-ui/src";
+```
 
-Chart rules, carried from the zero-build `tools/chart`: a threshold is drawn on the axes it
-judges; a log axis says so in its label and refuses a non-positive domain; decimation is
-printed on the panel; colour is a theme token, never a literal.
+```tsx
+import { Shell, PostList, Article, Button, Tier, LineChart } from "@polarizetech/polarize-ui/react"
+```
+
+- The package ships TypeScript source; Vite compiles it. There is no build step here yet.
+- `src/` uses **relative imports only** — an `@/` import would resolve against the
+  consuming app's alias and pick up its components. `dev_check.py` enforces this. The shadcn
+  CLI writes `@/` imports, so rewrite them after `npx shadcn add`.
+- Dark mode is a `.dark` class on `<html>`.
+- Chart rules, carried from the zero-build `tools/chart`: a threshold is drawn on the axes it
+  judges; a log axis says so in its label and refuses a non-positive domain; decimation is
+  printed on the panel; colour is a theme token, never a literal.
 
 ## Using it from another repo
 

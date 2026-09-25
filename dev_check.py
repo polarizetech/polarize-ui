@@ -470,8 +470,8 @@ def check_publication() -> None:
 
 
 def check_react_mirror() -> None:
-    """src/index.css re-declares a few design.css classes for React documents; they must match."""
-    path = HERE / "src" / "index.css"
+    """src/theme.css re-declares a few design.css classes for React documents; they must match."""
+    path = HERE / "src" / "theme.css"
     if not path.is_file():
         return
     react = path.read_text()
@@ -487,6 +487,14 @@ def check_react_mirror() -> None:
         ok(f"React's .{cls} matches design.css", a == b and bool(a), f"design.css-only {sorted(a - b)}, react-only {sorted(b - a)}")
 
 
+def check_package_imports() -> None:
+    """src/ ships as source to other apps. An `@/` import there resolves against the
+    CONSUMER's alias, so it would silently pick up the host's own components."""
+    bad = [str(f.relative_to(HERE)) for f in (HERE / "src").rglob("*.ts*")
+           if re.search(r'from\s+"@/', f.read_text())]
+    ok("src/ uses relative imports only (no `@/` — it would resolve inside the consumer)", not bad, str(bad))
+
+
 def main() -> int:
     check_tokens()
     check_contrast()
@@ -497,6 +505,7 @@ def main() -> int:
     check_shadcn()
     check_publication()
     check_react_mirror()
+    check_package_imports()
     for name, detail in FAIL:
         print(f"FAIL  {name}" + (f"   [{detail}]" if detail else ""))
     print(f"\n{len(PASS)}/{len(PASS) + len(FAIL)} checks passed")

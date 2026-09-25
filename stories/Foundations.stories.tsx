@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import tokens from "../tokens.json"
-import { Display, Label, Standfirst } from "@/components/typography"
+import { Display, Eyebrow, Standfirst } from "@/components/typography"
 
 const meta: Meta = { title: "Foundations" }
 export default meta
@@ -42,12 +42,12 @@ export const Colour: StoryObj = {
 export const Typography: StoryObj = {
   render: () => (
     <div className="max-w-2xl space-y-3">
-      <Label accent>DIY bench · n-of-1 · not yet run</Label>
+      <Eyebrow accent>DIY bench · n-of-1 · not yet run</Eyebrow>
       <Display>Display one</Display>
       <Standfirst>The standfirst: one sentence saying what this page is for.</Standfirst>
       <p>Running text is Inter, never bold and never tracked. Hierarchy comes from size, face, colour and case. <strong>Strong</strong> is marked by full-strength ink.</p>
       <Display level={2}>Display two</Display>
-      <Label>An uppercase mono kicker</Label>
+      <Eyebrow>An uppercase mono kicker</Eyebrow>
       <Display level={3}>Display three</Display>
       <p className="font-mono tabular-nums">0.0123 Hz · 250.0 Hz · +32.2 dB</p>
     </div>

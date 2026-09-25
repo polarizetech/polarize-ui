@@ -1,5 +1,5 @@
 import * as React from "react"
-import { cn } from "@/lib/utils"
+import { cn } from "../lib/utils"
 
 const DISPLAY = {
   1: "text-[clamp(2.3rem,6vw,3.4rem)]",
@@ -14,7 +14,7 @@ export function Display({ level = 1, className, children }: { level?: 1 | 2 | 3;
 }
 
 /** Uppercase is ALWAYS the mono face. */
-export function Label({ accent = false, className, children }: { accent?: boolean; className?: string; children: React.ReactNode }) {
+export function Eyebrow({ accent = false, className, children }: { accent?: boolean; className?: string; children: React.ReactNode }) {
   return (
     <p className={cn("font-mono text-[11px] uppercase tracking-[.2em]", accent ? "text-primary" : "text-muted-foreground", className)}>
       {children}

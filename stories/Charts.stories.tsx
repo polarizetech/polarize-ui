@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { LineChart, sharedDomain, type Series } from "@/charts/LineChart"
 import { BarChart } from "@/charts/BarChart"
-import { Label } from "@/components/typography"
+import { Eyebrow } from "@/components/typography"
 import { detectionCurve, longTrace, spectrum } from "./data"
 
 const meta: Meta = { title: "Charts (visx)", parameters: { docs: { description: { component: "All data synthetic." } } } }
@@ -62,12 +62,12 @@ export const SharedVsIndependent: StoryObj = {
     return (
       <div className="grid gap-6">
         <div>
-          <Label>Shared — the residual looks as small as it is</Label>
+          <Eyebrow>Shared — the residual looks as small as it is</Eyebrow>
           <LineChart series={raw} y={{ domain: dom, label: "µV" }} x={{ label: "time (s)" }} scaleNote="shared" height={180} />
           <LineChart series={residual} y={{ domain: dom, label: "µV" }} x={{ label: "time (s)" }} scaleNote="shared" height={180} />
         </div>
         <div>
-          <Label>Independent — the same residual autoscaled looks like the signal</Label>
+          <Eyebrow>Independent — the same residual autoscaled looks like the signal</Eyebrow>
           <LineChart series={residual} y={{ label: "µV" }} x={{ label: "time (s)" }} scaleNote="independent" height={180} />
         </div>
       </div>

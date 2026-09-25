@@ -7,12 +7,12 @@
  */
 import * as React from "react"
 import { Info } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { Button } from "./ui/button"
+import { ScrollArea } from "./ui/scroll-area"
 import {
   Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle,
-} from "@/components/ui/sheet"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+} from "./ui/sheet"
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip"
 import { Tier, type TierId } from "./tier"
 
 type Entry = { id: string; title: string; section: string; tier?: TierId; body: React.ReactNode }

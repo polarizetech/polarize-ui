@@ -5,8 +5,8 @@
 import * as React from "react"
 import { ArrowUpRight, BookOpen, FileCheck, Rss, Mail, GitBranch, AlignLeft } from "lucide-react"
 import { Tier, type TierId } from "./components/tier"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { Button } from "./components/ui/button"
+import { cn } from "./lib/utils"
 
 const icon = "ui-icon size-[1em]"
 
@@ -72,11 +72,20 @@ export function SidebarSection({ heading, items }: { heading: string; items: Nav
   )
 }
 
-export function SidebarMeta({ feed, github }: { feed?: string; github?: string }) {
+export type IconLink = { label: string; href: string; icon: React.ReactNode }
+
+/** A row of icon links (feed, GitHub, socials). Every icon carries an accessible label. */
+export function SidebarMeta({ links, feed, github }: { links?: IconLink[]; feed?: string; github?: string }) {
+  const all: IconLink[] = [
+    ...(feed ? [{ label: "RSS feed", href: feed, icon: <Rss className="ui-icon size-4" /> }] : []),
+    ...(github ? [{ label: "GitHub", href: github, icon: <GitBranch className="ui-icon size-4" /> }] : []),
+    ...(links ?? []),
+  ]
   return (
     <div className="ui-sidebar__meta">
-      {feed && <a className="ui-sidebar__meta-link" href={feed} aria-label="RSS feed"><Rss className="ui-icon size-4" /></a>}
-      {github && <a className="ui-sidebar__meta-link" href={github} aria-label="GitHub"><GitBranch className="ui-icon size-4" /></a>}
+      {all.map((l) => (
+        <a key={l.href} className="ui-sidebar__meta-link" href={l.href} aria-label={l.label} title={l.label}>{l.icon}</a>
+      ))}
     </div>
   )
 }
