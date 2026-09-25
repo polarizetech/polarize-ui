@@ -1,4 +1,3 @@
-import * as React from "react"
 import { AxisBottom, AxisLeft } from "@visx/axis"
 import { GridRows } from "@visx/grid"
 import { Group } from "@visx/group"

@@ -1,4 +1,3 @@
-import * as React from "react"
 import { scaleLinear, scaleLog } from "@visx/scale"
 
 /** Series colours come from the theme (tokens.json → shadcn/theme.css). Never a literal. */

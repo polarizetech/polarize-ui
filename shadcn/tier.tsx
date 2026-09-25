@@ -11,8 +11,6 @@
  * `compact`, `iconOnly` or `hideLabel` prop — adding one re-opens the exact failure the
  * three-channel rule closes. PREDICTED must never be able to look like MEASURED.
  */
-import * as React from "react"
-
 export const TIERS = {
   "A": { label: "[A]", glyph: "\u25c6", family: "measured", meaning: "Established, textbook-derivable, or measured here." },
   "MEASURED": { label: "MEASURED", glyph: "\u25c6", family: "measured", meaning: "Read off the actual render or a real instrument. Never styled like a prediction." },

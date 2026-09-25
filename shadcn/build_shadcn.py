@@ -197,8 +197,6 @@ def tier_tsx() -> str:
  * `compact`, `iconOnly` or `hideLabel` prop — adding one re-opens the exact failure the
  * three-channel rule closes. PREDICTED must never be able to look like MEASURED.
  */
-import * as React from "react"
-
 export const TIERS = {
 %s,
 } as const

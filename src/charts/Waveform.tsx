@@ -1,4 +1,3 @@
-import * as React from "react"
 import { scaleLinear } from "@visx/scale"
 import { AreaClosed, LinePath } from "@visx/shape"
 
