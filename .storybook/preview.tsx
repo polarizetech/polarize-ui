@@ -1,6 +1,7 @@
 import type { Preview } from "@storybook/react-vite";
 import * as React from "react";
 import "../src/index.css";
+import "../src/fonts.css";
 import { TooltipProvider } from "../src/components/ui/tooltip";
 import { DocsProvider } from "../src/components/docs";
 

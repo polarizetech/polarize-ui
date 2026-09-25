@@ -7,12 +7,16 @@
  *
  * The @source line is what makes Tailwind generate the classes polarize-ui's
  * components use. Dark mode is a `.dark` class on <html>.
+ *
+ * The font faces are NOT imported here: Tailwind inlines this file into the
+ * app's stylesheet, which breaks relative url()s. They load from the React
+ * entry instead (src/index.ts imports fonts.css), where the bundler resolves
+ * them against this package.
  */
 @import "../shadcn/theme.css";
 @import "../shadcn/tier.css";
 @import "../shadcn/system.css";
 @import "../publication.css";
-@import "./fonts.css";
 
 @custom-variant dark (&:is(.dark *));
 

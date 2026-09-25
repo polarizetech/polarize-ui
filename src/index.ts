@@ -1,3 +1,7 @@
+// Self-hosted faces. Imported from JS, not from theme.css, so the bundler resolves
+// their url()s against this package rather than the consuming app.
+import "./fonts.css"
+
 export * from "./components/tier"
 export * from "./components/docs"
 export * from "./components/typography"
