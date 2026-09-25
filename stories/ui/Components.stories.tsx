@@ -1,17 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { Pause, Play, Repeat, SkipBack } from "lucide-react"
+import { Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label as FieldLabel } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tier } from "@/components/tier"
-import { Readout } from "@/components/value"
-import { Waveform } from "@/charts/Waveform"
-import { amTone } from "./data"
+import { Tier } from "@/science/evidence/tier"
 
-const meta: Meta = { title: "Components" }
+const meta: Meta = { title: "General UI/Components" }
 export default meta
 
 export const Buttons: StoryObj = {
@@ -45,17 +42,6 @@ export const StimulusCard: StoryObj = {
   ),
 }
 
-export const ReadoutStory: StoryObj = {
-  name: "Readout",
-  render: () => (
-    <Readout items={[
-      { label: "Sample rate", value: "250.0 Hz", source: "measured from timestamps" },
-      { label: "Mains pickup", value: "+32.2 dB", source: "60 Hz, p = 2e-26" },
-      { label: "Contact", value: "good", source: "bridge quality check" },
-    ]} />
-  ),
-}
-
 export const TableStory: StoryObj = {
   name: "Table",
   render: () => (
@@ -77,21 +63,5 @@ export const TabsStory: StoryObj = {
       <TabsContent value="live" className="text-sm text-muted-foreground">Connect, then record.</TabsContent>
       <TabsContent value="playback" className="text-sm text-muted-foreground">Pick a session to replay.</TabsContent>
     </Tabs>
-  ),
-}
-
-export const Transport: StoryObj = {
-  name: "Waveform + transport",
-  render: () => (
-    <div className="max-w-2xl space-y-2">
-      <Waveform samples={amTone()} progress={0.38} regions={[{ start: 0.55, end: 0.68, label: "blink", kind: "attention" }]} />
-      <div className="flex items-center gap-1">
-        <Button size="icon" aria-label="Play"><Play /></Button>
-        <Button size="icon" variant="ghost" aria-label="Pause"><Pause /></Button>
-        <Button size="icon" variant="ghost" aria-label="Back"><SkipBack /></Button>
-        <Button size="icon" variant="ghost" aria-label="Repeat"><Repeat /></Button>
-        <span className="ml-2 font-mono text-xs tabular-nums text-muted-foreground">00:12 / 05:00</span>
-      </div>
-    </div>
   ),
 }

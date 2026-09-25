@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import {
   Article, AuthorNote, Badges, Brand, Cite, Claims, Footer, Pager, Parts, PostList, Prose,
   References, Shell, SidebarMeta, SidebarSection, Source, Summary, type PostSummary,
-} from "@/publication"
+} from "@/components/publication"
 
 // Every record below is a PLACEHOLDER for layout only. In a real site these come from the
 // citation ledger and the claims register, never typed by hand.
@@ -10,16 +10,16 @@ const posts: PostSummary[] = [
   {
     href: "#", date: "25 Sep 2026", title: "What a $70 amplifier can and cannot hear",
     description: "An example description, one or two sentences long, sitting under the title at a readable measure.",
-    badges: <Badges tier="B" items={[{ label: "Audio-evoked potentials", href: "#" }]} />,
+    badges: <Badges tier="B" items={[{ label: "Audio-evoked potentials" }]} />,
   },
   {
     href: "#", date: "12 Sep 2026", title: "A spiking network built to lose",
     description: "Placeholder text for a second row without a thumbnail.",
-    badges: <Badges tier="C" items={[{ label: "Method", href: "#" }]} />,
+    badges: <Badges tier="C" items={[{ label: "Method" }]} />,
   },
   {
     href: "#", date: "30 Aug 2026", title: "A closed door is not a closed question",
-    badges: <Badges tier="SPEC" items={[{ label: "Method", href: "#" }]} />,
+    badges: <Badges tier="SPEC" items={[{ label: "Method" }]} />,
   },
 ]
 
@@ -41,7 +41,7 @@ const sidebar = (
   </>
 )
 
-const meta: Meta = { title: "Publication", parameters: { layout: "fullscreen" } }
+const meta: Meta = { title: "General UI/Layouts", parameters: { layout: "fullscreen" } }
 export default meta
 
 export const SiteShell: StoryObj = {

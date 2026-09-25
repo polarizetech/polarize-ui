@@ -41,3 +41,34 @@ export function longTrace(n = 12000, seed = 7): [number, number][] {
 export function amTone(n = 1200) {
   return Array.from({ length: n }, (_, i) => (0.55 + 0.45 * Math.sin(i * 0.02)) * Math.sin(i * 0.9))
 }
+
+/**
+ * A synthetic spectrogram in dB: 1/f background, a 10 Hz alpha burst between 20 and 40 s,
+ * and a slow chirp. rows = frequency bins (row 0 = lowest), cols = time bins.
+ */
+export function spectrogram({ rows = 60, cols = 240, alpha = 1, seed = 11 } = {}) {
+  const r = rng(seed)
+  const fMax = 30, tMax = 60
+  const grid: number[][] = []
+  for (let i = 0; i < rows; i++) {
+    const f = ((i + 0.5) / rows) * fMax
+    const row: number[] = []
+    for (let j = 0; j < cols; j++) {
+      const t = ((j + 0.5) / cols) * tMax
+      let p = 40 / (f + 1)
+      const burst = t > 20 && t < 40 ? Math.sin(((t - 20) / 20) * Math.PI) : 0
+      p += alpha * 60 * burst * Math.exp(-((f - 10) ** 2) / 2)
+      p += 12 * Math.exp(-((f - (4 + t * 0.35)) ** 2) / 0.6)
+      p *= Math.exp(0.35 * gauss(r))
+      row.push(10 * Math.log10(p))
+    }
+    grid.push(row)
+  }
+  return { grid, x: [0, tMax] as [number, number], y: [0, fMax] as [number, number] }
+}
+
+/** A null distribution of a statistic: n draws from a noisy null centred at `centre`. */
+export function nullDraws(n = 999, centre = 0.21, spread = 0.04, seed = 5) {
+  const r = rng(seed)
+  return Array.from({ length: n }, () => centre + spread * gauss(r))
+}

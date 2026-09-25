@@ -51,6 +51,9 @@ _FAMILY_BORROW = {
 }
 
 
+DARK_MODES = {"polarize", "dark", "instrument-dark"}
+
+
 def _vars(mode: str, indent: int = 2) -> str:
     c = TOKENS["color"][mode]
     fam = TOKENS["epistemic"]["families"]
@@ -78,6 +81,12 @@ def _vars(mode: str, indent: int = 2) -> str:
         out.append(f"  --{name}: {v[fam_mode]};")
     for i, hex_ in enumerate(series, 1):
         out.append(f"  --series-{i}: {hex_};")
+    # Sequential ramp: --seq-1 is always "near zero", so it flips on dark themes.
+    seq = list(TOKENS["sequential"]["steps"].values())
+    if mode in DARK_MODES:
+        seq = seq[::-1]
+    for i, hex_ in enumerate(seq, 1):
+        out.append(f"  --seq-{i}: {hex_};")
     if mode == "polarize":
         ink = TOKENS["audioInk"]
         out.append(f"  --clay: {ink['clay']['value']};")

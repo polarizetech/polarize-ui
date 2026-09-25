@@ -2,16 +2,25 @@
 // their url()s against this package rather than the consuming app.
 import "./fonts.css"
 
-export * from "./components/tier"
-export * from "./components/docs"
+// ── Science: the reason this library exists ─────────────────────────────────────
+// Charts
+export * from "./science/charts/LineChart"
+export * from "./science/charts/BarChart"
+export { decimate } from "./science/charts/decimate"
+export { SERIES, TIER_COLOR } from "./science/charts/common"
+// Signals
+export * from "./science/signals/Waveform"
+export * from "./science/signals/Heatmap"
+// Statistics
+export * from "./science/stats/NullDistribution"
+// Evidence: how sure a value is, said so it cannot be hidden
+export * from "./science/evidence/tier"
+export * from "./science/evidence/value"
+export * from "./science/evidence/docs"
+
+// ── General UI ──────────────────────────────────────────────────────────────────
 export * from "./components/typography"
-export * from "./components/value"
-export * from "./charts/LineChart"
-export * from "./charts/BarChart"
-export * from "./charts/Waveform"
-export { decimate } from "./charts/decimate"
-export { SERIES, TIER_COLOR } from "./charts/common"
-export * from "./publication"
+export * from "./components/publication"
 export * from "./specimens"
 export * from "./components/specimen"
 

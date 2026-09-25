@@ -21,7 +21,8 @@
   "include": [
     "src",
     "stories",
-    ".storybook",
-    "shadcn"
+    "shadcn",
+    ".storybook/*.ts",
+    ".storybook/*.tsx"
   ]
 }

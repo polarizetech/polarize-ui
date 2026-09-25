@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import tokens from "../tokens.json"
+import tokens from "../../tokens.json"
 import { Display, Eyebrow, Standfirst } from "@/components/typography"
 
-const meta: Meta = { title: "Foundations" }
+const meta: Meta = { title: "General UI/Foundations" }
 export default meta
 
 const Swatch = ({ color, label }: { color: string; label: string }) => (

@@ -4,29 +4,44 @@ import { Meta } from "@storybook/addon-docs/blocks";
 
 # Polarize UI
 
-A React + shadcn/ui library for showing scientific data honestly, on one token file
-(`tokens.json`). Charts are [visx](https://visx.airbnb.tech/).
+Components for **showing scientific data honestly**: charts, signal views and statistical
+tests that state their own limits, on one token file (`tokens.json`). Charts are
+[visx](https://visx.airbnb.tech/). The general UI (buttons, cards, type, page layouts) is
+[shadcn/ui](https://ui.shadcn.com/) on the same theme, and lives in its own section.
+
+## Science: start here
+
+| Section | What it is for |
+|---|---|
+| **Science / Charts** | Line and bar charts where a threshold sits on the axes it judges, a log axis says so, and thinning a trace for display is printed on the panel. |
+| **Science / Signals** | Time–frequency heatmaps (spectrograms) on a one-hue magnitude ramp with a stated colour range, and waveforms with marked regions. |
+| **Science / Statistics** | An observed statistic against its surrogate or permutation null: the permutation p with its count, z beside it, and a warning when p is at its floor. |
+| **Science / Evidence** | How sure a number is: tier badges that can't be hidden, measured versus predicted values, readouts that carry their source, and a drawer for the explanation. |
 
 ## The rule
 
 **A label may never be hidden. Its explanation must be.**
 
-- `<Tier>` always shows colour, word and glyph. It has no compact form.
-- `<Note>` shows only a marker; its explanation lives in the documentation drawer.
-- `<Value kind="measured">` and `kind="predicted"` never share styling.
+## What every science view states, rather than implies
 
-## Chart rules
-
-1. A threshold is drawn on the same axes as the series it judges.
-2. A log axis says so in its own label, and refuses a non-positive domain.
-3. Decimation is printed on the panel, never silent.
-4. Colour comes from the theme — `--chart-n` for series, `--tier-*` for evidence — never a literal.
+1. **The comparison it is making.** A threshold or observed value is drawn on the same axis
+   as what it is judged against.
+2. **Its scale.** A log axis says so. A colour range is on a colour bar. A shared scale
+   across panels is declared, and so is an independent one, because two panels that each
+   autoscale can't be compared.
+3. **What it changed.** Decimation, clipping and missing values are counted on the panel,
+   never silent.
+4. **Its uncertainty.** A p-value comes with its n and an effect size, and a "measured" value
+   never looks like a "predicted" one.
+5. **Colour from the theme.** `--chart-n` is used for series, `--seq-n` for magnitude and
+   `--tier-*` for evidence. Colour is never a literal, and never the only channel.
 
 ## Two ways in
 
-- **React / Vite:** `import { LineChart, Tier, Note } from "@polarizetech/polarize-ui/react"` and
-  `src/index.css`. This is what this Storybook shows.
-- **Zero-build pages:** `design.css` + `design.js` (custom elements), unchanged. See `INTEGRATION.md`.
-  Do not load `design.css` and the React theme in the same document — both define `--accent`.
+- **React / Vite:** `import { Heatmap, NullDistribution, LineChart, Tier } from "@polarizetech/polarize-ui/react"`
+  with the theme. This is what this Storybook shows.
+- **Zero-build pages:** `design.css` + `design.js` (custom elements). See `INTEGRATION.md`.
+  Do not load `design.css` and the React theme in the same document, because both define
+  `--accent`.
 
 Every chart in this Storybook is drawn from **synthetic** data.

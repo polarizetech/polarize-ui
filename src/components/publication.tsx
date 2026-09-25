@@ -4,9 +4,9 @@
  */
 import * as React from "react"
 import { ArrowUpRight, BookOpen, FileCheck, Rss, Mail, GitBranch, AlignLeft } from "lucide-react"
-import { Tier, type TierId } from "./components/tier"
-import { Button } from "./components/ui/button"
-import { cn } from "./lib/utils"
+import { Tier, type TierId } from "../science/evidence/tier"
+import { Button } from "./ui/button"
+import { cn } from "../lib/utils"
 
 const icon = "ui-icon size-[1em]"
 
@@ -60,7 +60,7 @@ export function SidebarSection({ heading, items }: { heading: string; items: Nav
       <p className="ui-label ui-sidebar__heading">{heading}</p>
       <ul className="ui-sidebar__list">
         {items.map((it) => (
-          <li key={it.href}>
+          <li key={`${it.label}|${it.href}`}>
             <a className={cn("ui-sidebar__link", it.current && "is-current")} href={it.href} aria-current={it.current ? "page" : undefined}>
               <span>{it.label}</span>
               {it.count !== undefined && <span className="ui-sidebar__count">{it.count}</span>}
@@ -84,7 +84,7 @@ export function SidebarMeta({ links, feed, github }: { links?: IconLink[]; feed?
   return (
     <div className="ui-sidebar__meta">
       {all.map((l) => (
-        <a key={l.href} className="ui-sidebar__meta-link" href={l.href} aria-label={l.label} title={l.label}>{l.icon}</a>
+        <a key={`${l.label}|${l.href}`} className="ui-sidebar__meta-link" href={l.href} aria-label={l.label} title={l.label}>{l.icon}</a>
       ))}
     </div>
   )
@@ -101,7 +101,7 @@ export function PostList({ posts, empty = "Nothing here yet." }: { posts: PostSu
   return (
     <ul className="ui-postlist">
       {posts.map((p) => (
-        <li key={p.href} className="ui-postlist__item">
+        <li key={`${p.title}|${p.href}`} className="ui-postlist__item">
           <a className="ui-postlist__link" href={p.href}>
             <span className="ui-postlist__main">
               <time className="ui-postlist__date">{p.date}</time>

@@ -24,6 +24,19 @@ Before every commit:
 **removed**, but they cannot detect a changed prop, signature or behaviour. That part is on
 you.
 
+## Where things go
+
+- **`src/science/`** holds the charts (`charts/`), signal views (`signals/`), statistical views
+  (`stats/`) and evidence labels (`evidence/`). **This is the core of the library.** A new
+  chart, data view or analysis display goes here, with a story under `stories/science/`
+  titled `Science/<Charts|Signals|Statistics|Evidence>`.
+- **`src/components/`** holds the general UI: shadcn components (`ui/`), typography, page
+  layouts and illustrations. Stories go under `stories/ui/`, titled `General UI/…`.
+- Science views follow the chart rules in `stories/Introduction.mdx`. They state their scale,
+  what they dropped or clipped, and their uncertainty. Colour comes from tokens only:
+  `--chart-n` for series, `--seq-n` for magnitude, `--tier-*` for evidence.
+- Export anything public from `src/index.ts`, in its section.
+
 ## Checks
 
 ```bash

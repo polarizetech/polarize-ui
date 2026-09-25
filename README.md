@@ -16,15 +16,26 @@ It comes in two forms that share one set of tokens:
 
 ## What is in it
 
+### Science: the charts and analysis views (the point of the library)
+
 | | |
 |---|---|
-| `tokens.json` | The single source of truth: colour, type, spacing, the epistemic tier ladder, a colour-blind-validated chart palette. |
-| `design.css` | Generated from the tokens (`build_css.py`). Link it and set `<body class="ui">`. |
-| `design.js` | Custom elements: `<ui-tier>` (an always-visible evidence badge), `<ui-note>` / `<ui-docs>` (explanations in a documentation drawer), tooltips. |
-| `publication.css` | Components for a research blog: sidebar shell, post list, article, prose, source cards, citations, claims, references, parts, pager, form, footer. |
-| `specimens.css` | Field-guide style specimen icons, drawn in theme colours ([`SPECIMEN-ICONS.md`](SPECIMEN-ICONS.md)). |
-| `src/` | The React library: shadcn/ui components restyled to the type rules; `Tier`, `Note`/`DocsProvider`, `Hint`, `Value`, `Readout`; `Display`, `Eyebrow`, `Standfirst`; the publication layouts (`Shell`, `PostList`, `Article`, `Source`, `References`, …); `Specimen`; and the charts `LineChart`, `BarChart`, `Waveform`. |
-| `shadcn/` | The generated shadcn/ui theme and the React `Tier`. |
+| **Charts** | `LineChart`, `BarChart`. A threshold is drawn on the axes it judges, a log axis says so in its label, thinning a trace for display is printed on the panel, and a shared or independent y-scale across panels is declared. |
+| **Signals** | `Heatmap` (spectrograms, time–frequency maps, comodulograms) on a one-hue magnitude ramp with a colour bar, hover readout, and counted clipping. `Waveform` with marked regions. |
+| **Statistics** | `NullDistribution` and `nullTest()`: an observed statistic against its surrogate or permutation null, with the permutation p printed with its count, z beside it, and a warning when p is at its floor. |
+| **Evidence** | `Tier` (a MEASURED / PREDICTED / REFUTED badge that can't be hidden), `Value` (measured and predicted never styled alike), `Readout` (figures with their source), and `Note` + `DocsProvider` (explanations in a drawer). |
+
+Source: `src/science/`. Every view is in the [live Storybook](https://polarizetech.github.io/polarize-ui/) under **Science**.
+
+### General UI
+
+| | |
+|---|---|
+| `tokens.json` | The single source of truth: colour, type, spacing, the tier ladder, a colour-blind-validated categorical palette and a one-hue sequential ramp. |
+| `design.css` + `design.js` | The zero-build form, generated from the tokens: link it and set `<body class="ui">`. Custom elements: `<ui-tier>`, `<ui-note>`, `<ui-docs>`. |
+| `publication.css` | Layouts for a research blog: sidebar shell, post list, article, prose, source cards, citations, claims, references, pager, footer. React versions render the same classes. |
+| `specimens.css` | Field-guide style illustrations drawn in theme colours ([`SPECIMEN-ICONS.md`](SPECIMEN-ICONS.md)). |
+| `src/components/` | shadcn/ui components restyled to the type rules, typography (`Display`, `Eyebrow`, `Standfirst`), the publication layouts and `Specimen`. |
 | `fonts/`, `icons/` | Self-hosted Instrument Serif, Inter, IBM Plex Mono, Literata (OFL) and a Phosphor icon sprite (MIT). |
 
 ## Using it
@@ -48,7 +59,7 @@ npm install github:polarizetech/polarize-ui#v0.5.2     # or: yarn add github:pol
 ```
 
 ```tsx
-import { Shell, PostList, Article, Button, Tier, LineChart } from "@polarizetech/polarize-ui/react"
+import { Heatmap, NullDistribution, LineChart, Tier, Button } from "@polarizetech/polarize-ui/react"
 ```
 
 - The package ships TypeScript source and your bundler compiles it; there is no build step

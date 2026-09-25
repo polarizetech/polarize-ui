@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Specimen } from "@/components/specimen"
 import { SPECIMENS, SPECIMEN_LABELS, type SpecimenKey } from "@/specimens"
 
-const meta: Meta = { title: "Specimens" }
+const meta: Meta = { title: "General UI/Illustrations" }
 export default meta
 
 const keys = Object.keys(SPECIMENS) as SpecimenKey[]

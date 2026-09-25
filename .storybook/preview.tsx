@@ -1,9 +1,8 @@
 import type { Preview } from "@storybook/react-vite";
-import * as React from "react";
 import "../src/index.css";
 import "../src/fonts.css";
 import { TooltipProvider } from "../src/components/ui/tooltip";
-import { DocsProvider } from "../src/components/docs";
+import { DocsProvider } from "../src/science/evidence/docs";
 
 const preview: Preview = {
   globalTypes: {
@@ -40,6 +39,16 @@ const preview: Preview = {
   ],
   parameters: {
     layout: "padded",
+    // Science first: the charts and analysis views are what this library is for.
+    options: {
+      storySort: {
+        order: [
+          "Introduction",
+          "Science", ["Charts", "Signals", "Statistics", "Evidence"],
+          "General UI", ["Foundations", "Components", "Layouts", "Illustrations"],
+        ],
+      },
+    },
     backgrounds: { disable: true },
     a11y: { test: "todo" },
   },

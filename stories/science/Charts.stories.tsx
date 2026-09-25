@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { LineChart, sharedDomain, type Series } from "@/charts/LineChart"
-import { BarChart } from "@/charts/BarChart"
+import { LineChart, sharedDomain, type Series } from "@/science/charts/LineChart"
+import { BarChart } from "@/science/charts/BarChart"
 import { Eyebrow } from "@/components/typography"
-import { detectionCurve, longTrace, spectrum } from "./data"
+import { detectionCurve, longTrace, spectrum } from "../data"
 
-const meta: Meta = { title: "Charts (visx)", parameters: { docs: { description: { component: "All data synthetic." } } } }
+const meta: Meta = { title: "Science/Charts", parameters: { docs: { description: { component: "All data synthetic." } } } }
 export default meta
 
 export const DetectionCurve: StoryObj = {
@@ -33,7 +33,7 @@ export const Spectrum: StoryObj = {
       title="Power spectrum"
       series={[{ label: "Oz", points: spectrum() }]}
       x={{ label: "frequency (Hz)" }}
-      y={{ type: "log", label: "power (µV²/Hz)", format: (v) => v.toExponential(0) }}
+      y={{ type: "log", label: "power (µV²/Hz)", format: (v: number) => v.toExponential(0) }}
       thresholds={[{ value: 40, axis: "x", label: "front-end corner 40 Hz", tier: "refuted" }]}
     />
   ),
@@ -90,7 +90,7 @@ export const Bars: StoryObj = {
       y={{ label: "fraction", domain: [0, 1] }}
       xLabel="subject"
       threshold={{ value: 0.95, label: "95% bar" }}
-      valueFormat={(v) => v.toFixed(2)}
+      valueFormat={(v: number) => v.toFixed(2)}
     />
   ),
 }

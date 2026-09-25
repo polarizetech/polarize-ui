@@ -267,6 +267,8 @@ def system_css() -> str:
         rows = [("faint-foreground", t["faint-foreground"]), ("border-strong", t["border-strong"])]
         rows += [(k, v[mode]) for k, v in fam.items()]
         rows += [(f"series-{i}", c) for i, c in enumerate(ser[mode], 1)]
+        seq = list(TOKENS["sequential"]["steps"].values())
+        rows += [(f"seq-{i}", c) for i, c in enumerate(seq[::-1] if dark else seq, 1)]
         return "\n".join(f"{ind}--{k}: {v};" for k, v in rows)
 
     scales = "\n".join(

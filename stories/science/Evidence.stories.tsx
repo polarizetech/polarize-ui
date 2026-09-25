@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { Tier, TIERS, type TierId } from "@/components/tier"
-import { Hint, Note } from "@/components/docs"
-import { Value } from "@/components/value"
+import { Tier, TIERS, type TierId } from "@/science/evidence/tier"
+import { Hint, Note } from "@/science/evidence/docs"
+import { Readout, Value } from "@/science/evidence/value"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
 const ids = Object.keys(TIERS) as TierId[]
 
 const meta: Meta<{ id: TierId }> = {
-  title: "Epistemic",
+  title: "Science/Evidence",
   component: Tier,
   args: { id: "MEASURED" },
   argTypes: { id: { control: "select", options: ids } },
@@ -64,5 +64,16 @@ export const MeasuredVsPredicted: StoryObj = {
       Modulation: predicted <Value kind="predicted">4.00 Hz</Value>, measured <Value kind="measured">4.03 Hz</Value>.
       The two never share styling.
     </p>
+  ),
+}
+
+export const ReadoutStory: StoryObj = {
+  name: "Readout (figures with their source)",
+  render: () => (
+    <Readout items={[
+      { label: "Sample rate", value: "250.0 Hz", source: "measured from timestamps" },
+      { label: "Mains pickup", value: "+32.2 dB", source: "60 Hz, p = 2e-26" },
+      { label: "Contact", value: "good", source: "bridge quality check" },
+    ]} />
   ),
 }
