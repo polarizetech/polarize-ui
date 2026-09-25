@@ -17,6 +17,7 @@
 @import "../shadcn/tier.css";
 @import "../shadcn/system.css";
 @import "../publication.css";
+@import "../specimens.css";
 
 @custom-variant dark (&:is(.dark *));
 

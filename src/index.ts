@@ -12,6 +12,8 @@ export * from "./charts/Waveform"
 export { decimate } from "./charts/decimate"
 export { SERIES, TIER_COLOR } from "./charts/common"
 export * from "./publication"
+export * from "./specimens"
+export * from "./components/specimen"
 
 // shadcn/ui components, restyled to the type rules (never bold, never tracked)
 export * from "./components/ui/badge"

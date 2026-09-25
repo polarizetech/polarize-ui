@@ -19,6 +19,8 @@ the label can never be hidden.
   `<Note>` + `<DocsProvider>` (the documentation drawer, replacing `<ui-note>`/`<ui-docs>`),
   `<Hint>`, `<Value>`, `<Readout>`, `<Display>`/`<Label>`/`<Standfirst>`, and visx charts —
   `<LineChart>`, `<BarChart>`, `<Waveform>`.
+- **`specimens.css`, `src/specimens.ts`** — specimen icons: field-guide style illustrations
+  (`<Specimen name="bee" />`) drawn in theme colours. How to draw more: `SPECIMEN-ICONS.md`.
 - **`fonts/`, `icons/`** — self-hosted Instrument Serif, Inter, IBM Plex Mono, Literata (OFL)
   and a Phosphor icon sprite (MIT).
 

@@ -1,0 +1,25 @@
+/* Specimen icons (SPECIMEN-ICONS.md). Works on its own or through theme.css.
+ *
+ *   <svg class="ui-specimen" viewBox="0 0 200 200">…inner markup…</svg>
+ *
+ * The drawing classes only ever read the three --specimen-* colours, which come from
+ * the theme's surface tokens, so every icon follows light and dark mode. Override the
+ * three properties on a container to put specimens on a different surface.
+ * The rules sit in the components layer so utility classes (size-16, w-24) can size an icon. */
+@layer components {
+  .ui-specimen {
+    --specimen-tile: var(--card);
+    --specimen-stroke: color-mix(in oklab, var(--foreground) 82%, var(--card));
+    --specimen-fill: color-mix(in oklab, var(--foreground) 16%, var(--card));
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .ui-specimen * { stroke-linecap: round; stroke-linejoin: round; }
+  .ui-specimen .a { fill: var(--specimen-tile); stroke: var(--specimen-stroke); stroke-width: 2; }
+  .ui-specimen .b { fill: var(--specimen-fill); stroke: var(--specimen-stroke); stroke-width: 2; }
+  .ui-specimen .l { fill: none; stroke: var(--specimen-stroke); stroke-width: 2; }
+  .ui-specimen .t { fill: none; stroke: var(--specimen-stroke); stroke-width: 1.25; opacity: .55; }
+  .ui-specimen .d { fill: var(--specimen-fill); stroke: none; }
+  .ui-specimen .k { fill: var(--specimen-stroke); stroke: none; }
+}

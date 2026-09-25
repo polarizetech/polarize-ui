@@ -1,6 +1,6 @@
 {
   "name": "@polarizetech/polarize-ui",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "Polarize's design system for scientific and research interfaces: tokens, a zero-build stylesheet, epistemic tier badges, and a shadcn/ui bridge.",
   "license": "MIT",
   "type": "module",
@@ -11,6 +11,7 @@
   "files": [
     "design.css",
     "publication.css",
+    "specimens.css",
     "design.js",
     "tokens.json",
     "fonts",
@@ -26,6 +27,7 @@
     "./react": "./src/index.ts",
     "./react.css": "./src/index.css",
     "./publication.css": "./publication.css",
+    "./specimens.css": "./specimens.css",
     "./theme.css": "./src/theme.css",
     "./fonts.css": "./src/fonts.css"
   },
