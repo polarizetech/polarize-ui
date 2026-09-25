@@ -86,7 +86,7 @@ Every push to `main` that passes the checks is tagged automatically
 `package.json`'s version yourself (for a minor or major release), in which case that
 version is tagged.
 
-Each consuming repo runs a `polarize-ui` workflow hourly (or on demand from its Actions
+Each consuming repo runs a `polarize-ui` workflow once a day (or on demand from its Actions
 tab) that moves its pin to the newest tag, runs its own checks, and commits + deploys
 only if they pass:
 
