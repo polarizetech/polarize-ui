@@ -10,6 +10,10 @@ the label can never be hidden.
   `<body class="ui">`; no build step, no CDN.
 - **`design.js`** — custom elements: `<ui-tier>` (an always-visible evidence badge),
   `<ui-note>` / `<ui-docs>` (explanations in a documentation drawer), tooltips.
+- **`publication.css`** — components for a research blog: sidebar shell, post list,
+  article, prose, inline source cards, citations, claims, references, parts, pager, form,
+  footer. Load after `design.css`; the React versions (`Shell`, `PostList`, `Article`,
+  `Source`, `References`, …) render the same classes.
 - **`shadcn/`** — the generated shadcn/ui theme (from `tokens.json`) and the React `<Tier>`.
 - **`src/`** — the React library: shadcn/ui components (restyled to the type rules), `<Tier>`,
   `<Note>` + `<DocsProvider>` (the documentation drawer, replacing `<ui-note>`/`<ui-docs>`),

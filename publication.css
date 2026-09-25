@@ -1,0 +1,470 @@
+/* ============================================================
+   polarize-ui — PUBLICATION layer
+
+   Components for a research blog or long-form site: the sidebar shell, post
+   index, article, prose, inline source cards, citations, claims, references,
+   parts, pager, footer and a plain form. Extracted from polarize.tech on
+   2026-09-25 so any site on the system gets them.
+
+   Load AFTER design.css (zero-build) or after src/index.css (React, which
+   pulls in shadcn/system.css for the same token names).
+
+   Rules, the same as design.css and checked by dev_check.py:
+     · every colour is a token — no hex, no rgb()
+     · the sans is never bold and never tracked
+     · uppercase is always the mono face
+     · a tier badge is <ui-tier>/<Tier>, never hand-built here
+
+   --pub-accent is the brand colour. It falls back to --accent, which is the
+   brand teal in design.css. In a React document --accent is shadcn's muted
+   hover surface, so shadcn/system.css sets --pub-accent: var(--primary).
+   ============================================================ */
+
+/* ---------- Shell: sidebar + main ---------- */
+/* Named areas so the brand can be placed independently of the rest of the
+   sidebar: on desktop it heads the left column, on mobile it stays at the top
+   and everything else in the sidebar drops below the content. */
+.ui-shell {
+  display: grid;
+  grid-template-columns: 22rem minmax(0, 1fr);
+  grid-template-areas:
+    "brand main"
+    "side  main";
+  grid-template-rows: auto 1fr;
+  column-gap: clamp(var(--space-6), 5vw, var(--space-9));
+  row-gap: var(--space-5);
+  padding: var(--space-8) clamp(var(--space-5), 3vw, var(--space-7)) var(--space-9);
+  align-items: start;
+}
+.ui-shell__brand { grid-area: brand; }
+.ui-sidebar { grid-area: side; }
+/* The column is allowed to be genuinely wide; readability is protected on the
+   TEXT (.ui-postlist__desc, .ui-prose) rather than by starving the column. */
+.ui-main { grid-area: main; min-width: 0; max-width: 76rem; position: relative; }
+
+@media (max-width: 900px) {
+  .ui-shell {
+    grid-template-columns: 1fr;
+    grid-template-areas: "brand" "main" "side";
+    grid-template-rows: auto auto auto;
+    row-gap: var(--space-7);
+    padding-top: var(--space-6);
+  }
+}
+
+/* The main column's alignment anchor: its top edge matches the sidebar brand. */
+.ui-main__heading {
+  margin: 0 0 var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border);
+  color: var(--muted-foreground);
+}
+.ui-main__heading + .ui-postlist .ui-postlist__item:first-child .ui-postlist__link { padding-top: var(--space-5); }
+
+/* .ui-btn was written for <button>, which has no underline. */
+a.ui-btn { text-decoration: none; }
+
+/* ---------- Brand ---------- */
+.ui-brand { display: inline-flex; align-items: center; gap: var(--space-2); text-decoration: none; }
+.ui-brand__mark { width: 12px; height: 20px; background: var(--pub-accent, var(--accent)); border-radius: 2px; }
+.ui-brand__word {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--foreground);
+}
+
+/* ---------- Sidebar ---------- */
+.ui-sidebar { position: sticky; top: var(--space-6); }
+@media (max-width: 900px) {
+  /* Below the content now, so it takes a rule ABOVE it rather than below. */
+  .ui-sidebar { position: static; border-top: 1px solid var(--border); padding-top: var(--space-6); }
+}
+.ui-sidebar__tagline {
+  font-family: var(--font-display);
+  font-size: var(--display-3);
+  line-height: 1.2;
+  color: var(--foreground);
+  margin: var(--space-4) 0 0;
+}
+/* Author note: avatar left, identity stacked beside it, description below the
+   whole group so it stays flush with the avatar's left edge. */
+.ui-sidebar__ident { display: flex; align-items: flex-start; gap: var(--space-3); margin-top: var(--space-3); }
+.ui-sidebar__avatar { flex: none; width: 56px; height: 56px; border-radius: var(--radius-base); object-fit: cover; }
+.ui-sidebar__who { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+.ui-sidebar__name { color: var(--foreground); font-size: var(--text-base); }
+.ui-sidebar__place { color: var(--faint-foreground); font-size: var(--text-sm); }
+.ui-sidebar__note { margin: var(--space-4) 0 0; font-size: var(--text-sm); line-height: 1.55; color: var(--faint-foreground); }
+.ui-sidebar__contact { margin-top: var(--space-1); color: var(--pub-accent, var(--accent)); text-decoration: none; font-size: var(--text-sm); }
+.ui-sidebar__contact .ui-icon { margin-right: .4em; opacity: .8; }
+.ui-sidebar__section { margin-top: var(--space-7); }
+.ui-sidebar__heading { margin-bottom: var(--space-3); }
+.ui-sidebar__heading .ui-icon { opacity: .55; margin-right: .35em; }
+.ui-sidebar__list { list-style: none; margin: 0; padding: 0; }
+.ui-sidebar__list li { border-top: 1px solid var(--border); }
+.ui-sidebar__link {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  align-items: baseline;
+  padding: var(--space-2) 0;
+  font-size: var(--text-base);
+  color: var(--muted-foreground);
+  text-decoration: none;
+}
+.ui-sidebar__link:hover { color: var(--foreground); }
+.ui-sidebar__link.is-current { color: var(--pub-accent, var(--accent)); }
+.ui-sidebar__count { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--faint-foreground); }
+.ui-sidebar__meta {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+.ui-sidebar__meta-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--faint-foreground);
+  text-decoration: none;
+  transition: color var(--motion-base) ease, border-color var(--motion-base) ease;
+}
+.ui-sidebar__meta-link:hover { color: var(--pub-accent, var(--accent)); border-color: var(--pub-accent, var(--accent)); }
+.ui-sidebar__meta-link .ui-icon { width: 1rem; height: 1rem; fill: currentColor; }
+.ui-sidebar__meta-link:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+/* ---------- Document pages ---------- */
+.ui-doc { max-width: 46rem; margin: 0 auto; padding: var(--space-9) var(--space-5) var(--space-8); }
+.ui-doc__head { border-bottom: 1px solid var(--border); padding-bottom: var(--space-6); margin-bottom: var(--space-7); }
+.ui-doc__lede { font-size: var(--text-lg); line-height: 1.6; color: var(--muted-foreground); max-width: 58ch; }
+.ui-main .ui-doc { max-width: none; padding: 0; }
+.ui-main .ui-doc__head { padding-bottom: var(--space-5); margin-bottom: var(--space-5); }
+
+/* ---------- Pager ---------- */
+.ui-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-7);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border);
+}
+.ui-pager__spacer { flex: none; width: 1px; }
+.ui-pager__count { color: var(--faint-foreground); }
+
+/* ---------- Post index ---------- */
+/* Stacked, not columnar: date over title over description over meta. Body
+   first, optional thumbnail trailing; flex rather than a fixed grid so a row
+   with no image is full-width text instead of text beside an empty column. */
+.ui-postlist { list-style: none; margin: 0; padding: 0; }
+.ui-postlist__item { border-bottom: 1px solid var(--border); }
+.ui-postlist__item--empty { padding: var(--space-6) 0; color: var(--faint-foreground); }
+.ui-postlist__link {
+  display: flex;
+  gap: var(--space-5);
+  align-items: flex-start;
+  padding: var(--space-6) 0;
+  text-decoration: none;
+  transition: opacity var(--motion-base) ease;
+}
+.ui-postlist__link:hover { opacity: .7; }
+.ui-postlist__main { flex: 1 1 auto; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); min-width: 0; }
+.ui-postlist__body { display: block; }
+.ui-postlist__thumb {
+  flex: none;
+  width: 10rem;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-base);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: var(--muted);
+}
+.ui-postlist__thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ui-postlist__date {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--faint-foreground);
+}
+.ui-postlist__title {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--display-2);
+  line-height: 1.25;
+  color: var(--foreground);
+  margin-bottom: var(--space-1);
+}
+.ui-postlist__desc { display: block; font-size: var(--text-base); line-height: 1.6; color: var(--muted-foreground); max-width: 62ch; }
+.ui-postlist__meta { display: flex; gap: var(--space-2); flex-wrap: wrap; align-items: center; margin-top: var(--space-1); }
+/* After every .ui-postlist rule above: same specificity, so source order decides. */
+@media (max-width: 600px) {
+  .ui-postlist__link { gap: var(--space-4); }
+  .ui-postlist__thumb { width: 6rem; }
+  .ui-postlist__title { font-size: var(--display-3); }
+}
+
+/* ---------- Article ----------
+   One measure for the whole article, so header, prose, lead image, claims and
+   references share one left-to-right edge. A rem measure rather than ch so it
+   does not drift with a block's own font-size. */
+.ui-article { --measure: 42rem; }
+.ui-article__head { max-width: var(--measure); border-bottom: 1px solid var(--border); padding-bottom: var(--space-6); margin-bottom: var(--space-7); }
+.ui-article__head > .ui-label { margin-bottom: var(--space-3); }
+.ui-article__head h1 { margin-bottom: var(--space-4); }
+.ui-article__head .ui-standfirst { margin-bottom: var(--space-5); }
+.ui-article__meta { display: flex; gap: var(--space-4); flex-wrap: wrap; align-items: center; margin-bottom: var(--space-4); }
+.ui-article__badges { display: flex; gap: var(--space-2); flex-wrap: wrap; align-items: center; list-style: none; margin: 0; padding: 0; }
+.ui-article__topic { color: var(--muted-foreground); text-decoration: none; }
+.ui-article__topic:hover { color: var(--pub-accent, var(--accent)); }
+
+/* "In short" — the summary that opens an article. */
+.ui-article__summary { max-width: var(--measure); border-left: 2px solid var(--pub-accent, var(--accent)); padding-left: var(--space-4); margin: var(--space-6) 0 var(--space-7); }
+.ui-article__summary-title { margin-bottom: var(--space-2); }
+.ui-article__summary-title .ui-icon { opacity: .55; margin-right: .35em; }
+.ui-article__summary-body p { font-size: var(--text-lg); line-height: 1.6; margin: var(--space-2) 0; }
+.ui-article__summary-body p:first-child { margin-top: 0; }
+
+.ui-article__audio { max-width: var(--measure); margin: var(--space-6) 0 var(--space-7); }
+.ui-article__audio-label { margin-bottom: var(--space-2); }
+.ui-article__audio audio { width: 100%; max-width: 34rem; }
+
+.ui-article__lead { max-width: var(--measure); margin: 0 0 var(--space-7); }
+.ui-article__lead img { display: block; width: 100%; height: auto; border-radius: var(--radius-base); border: 1px solid var(--border); }
+.ui-article__credit { margin: var(--space-2) 0 0; font-size: var(--text-xs); color: var(--faint-foreground); }
+.ui-article__credit a { color: var(--muted-foreground); }
+
+/* ---------- Prose ---------- */
+.ui-prose { font-size: var(--text-lg); line-height: 1.7; max-width: var(--measure, 42rem); }
+.ui-prose h2 {
+  font-family: var(--font-display);
+  font-size: var(--display-2);
+  line-height: 1.15;
+  letter-spacing: -.015em;
+  margin: var(--space-8) 0 var(--space-4);
+}
+.ui-prose h3 { font-family: var(--font-display); font-size: var(--display-3); margin: var(--space-6) 0 var(--space-3); }
+.ui-prose p { margin: 0 0 var(--space-4); color: var(--muted-foreground); }
+.ui-prose strong, .ui-prose em { color: var(--foreground); }
+.ui-prose a { color: var(--pub-accent, var(--accent)); }
+.ui-prose a:hover,
+.ui-sidebar__contact:hover { text-decoration: underline; text-underline-offset: .18em; }
+.ui-prose ul, .ui-prose ol { margin: 0 0 var(--space-4); padding-left: var(--space-5); color: var(--muted-foreground); }
+.ui-prose ul { list-style: disc; }
+.ui-prose ol { list-style: decimal; }
+.ui-prose li { margin-bottom: var(--space-2); }
+.ui-prose blockquote {
+  border-left: 2px solid var(--border-strong);
+  margin: var(--space-5) 0;
+  padding-left: var(--space-4);
+  color: var(--muted-foreground);
+}
+.ui-prose code {
+  font-family: var(--font-mono);
+  font-size: .9em;
+  background: var(--muted);
+  border-radius: var(--radius-sm);
+  padding: .12em .35em;
+}
+.ui-prose pre {
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-base);
+  padding: var(--space-4);
+  overflow-x: auto;
+}
+.ui-prose pre code { background: none; padding: 0; }
+.ui-prose table { width: 100%; border-collapse: collapse; margin: var(--space-5) 0; font-size: var(--text-base); }
+.ui-prose th, .ui-prose td { border-bottom: 1px solid var(--border); padding: var(--space-2) var(--space-3); text-align: left; }
+.ui-prose th {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--faint-foreground);
+}
+.ui-prose td { color: var(--muted-foreground); }
+.ui-prose__scroll { overflow-x: auto; }
+
+/* ---------- Inline source card ----------
+   Sits between paragraphs at the point a source is used. Every field in it
+   should be machine-resolved from a citation ledger; the card presents a
+   record, it is not a hand-written reference. */
+.ui-source {
+  margin: var(--space-4) 0 var(--space-5);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--pub-accent, var(--accent));
+  border-radius: var(--radius-sm);
+  background: var(--card);
+}
+.ui-source__link { display: flex; align-items: flex-start; gap: var(--space-3); padding: var(--space-3) var(--space-4); text-decoration: none; }
+.ui-source__link:hover { background: var(--muted); }
+.ui-source__icon { flex: none; color: var(--pub-accent, var(--accent)); line-height: 1.4; }
+.ui-source__icon .ui-icon { width: 1rem; height: 1rem; }
+.ui-source__text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ui-source__title { font-size: var(--text-base); line-height: 1.45; color: var(--foreground); }
+.ui-source__meta { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--faint-foreground); }
+.ui-source__go { flex: none; margin-left: auto; color: var(--faint-foreground); font-size: var(--text-sm); }
+.ui-source__link:hover .ui-source__go { color: var(--pub-accent, var(--accent)); }
+.ui-source__note {
+  margin: 0;
+  padding: 0 var(--space-4) var(--space-3) calc(var(--space-4) + 1rem + var(--space-3));
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+.ui-source__ft {
+  margin: 0;
+  padding: 0 var(--space-4) var(--space-3) calc(var(--space-4) + 1rem + var(--space-3));
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--measured);
+}
+.ui-source__ft .ui-icon { width: .9em; height: .9em; margin-right: .35em; }
+.ui-source--broken { border-left-color: var(--refuted); padding: var(--space-3) var(--space-4); font-size: var(--text-sm); color: var(--refuted); }
+
+/* ---------- Parts (hardware, inline) ----------
+   Framed squares so differently shaped product photos read as one row. */
+.ui-parts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  gap: var(--space-3);
+  max-width: var(--measure, 42rem);
+  margin: var(--space-4) 0 var(--space-6);
+}
+.ui-part {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  text-decoration: none;
+  overflow: hidden;
+}
+.ui-part:hover { background: var(--muted); }
+.ui-part__media { display: block; aspect-ratio: 1 / 1; background: var(--muted); border-bottom: 1px solid var(--border); }
+.ui-part__media img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.ui-part__text { display: flex; flex-direction: column; gap: 2px; padding: var(--space-3); }
+.ui-part__name { font-size: var(--text-sm); line-height: 1.4; color: var(--foreground); }
+.ui-part__role { font-size: var(--text-xs); line-height: 1.45; color: var(--muted-foreground); }
+.ui-part__meta { margin-top: var(--space-1); font-family: var(--font-mono); font-size: var(--text-xs); color: var(--faint-foreground); }
+.ui-part:hover .ui-part__meta { color: var(--pub-accent, var(--accent)); }
+
+/* ---------- Inline citation marker ---------- */
+.ui-cite {
+  font-family: var(--font-mono);
+  font-size: .72em;
+  vertical-align: super;
+  line-height: 0;
+  color: var(--pub-accent, var(--accent));
+  text-decoration: none;
+}
+
+/* ---------- Claims ---------- */
+/* Flex, not grid: under `auto auto` the full-width statement inflated both
+   tracks and pushed the tier badge ~480px away from its claim id. */
+.ui-claims { max-width: var(--measure, 42rem); margin: var(--space-7) 0 0; }
+.ui-claims__list { list-style: none; margin: 0; padding: 0; }
+.ui-claims__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--border);
+}
+.ui-claims__id {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--foreground);
+}
+.ui-claims__item > .ui-tier { flex: none; }
+.ui-claims__stmt { flex: 1 0 100%; font-size: var(--text-base); line-height: 1.55; color: var(--muted-foreground); }
+.ui-claims__stmt--broken { color: var(--refuted); }
+
+/* ---------- References ---------- */
+.ui-refs { max-width: var(--measure, 42rem); margin: var(--space-8) 0 0; padding-top: var(--space-5); border-top: 1px solid var(--border); }
+.ui-refs__title { font-family: var(--font-display); font-size: var(--display-3); margin: 0 0 var(--space-4); }
+.ui-refs__title .ui-icon { opacity: .55; margin-right: .35em; }
+.ui-refs__list { margin: 0; padding-left: var(--space-5); }
+.ui-refs__item { margin-bottom: var(--space-4); font-size: var(--text-base); color: var(--muted-foreground); }
+.ui-refs__item::marker { color: var(--pub-accent, var(--accent)); font-variant-numeric: tabular-nums; }
+.ui-refs__item:target { background: var(--muted); box-shadow: -.8rem 0 0 var(--muted); }
+.ui-refs__key { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--faint-foreground); }
+.ui-refs__key--broken { color: var(--refuted); }
+.ui-refs__authors { color: var(--foreground); }
+.ui-refs__ttl { display: block; color: var(--foreground); }
+.ui-refs__journal { font-style: italic; }
+.ui-refs__year { color: var(--faint-foreground); }
+.ui-refs__meta { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-3); margin-top: var(--space-1); font-size: var(--text-xs); }
+.ui-refs__doi { font-family: var(--font-mono); color: var(--muted-foreground); text-decoration: none; border-bottom: 1px solid var(--border); }
+.ui-refs__doi:hover { color: var(--pub-accent, var(--accent)); }
+.ui-refs__ft,
+.ui-refs__verified {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.ui-refs__ft { color: var(--measured); }
+.ui-refs__ft .ui-icon { margin-right: .3em; }
+.ui-refs__verified { color: var(--faint-foreground); }
+.ui-refs__why {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-3);
+  border-left: 1px solid var(--border);
+  font-size: var(--text-base);
+  line-height: 1.55;
+  color: var(--faint-foreground);
+  font-style: italic;
+}
+.ui-refs__note { margin-top: var(--space-5); font-size: var(--text-sm); line-height: 1.6; color: var(--faint-foreground); }
+.ui-refs__note code { font-family: var(--font-mono); }
+
+/* ---------- Form ---------- */
+.ui-form { display: flex; flex-direction: column; gap: var(--space-4); align-items: flex-start; }
+.ui-form__field { display: flex; flex-direction: column; gap: var(--space-2); width: 100%; }
+.ui-form input,
+.ui-form textarea {
+  width: 100%;
+  font: inherit;
+  font-size: var(--text-base);
+  color: var(--foreground);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+}
+.ui-form input:focus-visible,
+.ui-form textarea:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; border-color: var(--pub-accent, var(--accent)); }
+.ui-form textarea { resize: vertical; min-height: 8rem; }
+/* A honeypot field: off-screen, still in the form. */
+.ui-form__trap { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.ui-form__note { margin: 0; font-size: var(--text-sm); color: var(--faint-foreground); }
+
+/* ---------- Footer ---------- */
+.ui-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+  border-top: 1px solid var(--border);
+  padding: var(--space-8) var(--space-5) var(--space-9);
+  background: var(--card);
+  margin-top: var(--space-9);
+}
+.ui-footer__brand { display: inline-flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-4); }
+.ui-footer__tag { font-family: var(--font-display); font-size: var(--display-3); color: var(--foreground); margin: 0 0 var(--space-3); }
+.ui-footer__fine { margin: 0; max-width: 46ch; }

@@ -443,6 +443,50 @@ def check_shadcn() -> None:
         print("SKIP  shadcn adoption check -- not mounted inside the audio-projects monorepo")
 
 
+def check_publication() -> None:
+    """publication.css is held to the same rules as design.css."""
+    path = HERE / "publication.css"
+    ok("publication.css exists", path.is_file())
+    if not path.is_file():
+        return
+    css = re.sub(r"/\*.*?\*/", "", path.read_text(), flags=re.S)
+    ok("publication.css has no hex or rgb() colour literal",
+       not re.search(r"#[0-9a-fA-F]{3,8}\b|rgba?\(", css))
+    ok("publication.css never bolds",
+       not re.search(r"font-weight:\s*(600|700|800|900|bold)", css))
+    blocks = re.findall(r"([^{}]+)\{([^{}]*)\}", css)
+    upper = [s.strip() for s, b in blocks if "uppercase" in b and "var(--font-mono)" not in b]
+    ok("publication.css: every uppercase rule sets the mono face", not upper, str(upper[:3]))
+    tracked = [s.strip() for s, b in blocks if "letter-spacing" in b
+               and not any(k in b for k in ("var(--font-mono)", "uppercase", "var(--font-display)"))]
+    ok("publication.css: the sans is never tracked", not tracked, str(tracked[:3]))
+    names = set(re.findall(r"var\((--[a-z0-9-]+)", css)) - {"--pub-accent", "--measure", "--tier-color"}
+    system = (HERE / "shadcn" / "system.css").read_text() + (HERE / "shadcn" / "theme.css").read_text()
+    for where, text in (("design.css", CSS), ("the React theme", system)):
+        missing = sorted(n for n in names if f"{n}:" not in text)
+        ok(f"every token publication.css reads is defined by {where}", not missing, str(missing))
+    ok("publication.css only ever reads the brand colour through --pub-accent",
+       "var(--accent)" not in css.replace("var(--pub-accent, var(--accent))", ""))
+
+
+def check_react_mirror() -> None:
+    """src/index.css re-declares a few design.css classes for React documents; they must match."""
+    path = HERE / "src" / "index.css"
+    if not path.is_file():
+        return
+    react = path.read_text()
+
+    def decls(css: str, cls: str) -> set[str]:
+        m = re.search(r"(?m)^\s*\." + re.escape(cls) + r"\s*\{([^}]*)\}", css)
+        return {d.strip() for d in m.group(1).replace("\n", " ").split(";") if d.strip()} if m else set()
+
+    # .ui-icon is deliberately NOT mirrored: design.css fills a sprite icon, and lucide
+    # icons are strokes, so `fill: currentColor` would paint them solid.
+    for cls in ("ui-label", "ui-standfirst", "ui-pill"):
+        a, b = decls(CSS, cls), decls(react, cls)
+        ok(f"React's .{cls} matches design.css", a == b and bool(a), f"design.css-only {sorted(a - b)}, react-only {sorted(b - a)}")
+
+
 def main() -> int:
     check_tokens()
     check_contrast()
@@ -451,6 +495,8 @@ def main() -> int:
     check_css()
     check_js()
     check_shadcn()
+    check_publication()
+    check_react_mirror()
     for name, detail in FAIL:
         print(f"FAIL  {name}" + (f"   [{detail}]" if detail else ""))
     print(f"\n{len(PASS)}/{len(PASS) + len(FAIL)} checks passed")
