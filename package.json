@@ -72,5 +72,9 @@
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18"
+  },
+  "homepage": "https://polarizetech.github.io/polarize-ui/",
+  "bugs": {
+    "url": "https://github.com/polarizetech/polarize-ui/issues"
   }
 }

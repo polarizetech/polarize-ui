@@ -1,12 +1,15 @@
-# Every push to main that passes the checks becomes a release tag (vX.Y.Z).
+# Every push to main that passes the checks is released and the Storybook deployed.
 #
-# - If package.json's version has no tag yet (you bumped it by hand for a minor or
-#   major release), that version is tagged as-is.
-# - Otherwise the patch number is bumped, committed as "Release vX.Y.Z", and tagged.
-#
-# Consumers (polarize.tech, joshuaanderton.ca, the audio-projects monorepo) each run a
-# `polarize-ui` workflow that polls for new tags, updates their pin, runs their own
-# checks and deploys. Nothing here needs a token for another repo.
+# Versioning (see README § Versioning — this workflow is what enforces it):
+#   · package.json's version has no tag yet → that version is released as-is
+#     (set it by hand for any release you want to number yourself).
+#   · otherwise, commits since the last tag decide the bump:
+#       a breaking change — a subject like "refactor!: …" or a "BREAKING CHANGE:" line —
+#         bumps MINOR while below 1.0.0, MAJOR from 1.0.0 on;
+#       from 1.0.0 on, a "feat: …" subject bumps MINOR;
+#       anything else bumps PATCH.
+#   · each release gets a tag vX.Y.Z and a GitHub Release with generated notes.
+#   · the Storybook is rebuilt showing that version and published to GitHub Pages.
 name: Release
 
 on:
@@ -16,6 +19,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: release
@@ -24,6 +29,8 @@ concurrency:
 jobs:
   release:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,21 +48,59 @@ jobs:
         run: python3 build_css.py --check && python3 shadcn/build_shadcn.py --check
       - name: Types
         run: npx tsc -p .
-      - name: Storybook builds
+
+      - name: Decide the version
+        id: version
+        run: |
+          if tag=$(git describe --tags --exact-match HEAD 2>/dev/null); then
+            echo "HEAD is already $tag; nothing to release"
+            echo "version=${tag#v}" >> "$GITHUB_OUTPUT"; echo "new=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          current=$(node -p "require('./package.json').version")
+          if ! git rev-parse -q --verify "refs/tags/v$current" >/dev/null; then
+            version=$current; reason="package.json set by hand"
+          else
+            last=$(git describe --tags --abbrev=0)
+            log=$(git log "$last"..HEAD --format='%s%n%b')
+            major=${current%%.*}
+            if echo "$log" | grep -qE '^[a-z]+(\([^)]*\))?!:|^BREAKING CHANGE:'; then
+              level=$([ "$major" = 0 ] && echo minor || echo major); reason="breaking change since $last"
+            elif [ "$major" != 0 ] && echo "$log" | grep -qE '^feat(\([^)]*\))?:'; then
+              level=minor; reason="feature since $last"
+            else
+              level=patch; reason="no breaking change since $last"
+            fi
+            version=$(npm version "$level" --no-git-tag-version | sed 's/^v//')
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"; echo "new=true" >> "$GITHUB_OUTPUT"
+          echo "Releasing v$version ($reason)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build the Storybook
         run: npx storybook build --quiet
 
-      - name: Tag the release
+      - name: Tag and publish the release
+        if: steps.version.outputs.new == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          V: ${{ steps.version.outputs.version }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git describe --tags --exact-match HEAD >/dev/null 2>&1; then
-            echo "HEAD is already tagged $(git describe --tags --exact-match HEAD)"; exit 0
-          fi
-          version=$(node -p "require('./package.json').version")
-          if git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
-            version=$(npm version patch --no-git-tag-version | sed 's/^v//')
-            git commit -am "Release v$version"
-          fi
-          git tag "v$version"
-          git push origin HEAD:main "v$version"
-          echo "Released v$version" >> "$GITHUB_STEP_SUMMARY"
+          if ! git diff --quiet package.json; then git commit -qam "Release v$V"; fi
+          git tag "v$V"
+          git push origin HEAD:main "v$V"
+          gh release create "v$V" --title "v$V" --generate-notes --verify-tag
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: storybook-static
+
+  storybook:
+    needs: release
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
