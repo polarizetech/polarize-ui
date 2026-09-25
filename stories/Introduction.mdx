@@ -1,0 +1,25 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Introduction" />
+
+# Polarize UI
+
+The design system for Polarize's research tools: one `tokens.json`, a stylesheet generated from it
+(`design.css`, no build step needed), four custom elements (`design.js`), and a shadcn/ui bridge
+(`shadcn/`) for React projects.
+
+## The rule
+
+**A label may never be hidden. Its explanation must be.**
+
+A tier badge — MEASURED, PREDICTED, REFUTED — is always visible and always carries a colour, a word
+and a glyph, so it survives colour-blindness and a greyscale screenshot. The prose explaining it goes
+in the documentation drawer (`<ui-note>`), never beside the control.
+
+## Using it
+
+- **Zero-build pages:** link `design.css` and `design.js`, set `<body class="ui">`. See `INTEGRATION.md`.
+- **React / Vite:** see `shadcn/SHADCN.md`. Do not load `design.css` and `shadcn/theme.css` in the same
+  document — both define `--accent` with different meanings.
+
+Use the **Theme** toolbar above to switch between themes.

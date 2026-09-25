@@ -1,0 +1,34 @@
+{
+  "name": "@polarizetech/polarize-ui",
+  "version": "0.1.0",
+  "description": "Polarize's design system for scientific and research interfaces: tokens, a zero-build stylesheet, epistemic tier badges, and a shadcn/ui bridge.",
+  "license": "MIT",
+  "type": "module",
+  "repository": { "type": "git", "url": "git+https://github.com/polarizetech/polarize-ui.git" },
+  "files": ["design.css", "design.js", "tokens.json", "fonts", "icons", "shadcn"],
+  "exports": {
+    "./design.css": "./design.css",
+    "./design.js": "./design.js",
+    "./tokens.json": "./tokens.json",
+    "./shadcn/*": "./shadcn/*"
+  },
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "check": "python3 dev_check.py"
+  },
+  "devDependencies": {
+    "@storybook/addon-a11y": "^10.6.0",
+    "@storybook/addon-docs": "^10.6.0",
+    "@storybook/addon-mcp": "^10.6.0",
+    "@storybook/react-vite": "^10.6.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "storybook": "^10.6.0",
+    "typescript": "^5.9.0",
+    "vite": "^8.3.1"
+  }
+}
