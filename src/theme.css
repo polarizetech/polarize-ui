@@ -18,6 +18,7 @@
 @import "../shadcn/system.css";
 @import "../publication.css";
 @import "../specimens.css";
+@import "../landing.css";
 
 @custom-variant dark (&:is(.dark *));
 

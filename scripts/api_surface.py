@@ -24,7 +24,7 @@ from io import BytesIO
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent.parent
-CSS_ENTRIES = ["design.css", "publication.css", "specimens.css",
+CSS_ENTRIES = ["design.css", "publication.css", "specimens.css", "landing.css",
                "shadcn/theme.css", "shadcn/system.css", "shadcn/tier.css", "src/theme.css"]
 NOTE_KEYS = re.compile(r"(^|_)note$|^palette_provenance$|^why_not_a_component_library$")
 
@@ -87,9 +87,10 @@ def surface(root: Path) -> set[str]:
     tokens = root / "tokens.json"
     if tokens.is_file():
         out |= {f"token:{k}" for k in _token_keys(json.loads(tokens.read_text()))}
-    js = root / "design.js"
-    if js.is_file():
-        out |= {f"element:{e}" for e in re.findall(r"customElements\.define\('([a-z-]+)'", js.read_text())}
+    for name in ("design.js", "cellfield.js"):
+        js = root / name
+        if js.is_file():
+            out |= {f"element:{e}" for e in re.findall(r"customElements\.define\('([a-z-]+)'", js.read_text())}
     return out
 
 

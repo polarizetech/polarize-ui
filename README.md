@@ -34,6 +34,7 @@ Source: `src/science/`. Every view is in the [live Storybook](https://polarizete
 | `tokens.json` | The single source of truth: colour, type, spacing, the tier ladder, a colour-blind-validated categorical palette and a one-hue sequential ramp. |
 | `design.css` + `design.js` | The zero-build form, generated from the tokens: link it and set `<body class="ui">`. Custom elements: `<ui-tier>`, `<ui-note>`, `<ui-docs>`. |
 | `publication.css` | Layouts for a research blog: sidebar shell, post list, article, prose, source cards, citations, claims, references, pager, footer. React versions render the same classes. |
+| `landing.css` + `cellfield.js` | A lab's front door: top bar, hero, section heads, process steps, project features, repository cards, a changelog feed, article and story cards, archival plates, the principle block and the site footer. `<ui-cellfield>` draws the animated speck field behind a page (WebGL, stops for reduced motion). React: `src/components/landing.tsx` and `CellField`. |
 | `specimens.css` | Field-guide style illustrations drawn in theme colours ([`SPECIMEN-ICONS.md`](SPECIMEN-ICONS.md)). |
 | `src/components/` | shadcn/ui components restyled to the type rules, typography (`Display`, `Eyebrow`, `Standfirst`), the publication layouts and `Specimen`. |
 | `fonts/`, `icons/` | Self-hosted Instrument Serif, Inter, IBM Plex Mono, Literata (OFL) and a Phosphor icon sprite (MIT). |

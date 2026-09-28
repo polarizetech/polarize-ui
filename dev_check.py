@@ -443,30 +443,55 @@ def check_shadcn() -> None:
         print("SKIP  shadcn adoption check -- not mounted inside the audio-projects monorepo")
 
 
-def check_publication() -> None:
-    """publication.css is held to the same rules as design.css."""
-    path = HERE / "publication.css"
-    ok("publication.css exists", path.is_file())
+def check_layer(name: str) -> None:
+    """A hand-written layer (publication.css, landing.css) is held to the same rules as design.css."""
+    path = HERE / name
+    ok(f"{name} exists", path.is_file())
     if not path.is_file():
         return
     css = re.sub(r"/\*.*?\*/", "", path.read_text(), flags=re.S)
-    ok("publication.css has no hex or rgb() colour literal",
+    ok(f"{name} has no hex or rgb() colour literal",
        not re.search(r"#[0-9a-fA-F]{3,8}\b|rgba?\(", css))
-    ok("publication.css never bolds",
+    ok(f"{name} never bolds",
        not re.search(r"font-weight:\s*(600|700|800|900|bold)", css))
     blocks = re.findall(r"([^{}]+)\{([^{}]*)\}", css)
     upper = [s.strip() for s, b in blocks if "uppercase" in b and "var(--font-mono)" not in b]
-    ok("publication.css: every uppercase rule sets the mono face", not upper, str(upper[:3]))
+    ok(f"{name}: every uppercase rule sets the mono face", not upper, str(upper[:3]))
     tracked = [s.strip() for s, b in blocks if "letter-spacing" in b
                and not any(k in b for k in ("var(--font-mono)", "uppercase", "var(--font-display)"))]
-    ok("publication.css: the sans is never tracked", not tracked, str(tracked[:3]))
+    ok(f"{name}: the sans is never tracked", not tracked, str(tracked[:3]))
     names = set(re.findall(r"var\((--[a-z0-9-]+)", css)) - {"--pub-accent", "--measure", "--tier-color"}
     system = (HERE / "shadcn" / "system.css").read_text() + (HERE / "shadcn" / "theme.css").read_text()
     for where, text in (("design.css", CSS), ("the React theme", system)):
         missing = sorted(n for n in names if f"{n}:" not in text)
-        ok(f"every token publication.css reads is defined by {where}", not missing, str(missing))
-    ok("publication.css only ever reads the brand colour through --pub-accent",
+        ok(f"every token {name} reads is defined by {where}", not missing, str(missing))
+    ok(f"{name} only ever reads the brand colour through --pub-accent",
        "var(--accent)" not in css.replace("var(--pub-accent, var(--accent))", ""))
+
+
+def check_publication() -> None:
+    check_layer("publication.css")
+
+
+def check_landing() -> None:
+    check_layer("landing.css")
+    css = (HERE / "landing.css").read_text() if (HERE / "landing.css").is_file() else ""
+    ok("landing.css honours prefers-reduced-motion", "prefers-reduced-motion" in css)
+    ok("landing.css imported by the React theme", '@import "../landing.css";' in (HERE / "src" / "theme.css").read_text())
+
+
+def check_cellfield() -> None:
+    """cellfield.js: decoration only, so it must stop for reduced motion and fetch nothing."""
+    path = HERE / "cellfield.js"
+    ok("cellfield.js exists", path.is_file())
+    if not path.is_file():
+        return
+    js = path.read_text()
+    ok("cellfield.js defines <ui-cellfield>", "customElements.define('ui-cellfield'" in js)
+    ok("cellfield.js stops for prefers-reduced-motion", "prefers-reduced-motion: reduce" in js)
+    ok("cellfield.js fetches nothing", "fetch(" not in js)
+    ok("cellfield.js is hidden from assistive tech", "aria-hidden" in js)
+    ok("cellfield.js has a type declaration for React", (HERE / "cellfield.d.ts").is_file())
 
 
 def check_react_mirror() -> None:
@@ -504,6 +529,8 @@ def main() -> int:
     check_js()
     check_shadcn()
     check_publication()
+    check_landing()
+    check_cellfield()
     check_react_mirror()
     check_package_imports()
     for name, detail in FAIL:
