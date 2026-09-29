@@ -57,6 +57,7 @@ the label. A simulation's output is **modelled**, however realistic it looks.
 | power spectrum | `LineChart`, log power axis | the aperiodic (1/f) background the peak must clear | a peak on a linear axis that is only 1/f |
 | time–frequency | `Heatmap` | the window length (it sets both resolutions) | autoscaled panels compared with each other |
 | coupling between bands | `Comodulogram` | resolvable cells, family-wise threshold | coupling produced by sharp or non-sinusoidal waveforms |
+| signed values (a difference, a signed amplitude) | `Heatmap` with `scale="diverging"` | a colour range symmetric about zero, so gray means zero | a one-hue ramp, where "low" and "negative" look the same |
 | two continuous measures | `ScatterPlot` | which band (confidence or prediction) | reading a confidence band as where new points fall |
 | a test against chance | `NullDistribution` | how the null was built and its size | a p-value without its count or effect size |
 | repeated responses (trials, beats) | a stack aligned to the event, plus the average with its interval | how many repeats, and how many were rejected | an average that hides that most trials did not respond |

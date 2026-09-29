@@ -87,6 +87,10 @@ def _vars(mode: str, indent: int = 2) -> str:
         seq = seq[::-1]
     for i, hex_ in enumerate(seq, 1):
         out.append(f"  --seq-{i}: {hex_};")
+    # Diverging ramp: --div-7 is zero; each theme has its own steps (see tokens.json).
+    div = TOKENS["diverging"]["steps"]["dark" if mode in DARK_MODES else "light"]
+    for i, hex_ in enumerate(div, 1):
+        out.append(f"  --div-{i}: {hex_};")
     if mode == "polarize":
         ink = TOKENS["audioInk"]
         out.append(f"  --clay: {ink['clay']['value']};")

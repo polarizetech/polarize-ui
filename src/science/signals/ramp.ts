@@ -8,12 +8,15 @@ import * as React from "react"
 export const SEQ_STOPS = 13
 export type RGB = [number, number, number]
 
-export function readRamp(from: Element = document.documentElement): RGB[] {
+/** "seq": magnitude, one hue. "div": signed values, blue below zero, gray at zero, red above. */
+export type RampKind = "seq" | "div"
+
+export function readRamp(from: Element = document.documentElement, kind: RampKind = "seq"): RGB[] {
   const cs = getComputedStyle(from)
   const out: RGB[] = []
   for (let i = 1; i <= SEQ_STOPS; i++) {
-    const hex = cs.getPropertyValue(`--seq-${i}`).trim()
-    if (!/^#[0-9a-f]{6}$/i.test(hex)) throw new Error(`--seq-${i} is not defined — load the polarize-ui theme`)
+    const hex = cs.getPropertyValue(`--${kind}-${i}`).trim()
+    if (!/^#[0-9a-f]{6}$/i.test(hex)) throw new Error(`--${kind}-${i} is not defined — load the polarize-ui theme`)
     out.push([1, 3, 5].map((j) => parseInt(hex.slice(j, j + 2), 16)) as RGB)
   }
   return out

@@ -269,6 +269,7 @@ def system_css() -> str:
         rows += [(f"series-{i}", c) for i, c in enumerate(ser[mode], 1)]
         seq = list(TOKENS["sequential"]["steps"].values())
         rows += [(f"seq-{i}", c) for i, c in enumerate(seq[::-1] if dark else seq, 1)]
+        rows += [(f"div-{i}", c) for i, c in enumerate(TOKENS["diverging"]["steps"]["dark" if dark else "light"], 1)]
         return "\n".join(f"{ind}--{k}: {v};" for k, v in rows)
 
     scales = "\n".join(

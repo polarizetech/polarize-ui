@@ -545,6 +545,30 @@ def check_datasets() -> None:
            f"datasets/{d.name}/data.json" not in stories or f"datasets/{d.name}/SOURCE.json" in stories)
 
 
+def check_diverging() -> None:
+    """The diverging ramp is derived and checked by scripts/diverging.py, never hand-edited:
+    the two arms must match in lightness, stay apart for colour-blind readers, and meet at a
+    neutral zero that recedes toward the surface on both themes."""
+    sys.path.insert(0, str(HERE / "scripts"))
+    import diverging as D
+    div = TOKENS.get("diverging", {})
+    ok("diverging: tokens.json carries a diverging ramp", "steps" in div)
+    if "steps" not in div:
+        return
+    ok("diverging: its blue arm is the sequential ramp (no second copy that can drift)",
+       D.SEQ == TOKENS["sequential"]["steps"])
+    for mode in ("light", "dark"):
+        stops, worst, fails = D.check(mode)
+        ok(f"diverging {mode}: every derivation check passes", not fails, "; ".join(fails))
+        ok(f"diverging {mode}: tokens.json matches what the script derives", div["steps"][mode] == stops)
+        ok(f"diverging {mode}: 13 stops with zero in the middle", len(stops) == 13 and stops[6] == D.MID[mode])
+    for i in range(1, 14):
+        ok(f"diverging: design.css defines --div-{i}", f"--div-{i}:" in CSS)
+    heat = (HERE / "src" / "science" / "signals" / "Heatmap.tsx").read_text()
+    ok("diverging: Heatmap refuses a colour range that is not symmetric about zero",
+       "must be symmetric about zero" in heat)
+
+
 def main() -> int:
     check_tokens()
     check_contrast()
@@ -559,6 +583,7 @@ def main() -> int:
     check_react_mirror()
     check_package_imports()
     check_datasets()
+    check_diverging()
     for name, detail in FAIL:
         print(f"FAIL  {name}" + (f"   [{detail}]" if detail else ""))
     print(f"\n{len(PASS)}/{len(PASS) + len(FAIL)} checks passed")

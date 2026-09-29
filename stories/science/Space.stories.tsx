@@ -112,6 +112,13 @@ export const EventAlignedStack: StoryObj = {
         notes={[`channel ${abr.source.channel} (left earlobe, ref FCz) · left-ear clicks · ${abr.filter}`, "each row is itself an average of 1213–1820 clicks"]}
       />
       <div>
+        <Eyebrow>The same trials as a 2-D image (an "ERP image") — read values here</Eyebrow>
+        <Heatmap values={abr.rows_uv} scale="diverging" colorDomain={[-0.6, 0.6]}
+          x={{ domain: [abr.lags_ms[0], abr.lags_ms[abr.lags_ms.length - 1]], label: "time from click (ms)" }}
+          y={{ domain: [1, abr.rows_uv.length], label: "trial" }} colorLabel="µV" height={260}
+          notes={["colour range fixed at ±0.6 µV so a few noisy trials do not wash out the rest"]} />
+      </div>
+      <div>
         <Eyebrow>The average against its control</Eyebrow>
         <LineChart
           title="Mean response and the same averaging at the wrong click times"

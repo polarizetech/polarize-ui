@@ -132,3 +132,21 @@ export const ComodulogramShared: StoryObj = {
     )
   },
 }
+
+const diffGrid = eyesClosed.grid.map((row, r) => row.map((v, c) => v - eyesOpen.grid[r][c]))
+const diffMax = Math.max(...diffGrid.flat().map(Math.abs))
+
+export const Difference: StoryObj = {
+  name: "A signed difference on the diverging scale",
+  render: () => (
+    <Heatmap
+      title="Eyes closed minus eyes open"
+      values={diffGrid}
+      scale="diverging"
+      colorDomain={[-diffMax, diffMax]}
+      x={{ domain: eyesClosed.x, label: "time (s)" }}
+      y={{ domain: eyesClosed.y, label: "frequency (Hz)" }}
+      colorLabel="difference (dB)"
+    />
+  ),
+}

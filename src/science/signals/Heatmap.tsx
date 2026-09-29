@@ -15,6 +15,11 @@ import { SEQ_STOPS, colorAt, readRamp, useThemeKey } from "./ramp"
  *     an independent one — two heatmaps autoscaled to themselves cannot be compared;
  *   · values outside the range are clipped AND counted on the panel; missing cells are
  *     drawn empty and counted. Nothing is silently dropped.
+ *
+ * `scale="diverging"` is for SIGNED values around a meaningful zero (a signed amplitude, a
+ * difference): blue below zero, neutral gray at zero, red above (--div-1 … --div-13). Its
+ * colour range must be symmetric about zero — otherwise the gray stops meaning zero — so an
+ * asymmetric `colorDomain` is refused, and an omitted one is fitted as ±max|value|.
  */
 export type HeatmapProps = {
   /** values[row][col]; row 0 is the BOTTOM of the plot (lowest y). */
@@ -38,6 +43,8 @@ export type HeatmapProps = {
   /** Replaces the "N missing cells drawn empty" note, for callers that leave cells empty on
    *  purpose and explain why in their own note. null prints nothing. */
   missingNote?: string | null
+  /** "sequential" (default) for magnitude; "diverging" for signed values around zero. */
+  scale?: "sequential" | "diverging"
 }
 
 const STOPS = SEQ_STOPS
@@ -45,7 +52,7 @@ const PAD = { l: 56, r: 100, t: 16, b: 40 }
 
 export function Heatmap({
   values, x, y, colorDomain, colorLabel, scaleNote, width = 720, height = 280, title,
-  overlay, notes: extraNotes = [], describeCell, missingNote,
+  overlay, notes: extraNotes = [], describeCell, missingNote, scale = "sequential",
 }: HeatmapProps) {
   const rows = values.length
   const cols = rows ? values[0].length : 0
@@ -53,7 +60,11 @@ export function Heatmap({
   if (values.some((r) => r.length !== cols)) throw new Error("Heatmap: every row needs the same number of columns")
 
   const finite = values.flat().filter(Number.isFinite)
-  const [lo, hi] = colorDomain ?? [Math.min(...finite), Math.max(...finite)]
+  const diverging = scale === "diverging"
+  if (diverging && colorDomain && Math.abs(colorDomain[0] + colorDomain[1]) > 1e-9 * Math.max(1, Math.abs(colorDomain[1])))
+    throw new Error("Heatmap: a diverging colour range must be symmetric about zero, e.g. [-2, 2]")
+  const maxAbs = Math.max(...finite.map(Math.abs))
+  const [lo, hi] = colorDomain ?? (diverging ? [-maxAbs, maxAbs] : [Math.min(...finite), Math.max(...finite)])
   if (!(hi > lo)) throw new Error("Heatmap: colour range must have hi > lo")
 
   const themeKey = useThemeKey()
@@ -75,12 +86,13 @@ export function Heatmap({
   const notes: string[] = []
   if (scaleNote === "shared") notes.push("shared colour scale")
   else if (scaleNote === "independent" || !colorDomain) notes.push("INDEPENDENT colour scale — not comparable across panels")
+  if (diverging) notes.push(`diverging colour scale: gray = 0, blue below, red above${colorDomain ? "" : ", fitted to ±max |value|"}`)
   if (below || above) notes.push(`clipped to the colour range: ${below} below, ${above} above`)
   if (missing && missingNote !== null) notes.push(missingNote ?? `${missing} missing cells drawn empty`)
   notes.push(...extraNotes)
 
   React.useLayoutEffect(() => {
-    const ramp = readRamp()
+    const ramp = readRamp(document.documentElement, diverging ? "div" : "seq")
     const cvs = document.createElement("canvas")
     cvs.width = cols
     cvs.height = rows
@@ -97,7 +109,7 @@ export function Heatmap({
     }
     ctx.putImageData(img, 0, 0)
     setImage(cvs.toDataURL())
-  }, [values, rows, cols, lo, hi, themeKey])
+  }, [values, rows, cols, lo, hi, themeKey, diverging])
 
   const gradientId = React.useId().replace(/:/g, "")
   const fmt = (v: number) => (Math.abs(v) >= 1e4 || (Math.abs(v) < 1e-3 && v !== 0) ? v.toExponential(1) : +v.toPrecision(3))
@@ -119,7 +131,7 @@ export function Heatmap({
         <defs>
           <linearGradient id={gradientId} x1="0" y1="1" x2="0" y2="0">
             {Array.from({ length: STOPS }, (_, i) => (
-              <stop key={i} offset={`${(i / (STOPS - 1)) * 100}%`} stopColor={`var(--seq-${i + 1})`} />
+              <stop key={i} offset={`${(i / (STOPS - 1)) * 100}%`} stopColor={`var(--${diverging ? "div" : "seq"}-${i + 1})`} />
             ))}
           </linearGradient>
         </defs>
