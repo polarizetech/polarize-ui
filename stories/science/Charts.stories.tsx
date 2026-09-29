@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { LineChart, sharedDomain, type Series } from "@/science/charts/LineChart"
 import { BarChart } from "@/science/charts/BarChart"
+import { ScatterPlot } from "@/science/charts/ScatterPlot"
 import { Eyebrow } from "@/components/typography"
-import { detectionCurve, longTrace, spectrum } from "../data"
+import { detectionCurve, longTrace, scatterPairs, spectrum } from "../data"
 
 const meta: Meta = { title: "Science/Charts", parameters: { docs: { description: { component: "All data synthetic." } } } }
 export default meta
@@ -91,6 +92,52 @@ export const Bars: StoryObj = {
       xLabel="subject"
       threshold={{ value: 0.95, label: "95% bar" }}
       valueFormat={(v: number) => v.toFixed(2)}
+    />
+  ),
+}
+
+export const ScatterFit: StoryObj = {
+  name: "Scatter with fit and 95% confidence band",
+  render: () => (
+    <ScatterPlot
+      title="Alpha power against eyes-closed duration"
+      points={scatterPairs()}
+      x={{ label: "eyes-closed duration (min)" }}
+      y={{ label: "alpha power (µV²)" }}
+    />
+  ),
+}
+
+export const ScatterWeak: StoryObj = {
+  name: "Scatter: a weak relationship (a flat line fits in the band)",
+  render: () => (
+    <ScatterPlot
+      points={scatterPairs({ slope: 0.08, noise: 2.2, seed: 4 })}
+      x={{ label: "session number" }}
+      y={{ label: "resting HR change (bpm)" }}
+    />
+  ),
+}
+
+export const ScatterBothBands: StoryObj = {
+  name: "Scatter: confidence vs prediction band",
+  render: () => (
+    <ScatterPlot
+      points={scatterPairs({ n: 30, noise: 1.4, seed: 8 })}
+      x={{ label: "stimulus level (dB SL)" }}
+      y={{ label: "response amplitude (µV)" }}
+      band="both"
+    />
+  ),
+}
+
+export const ScatterSmallN: StoryObj = {
+  name: "Scatter: small n (the interval is wide)",
+  render: () => (
+    <ScatterPlot
+      points={scatterPairs({ n: 6, seed: 13 })}
+      x={{ label: "dose (mg)" }}
+      y={{ label: "effect (a.u.)" }}
     />
   ),
 }

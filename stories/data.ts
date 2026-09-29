@@ -72,3 +72,12 @@ export function nullDraws(n = 999, centre = 0.21, spread = 0.04, seed = 5) {
   const r = rng(seed)
   return Array.from({ length: n }, () => centre + spread * gauss(r))
 }
+
+/** Synthetic (x, y) pairs: y = intercept + slope·x + Gaussian noise. */
+export function scatterPairs({ n = 40, slope = 0.8, intercept = 1.2, noise = 1, xMax = 10, seed = 21 } = {}) {
+  const r = rng(seed)
+  return Array.from({ length: n }, () => {
+    const x = r() * xMax
+    return [x, intercept + slope * x + noise * gauss(r)] as [number, number]
+  })
+}

@@ -6,6 +6,7 @@ import "./fonts.css"
 // Charts
 export * from "./science/charts/LineChart"
 export * from "./science/charts/BarChart"
+export * from "./science/charts/ScatterPlot"
 export { decimate } from "./science/charts/decimate"
 export { SERIES, TIER_COLOR } from "./science/charts/common"
 // Signals
@@ -13,6 +14,7 @@ export * from "./science/signals/Waveform"
 export * from "./science/signals/Heatmap"
 // Statistics
 export * from "./science/stats/NullDistribution"
+export { linearFit, tQuantile, tTwoSidedP, type LinearFit, type Pair } from "./science/stats/regression"
 // Evidence: how sure a value is, said so it cannot be hidden
 export * from "./science/evidence/tier"
 export * from "./science/evidence/value"
