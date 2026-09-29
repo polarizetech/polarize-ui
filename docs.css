@@ -114,6 +114,9 @@ html:has(.ui-docsite) { scroll-padding-top: calc(var(--docsite-bar-h, 64px) + 24
 }
 .ui-docsite__nav li a:hover { color: var(--foreground); border-left-color: var(--foreground); }
 .ui-docsite__nav li a.is-current { color: var(--pub-accent, var(--accent)); border-left-color: var(--pub-accent, var(--accent)); }
+/* A sub-page of the item above it (e.g. the signal types under one extension). */
+.ui-docsite__nav li.is-sub a { padding-left: 28px; font-size: 13px; }
+.ui-docsite__nav li.is-sub a::before { content: "↳"; margin-right: 2px; color: var(--faint-foreground); }
 .ui-docsite__navmeta { margin-left: auto; font-family: var(--font-mono); font-size: var(--text-xs); color: var(--faint-foreground); }
 
 .ui-docsite__main { min-width: 0; padding: 40px clamp(20px, 4vw, 56px) 80px; }

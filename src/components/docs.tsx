@@ -8,7 +8,7 @@ import { cn } from "../lib/utils"
 import type { PlotSpec } from "../../docs.js"
 
 export type { PlotSpec }
-export type DocsNavItem = { label: React.ReactNode; href: string; current?: boolean; meta?: React.ReactNode }
+export type DocsNavItem = { label: React.ReactNode; href: string; current?: boolean; meta?: React.ReactNode; sub?: boolean }
 export type DocsNavGroup = { title: string; items: DocsNavItem[] }
 export type DocsTocItem = { label: string; href: string; sub?: boolean }
 
@@ -46,7 +46,7 @@ export function DocsShell({ brand, sub = "docs", nav, toc, wide = false, flag, a
             <div className="ui-docsite__navgroup" key={g.title}>
               <h2 className="ui-docsite__navtitle">{g.title}</h2>
               <ul>{g.items.map((it) => (
-                <li key={it.href}><a href={it.href} className={cn(it.current && "is-current")}
+                <li key={it.href} className={cn(it.sub && "is-sub")}><a href={it.href} className={cn(it.current && "is-current")}
                   aria-current={it.current ? "page" : undefined}>{it.label}
                   {it.meta && <span className="ui-docsite__navmeta">{it.meta}</span>}</a></li>
               ))}</ul>
