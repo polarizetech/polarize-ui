@@ -81,3 +81,19 @@ export function scatterPairs({ n = 40, slope = 0.8, intercept = 1.2, noise = 1, 
     return [x, intercept + slope * x + noise * gauss(r)] as [number, number]
   })
 }
+
+/**
+ * A synthetic recording for phase–amplitude coupling: a drifting ~6 Hz rhythm (a random walk
+ * in instantaneous frequency, as real rhythms drift) plus a 60 Hz component whose amplitude
+ * follows the 6 Hz phase when `coupled`, plus noise.
+ */
+export function pacSignal({ coupled = true, fs = 500, secs = 30, seed = 1 } = {}) {
+  const r = rng(seed), n = fs * secs
+  let th = 0, f = 6
+  return Float64Array.from({ length: n }, (_, i) => {
+    const t = i / fs
+    f += 0.02 * gauss(r); f += (6 - f) * 0.002; th += (2 * Math.PI * f) / fs
+    const env = coupled ? 1 + 0.8 * Math.cos(th) : 1
+    return Math.sin(th) + 0.4 * env * Math.sin(2 * Math.PI * 60 * t) + 0.6 * gauss(r)
+  })
+}

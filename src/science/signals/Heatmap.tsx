@@ -28,10 +28,19 @@ export type HeatmapProps = {
   width?: number
   height?: number
   title?: string
+  /** Drawn over the cells (outlines, hatching). `cell(row, col)` gives a cell's rectangle. */
+  overlay?: (cell: (row: number, col: number) => { x: number; y: number; width: number; height: number }) => React.ReactNode
+  /** Extra notes printed under the plot, after the built-in ones. */
+  notes?: string[]
+  /** Extra hover text for a cell, appended to the readout. */
+  describeCell?: (row: number, col: number) => string | null
+  /** Replaces the "N missing cells drawn empty" note, for callers that leave cells empty on
+   *  purpose and explain why in their own note. null prints nothing. */
+  missingNote?: string | null
 }
 
 const STOPS = 13
-const PAD = { l: 56, r: 88, t: 16, b: 40 }
+const PAD = { l: 56, r: 100, t: 16, b: 40 }
 
 function readRamp(): [number, number, number][] {
   const cs = getComputedStyle(document.documentElement)
@@ -64,6 +73,7 @@ function useThemeKey() {
 
 export function Heatmap({
   values, x, y, colorDomain, colorLabel, scaleNote, width = 720, height = 280, title,
+  overlay, notes: extraNotes = [], describeCell, missingNote,
 }: HeatmapProps) {
   const rows = values.length
   const cols = rows ? values[0].length : 0
@@ -76,7 +86,7 @@ export function Heatmap({
 
   const themeKey = useThemeKey()
   const [image, setImage] = React.useState<string | null>(null)
-  const [hover, setHover] = React.useState<{ x: number; y: number; v: number } | null>(null)
+  const [hover, setHover] = React.useState<{ x: number; y: number; v: number; r: number; c: number } | null>(null)
 
   const plotW = width - PAD.l - PAD.r
   const plotH = height - PAD.t - PAD.b
@@ -94,7 +104,8 @@ export function Heatmap({
   if (scaleNote === "shared") notes.push("shared colour scale")
   else if (scaleNote === "independent" || !colorDomain) notes.push("INDEPENDENT colour scale — not comparable across panels")
   if (below || above) notes.push(`clipped to the colour range: ${below} below, ${above} above`)
-  if (missing) notes.push(`${missing} missing cells drawn empty`)
+  if (missing && missingNote !== null) notes.push(missingNote ?? `${missing} missing cells drawn empty`)
+  notes.push(...extraNotes)
 
   React.useLayoutEffect(() => {
     const ramp = readRamp()
@@ -117,7 +128,7 @@ export function Heatmap({
   }, [values, rows, cols, lo, hi, themeKey])
 
   const gradientId = React.useId().replace(/:/g, "")
-  const fmt = (v: number) => (Math.abs(v) >= 1000 || (Math.abs(v) < 0.01 && v !== 0) ? v.toExponential(1) : +v.toPrecision(3))
+  const fmt = (v: number) => (Math.abs(v) >= 1e4 || (Math.abs(v) < 1e-3 && v !== 0) ? v.toExponential(1) : +v.toPrecision(3))
 
   function onMove(e: React.MouseEvent<SVGRectElement>) {
     const svg = e.currentTarget.ownerSVGElement!
@@ -126,7 +137,7 @@ export function Heatmap({
     const p = pt.matrixTransform(svg.getScreenCTM()!.inverse())
     const c = Math.min(cols - 1, Math.max(0, Math.floor(((p.x - PAD.l) / plotW) * cols)))
     const r = Math.min(rows - 1, Math.max(0, Math.floor(((PAD.t + plotH - p.y) / plotH) * rows)))
-    setHover({ x: xs.invert(PAD.l + ((c + 0.5) / cols) * plotW), y: ys.invert(PAD.t + plotH - ((r + 0.5) / rows) * plotH), v: values[r][c] })
+    setHover({ x: xs.invert(PAD.l + ((c + 0.5) / cols) * plotW), y: ys.invert(PAD.t + plotH - ((r + 0.5) / rows) * plotH), v: values[r][c], r, c })
   }
 
   return (
@@ -143,6 +154,16 @@ export function Heatmap({
         {image && (
           <image href={image} x={PAD.l} y={PAD.t} width={plotW} height={plotH} preserveAspectRatio="none" style={{ imageRendering: "pixelated" }} />
         )}
+        {overlay && (
+          <g pointerEvents="none">
+            {overlay((r, c) => ({
+              x: PAD.l + (c / cols) * plotW,
+              y: PAD.t + plotH - ((r + 1) / rows) * plotH,
+              width: plotW / cols,
+              height: plotH / rows,
+            }))}
+          </g>
+        )}
         <rect x={PAD.l} y={PAD.t} width={plotW} height={plotH} fill="transparent" stroke={INK.axis}
           onMouseMove={onMove} onMouseLeave={() => setHover(null)} />
         <AxisBottom top={PAD.t + plotH} scale={xs} numTicks={6} stroke={INK.axis} tickStroke={INK.axis}
@@ -152,17 +173,17 @@ export function Heatmap({
           tickLabelProps={{ ...tickLabel, textAnchor: "end", dx: -4, dy: 3 }} label={y.label} labelProps={axisLabelProps} labelOffset={36}
           tickFormat={y.format ? (v) => y.format!(Number(v)) : undefined} />
         {/* Colour bar: the range is stated, never implied. */}
-        <rect x={width - PAD.r + 16} y={PAD.t} width={10} height={plotH} fill={`url(#${gradientId})`} stroke={INK.axis} />
-        <AxisLeft left={width - PAD.r + 44} scale={cs} numTicks={4} hideAxisLine tickStroke={INK.axis}
+        <rect x={width - PAD.r + 12} y={PAD.t} width={10} height={plotH} fill={`url(#${gradientId})`} stroke={INK.axis} />
+        <AxisLeft left={width - PAD.r + 36} scale={cs} numTicks={4} hideAxisLine tickStroke={INK.axis}
           tickLabelProps={{ ...tickLabel, textAnchor: "start", dx: 2, dy: 3 }} tickFormat={(v) => String(fmt(Number(v)))} tickLength={0} />
-        <text x={width - 12} y={PAD.t + plotH / 2} fill={INK.label} fontSize={10} fontFamily="var(--font-sans)" textAnchor="middle"
-          transform={`rotate(90 ${width - 12} ${PAD.t + plotH / 2})`}>{colorLabel}</text>
+        <text x={width - 14} y={PAD.t + plotH / 2} fill={INK.label} fontSize={10} fontFamily="var(--font-sans)" textAnchor="middle"
+          transform={`rotate(90 ${width - 14} ${PAD.t + plotH / 2})`}>{colorLabel}</text>
       </svg>
       {/* Notes go below the plot, not over the cells, where they would be unreadable. */}
       <p className="m-0 font-mono text-[length:var(--text-xs)] text-muted-foreground" data-note="">{notes.join(" · ")}</p>
       <figcaption className="mt-1 h-5 font-mono text-[length:var(--text-xs)] text-muted-foreground tabular-nums" aria-live="polite">
         {hover
-          ? `${x.label}: ${fmt(hover.x)} · ${y.label}: ${fmt(hover.y)} · ${colorLabel}: ${Number.isFinite(hover.v) ? fmt(hover.v) : "missing"}`
+          ? `${x.label}: ${fmt(hover.x)} · ${y.label}: ${fmt(hover.y)} · ${(() => { const d = describeCell?.(hover.r, hover.c); if (!Number.isFinite(hover.v) && d) return d; return `${colorLabel}: ${Number.isFinite(hover.v) ? fmt(hover.v) : "missing"}${d ? ` · ${d}` : ""}` })()}`
           : "Hover the plot to read a cell."}
       </figcaption>
     </figure>

@@ -21,7 +21,7 @@ It comes in two forms that share one set of tokens:
 | | |
 |---|---|
 | **Charts** | `LineChart`, `BarChart`, `ScatterPlot` (least-squares fit with a labelled 95% confidence or prediction band, fitted only over the measured range, with n, slope interval, r, R² and p printed; `linearFit()` gives the same numbers without the chart). A threshold is drawn on the axes it judges, a log axis says so in its label, thinning a trace for display is printed on the panel, and a shared or independent y-scale across panels is declared. |
-| **Signals** | `Heatmap` (spectrograms, time–frequency maps, comodulograms) on a one-hue magnitude ramp with a colour bar, hover readout, and counted clipping. `Waveform` with marked regions. |
+| **Signals** | `Comodulogram` + `computeComodulogram()`: phase–amplitude coupling (Tort MI) with a family-wise surrogate threshold, significant cells outlined, and unresolvable cells hatched instead of shown as zero. `Heatmap` (spectrograms, time–frequency maps) on a one-hue magnitude ramp with a colour bar, hover readout, and counted clipping. `Waveform` with marked regions. |
 | **Statistics** | `NullDistribution` and `nullTest()`: an observed statistic against its surrogate or permutation null, with the permutation p printed with its count, z beside it, and a warning when p is at its floor. |
 | **Evidence** | `Tier` (a MEASURED / PREDICTED / REFUTED badge that can't be hidden), `Value` (measured and predicted never styled alike), `Readout` (figures with their source), and `Note` + `DocsProvider` (explanations in a drawer). |
 

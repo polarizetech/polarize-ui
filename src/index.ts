@@ -12,9 +12,11 @@ export { SERIES, TIER_COLOR } from "./science/charts/common"
 // Signals
 export * from "./science/signals/Waveform"
 export * from "./science/signals/Heatmap"
+export * from "./science/signals/Comodulogram"
 // Statistics
 export * from "./science/stats/NullDistribution"
 export { linearFit, tQuantile, tTwoSidedP, type LinearFit, type Pair } from "./science/stats/regression"
+export { computeComodulogram, modulationIndex, type Comodulogram as ComodulogramResult, type ComodulogramInput } from "./science/stats/pac"
 // Evidence: how sure a value is, said so it cannot be hidden
 export * from "./science/evidence/tier"
 export * from "./science/evidence/value"
