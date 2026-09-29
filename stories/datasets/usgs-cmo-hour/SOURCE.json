@@ -1,0 +1,11 @@
+{
+  "name": "One hour of the College (CMO) geomagnetic observatory",
+  "source": "USGS Geomagnetism Program web service, geomag.usgs.gov/ws",
+  "accession": "CMO, adjusted, 1 s, 2026-08-22 10:00–10:59:59 UT",
+  "licence": "public-domain-usgs",
+  "attribution": "College (CMO) magnetic observatory, United States Geological Survey (USGS), via the USGS Geomagnetism Program web service. A work of the US Government, public domain.",
+  "why_this_hour": "An hour with strong long-period (Pc5) pulsations, picked for a demonstration. Nothing drawn from it is a finding.",
+  "reduction": "reduce.py: summed-axis spectrogram (512 s Hann, 64 s step, to 0.1 Hz) and a 1.67–6.67 mHz zero-phase band-pass of X, Y, Z sampled every 5 s; mean field over the hour",
+  "input_sha256": "056e8dc7730494e19798e401a65ab5a811ec59fa01aee4cb6fa678a07a68f180",
+  "data_sha256": "225e548fe96f0f49ee1fdc9cc917259c04c2976e1cd67fccf09e9e4674cf4549"
+}

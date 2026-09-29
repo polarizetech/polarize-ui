@@ -37,6 +37,12 @@ you.
   (`stats/`) and evidence labels (`evidence/`). **This is the core of the library.** A new
   chart, data view or analysis display goes here, with a story under `stories/science/`
   titled `Science/<Charts|Signals|Statistics|Evidence>`.
+- **`src/science/space/`** holds the 3-D views (`Scene3D` and the landscape, hodogram and
+  event-aligned stack on it), drawn on a plain canvas with no 3-D dependency. Scene axes are
+  right-handed; a left-handed data frame (north, east, up) is drawn mirrored.
+- **Real demo data** lives in `stories/datasets/<name>/` as `data.json` + `SOURCE.json`
+  (source, accession, licence, attribution, sha256) + the `reduce.py` that made it.
+  `dev_check.py` refuses a dataset without a redistributable licence or with a stale hash.
 - **`src/components/`** holds the general UI: shadcn components (`ui/`), typography, page
   layouts and illustrations. Stories go under `stories/ui/`, titled `General UI/…`.
 - Science views follow the chart rules in `stories/Introduction.mdx`. They state their scale,

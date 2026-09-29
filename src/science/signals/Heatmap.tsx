@@ -2,6 +2,7 @@ import * as React from "react"
 import { AxisBottom, AxisLeft } from "@visx/axis"
 import { scaleLinear } from "@visx/scale"
 import { INK, axisLabelProps, tickLabel } from "../charts/common"
+import { SEQ_STOPS, colorAt, readRamp, useThemeKey } from "./ramp"
 
 /**
  * A magnitude grid — a spectrogram, a time–frequency map, a comodulogram, a density.
@@ -39,37 +40,8 @@ export type HeatmapProps = {
   missingNote?: string | null
 }
 
-const STOPS = 13
+const STOPS = SEQ_STOPS
 const PAD = { l: 56, r: 100, t: 16, b: 40 }
-
-function readRamp(): [number, number, number][] {
-  const cs = getComputedStyle(document.documentElement)
-  const out: [number, number, number][] = []
-  for (let i = 1; i <= STOPS; i++) {
-    const hex = cs.getPropertyValue(`--seq-${i}`).trim()
-    if (!/^#[0-9a-f]{6}$/i.test(hex)) throw new Error(`Heatmap: --seq-${i} is not defined — load the polarize-ui theme`)
-    out.push([1, 3, 5].map((j) => parseInt(hex.slice(j, j + 2), 16)) as [number, number, number])
-  }
-  return out
-}
-
-function colorAt(ramp: [number, number, number][], t: number): [number, number, number] {
-  const x = Math.min(1, Math.max(0, t)) * (ramp.length - 1)
-  const i = Math.min(ramp.length - 2, Math.floor(x))
-  const f = x - i
-  return [0, 1, 2].map((k) => Math.round(ramp[i][k] + (ramp[i + 1][k] - ramp[i][k]) * f)) as [number, number, number]
-}
-
-/** Re-render when the page switches between light and dark (the ramp flips). */
-function useThemeKey() {
-  const [key, setKey] = React.useState(0)
-  React.useEffect(() => {
-    const mo = new MutationObserver(() => setKey((k) => k + 1))
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "data-theme"] })
-    return () => mo.disconnect()
-  }, [])
-  return key
-}
 
 export function Heatmap({
   values, x, y, colorDomain, colorLabel, scaleNote, width = 720, height = 280, title,

@@ -520,6 +520,31 @@ def check_package_imports() -> None:
     ok("src/ uses relative imports only (no `@/` — it would resolve inside the consumer)", not bad, str(bad))
 
 
+def check_datasets() -> None:
+    """Demo data in a PUBLIC library: every dataset names its source and a licence that allows
+    redistribution, its bytes match the recorded hash, and its reduction script ships beside it.
+    A recording of a person on a private bench has no licence here and cannot get past this."""
+    import hashlib
+    allowed = {"CC0", "CC-BY-4.0", "ODC-By", "public-domain-usgs", "public-domain", "OGL-Canada"}
+    root = HERE / "stories" / "datasets"
+    dirs = sorted(d for d in root.iterdir() if d.is_dir()) if root.is_dir() else []
+    for d in dirs:
+        src = d / "SOURCE.json"
+        if not src.exists():
+            ok(f"dataset {d.name} has a SOURCE.json", False)
+            continue
+        meta = json.loads(src.read_text())
+        ok(f"dataset {d.name}: licence allows redistribution", meta.get("licence") in allowed, meta.get("licence", "none"))
+        ok(f"dataset {d.name}: attribution and accession recorded", bool(meta.get("attribution")) and bool(meta.get("accession")))
+        data = d / "data.json"
+        ok(f"dataset {d.name}: data.json matches its recorded sha256",
+           data.exists() and hashlib.sha256(data.read_bytes()).hexdigest() == meta.get("data_sha256"))
+        ok(f"dataset {d.name}: the reduction script ships with it", (d / "reduce.py").exists())
+        stories = "".join(p.read_text() for p in (HERE / "stories").rglob("*.stories.tsx"))
+        ok(f"dataset {d.name}: every story importing it renders its attribution",
+           f"datasets/{d.name}/data.json" not in stories or f"datasets/{d.name}/SOURCE.json" in stories)
+
+
 def main() -> int:
     check_tokens()
     check_contrast()
@@ -533,6 +558,7 @@ def main() -> int:
     check_cellfield()
     check_react_mirror()
     check_package_imports()
+    check_datasets()
     for name, detail in FAIL:
         print(f"FAIL  {name}" + (f"   [{detail}]" if detail else ""))
     print(f"\n{len(PASS)}/{len(PASS) + len(FAIL)} checks passed")

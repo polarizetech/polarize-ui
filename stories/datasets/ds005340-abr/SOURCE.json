@@ -1,0 +1,9 @@
+{
+  "name": "Click-evoked auditory brainstem responses, one listener",
+  "source": "OpenNeuro ds005340 v1.0.4 (Polonenko & Maddox), sub-01, the 90 click trials",
+  "accession": "doi:10.18112/openneuro.ds005340.v1.0.4",
+  "licence": "CC0",
+  "attribution": "Polonenko, M. J., & Maddox, R. K. (2024). Fundamental frequency predominantly drives talker differences in auditory brainstem responses to continuous speech. JASA Express Letters, 4(11), 114401. Data: OpenNeuro ds005340, CC0.",
+  "reduction": "reduce.py: channel A1 (left earlobe, reference FCz), 30–2000 Hz zero-phase band-pass per 10 s trial, average of −5…20 ms epochs around every left-ear click (one row per trial); control rows use the next trial's click times. Displayed at 5 kHz.",
+  "data_sha256": "3db73fef08e61865d92a21d76211563c03f7d3f25b15b0b1892a66f962f18801"
+}
