@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Reduce OpenNeuro ds005185 (EESM19, sub-001 ses-001) to what three stories draw.
 
-    python3 reduce.py <assr.set> <wake_window.npz>        # writes data.json beside this file
+    python3 reduce.py <assr.set> <wake_window.npz>        --out data.json
 
 Inputs, both from ds005185 v1.0.2 (CC0):
   assr.set          sub-001_ses-001_task-ASSR_acq-PSG_eeg.set (+ its .fdt): 40 Hz amplitude-
@@ -157,7 +157,7 @@ def main(assr_set: Path, wake_npz: Path):
                        "segment": "first 30 s of the wake window, band-passed 1–40 Hz, 125 Hz",
                        "statistic": "time-reversal asymmetry, lag 1 sample (8 ms)"},
     }
-    dst = HERE / "data.json"
+    dst = OUT
     dst.write_text(json.dumps(out, separators=(",", ":")))
     t = out["steady_state"]["tests"]
     print(f"wrote {dst} ({dst.stat().st_size / 1e3:.0f} kB)")
@@ -169,4 +169,9 @@ def main(assr_set: Path, wake_npz: Path):
 
 
 if __name__ == "__main__":
+    if "--out" not in sys.argv:
+        raise SystemExit("usage: reduce.py <inputs...> --out <data.json>")
+    i = sys.argv.index("--out")
+    OUT = Path(sys.argv[i + 1])
+    del sys.argv[i:i + 2]
     main(Path(sys.argv[1]), Path(sys.argv[2]))

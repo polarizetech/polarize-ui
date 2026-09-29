@@ -5,9 +5,9 @@ import { Heatmap } from "@/science/signals/Heatmap"
 import { LineChart } from "@/science/charts/LineChart"
 import { Slider } from "@/components/ui/slider"
 import { Eyebrow } from "@/components/typography"
-import cmo from "../datasets/usgs-cmo-hour/data.json"
+import cmo from "virtual:dataset/usgs-cmo-hour"
 import cmoSource from "../datasets/usgs-cmo-hour/SOURCE.json"
-import abr from "../datasets/ds005340-abr/data.json"
+import abr from "virtual:dataset/ds005340-abr"
 import abrSource from "../datasets/ds005340-abr/SOURCE.json"
 
 const meta: Meta = {

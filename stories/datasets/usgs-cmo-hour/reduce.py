@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Reduce one hour of USGS geomagnetic data to what the stories draw. numpy only.
 
-    python3 reduce.py <usgs-response.json[.gz]>      # writes data.json beside this file
+    python3 reduce.py <usgs-response.json[.gz]>      --out data.json
 
 Input: the USGS Geomagnetism web service's JSON response, verbatim (geomag.usgs.gov/ws),
 elements X, Y, Z at 1 s. Output:
@@ -86,11 +86,16 @@ def main(src: Path) -> None:
         },
         "b0_nT": b0.round(1).tolist(),
     }
-    dst = HERE / "data.json"
+    dst = OUT
     dst.write_text(json.dumps(out, separators=(",", ":")))
     print(f"wrote {dst} ({dst.stat().st_size / 1e3:.0f} kB): {grid.shape[1]} windows × {grid.shape[0]} bins, "
           f"{vec.shape[1]} vector samples")
 
 
 if __name__ == "__main__":
+    if "--out" not in sys.argv:
+        raise SystemExit("usage: reduce.py <inputs...> --out <data.json>")
+    i = sys.argv.index("--out")
+    OUT = Path(sys.argv[i + 1])
+    del sys.argv[i:i + 2]
     main(Path(sys.argv[1]))

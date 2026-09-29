@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { NullDistribution } from "@/science/stats/NullDistribution"
 import { nullDraws } from "../data"
-import eesm from "../datasets/ds005185-eesm19/data.json"
+import eesm from "virtual:dataset/ds005185-eesm19"
 import eesmSource from "../datasets/ds005185-eesm19/SOURCE.json"
 import { Eyebrow } from "@/components/typography"
 

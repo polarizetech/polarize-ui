@@ -521,28 +521,43 @@ def check_package_imports() -> None:
 
 
 def check_datasets() -> None:
-    """Demo data in a PUBLIC library: every dataset names its source and a licence that allows
-    redistribution, its bytes match the recorded hash, and its reduction script ships beside it.
+    """Demo data in a PUBLIC library, served from outside it. Every dataset folder names its
+    source, a licence that allows redistribution, and a content-addressed public URL with the
+    sha256 of what lives there; the reduction script ships beside it; the data itself does NOT
+    live in this repository. `--network` also downloads each file and checks its hash.
     A recording of a person on a private bench has no licence here and cannot get past this."""
     import hashlib
-    allowed = {"CC0", "CC-BY-4.0", "ODC-By", "public-domain-usgs", "public-domain", "OGL-Canada"}
+    allowed = {"CC0", "CC-BY-4.0", "ODC-By-1.0", "public-domain-usgs", "public-domain", "OGL-Canada"}
+    base = "https://polarizetech-research-datasets.sfo3.digitaloceanspaces.com/derived/polarize-ui/"
     root = HERE / "stories" / "datasets"
     dirs = sorted(d for d in root.iterdir() if d.is_dir()) if root.is_dir() else []
+    decl = (root / "datasets.d.ts").read_text() if (root / "datasets.d.ts").exists() else ""
+    stories = "".join(p.read_text() for p in (HERE / "stories").rglob("*.stories.tsx"))
     for d in dirs:
         src = d / "SOURCE.json"
         if not src.exists():
             ok(f"dataset {d.name} has a SOURCE.json", False)
             continue
         meta = json.loads(src.read_text())
+        sha = meta.get("data_sha256", "")
         ok(f"dataset {d.name}: licence allows redistribution", meta.get("licence") in allowed, meta.get("licence", "none"))
         ok(f"dataset {d.name}: attribution and accession recorded", bool(meta.get("attribution")) and bool(meta.get("accession")))
-        data = d / "data.json"
-        ok(f"dataset {d.name}: data.json matches its recorded sha256",
-           data.exists() and hashlib.sha256(data.read_bytes()).hexdigest() == meta.get("data_sha256"))
+        ok(f"dataset {d.name}: a full sha256 is recorded", bool(re.fullmatch(r"[0-9a-f]{64}", sha)))
+        ok(f"dataset {d.name}: served from its content-addressed public URL",
+           meta.get("url") == f"{base}{d.name}/{sha[:16]}/data.json", meta.get("url", ""))
+        ok(f"dataset {d.name}: the data is NOT kept in this repository", not (d / "data.json").exists())
         ok(f"dataset {d.name}: the reduction script ships with it", (d / "reduce.py").exists())
-        stories = "".join(p.read_text() for p in (HERE / "stories").rglob("*.stories.tsx"))
-        ok(f"dataset {d.name}: every story importing it renders its attribution",
-           f"datasets/{d.name}/data.json" not in stories or f"datasets/{d.name}/SOURCE.json" in stories)
+        ok(f"dataset {d.name}: datasets.d.ts describes it", f'"virtual:dataset/{d.name}"' in decl)
+        ok(f"dataset {d.name}: every story loading it renders its attribution",
+           f"virtual:dataset/{d.name}\"" not in stories or f"datasets/{d.name}/SOURCE.json" in stories)
+        if "--network" in sys.argv:
+            import urllib.request
+            try:
+                body = urllib.request.urlopen(meta["url"], timeout=60).read()
+                ok(f"dataset {d.name}: the published file matches its sha256", hashlib.sha256(body).hexdigest() == sha)
+            except Exception as e:
+                ok(f"dataset {d.name}: the published file is readable anonymously", False, str(e))
+    ok("no story imports a data.json from this repository", not re.search(r'datasets/[^"]+/data\.json"', stories))
 
 
 def check_diverging() -> None:

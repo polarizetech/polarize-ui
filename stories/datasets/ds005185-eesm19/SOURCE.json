@@ -4,6 +4,8 @@
   "accession": "doi:10.18112/openneuro.ds005185.v1.0.2",
   "licence": "CC0",
   "attribution": "Mikkelsen, K. B., Kidmose, P., & Rezaei Tabar, Y. Ear-EEG Sleep Monitoring 2019 (EESM19), Aarhus University. OpenNeuro ds005185, CC0.",
-  "reduction": "reduce.py: channel F3. ASSR 130–240 s: one Hann FFT, 20–60 Hz, spectral F-tests. Welch spectra fitted with specparam for the ASSR run and the wake window. Time-reversal asymmetry of 30 s of wake against FT, AAFT and IAAFT surrogates, and of a phase-randomised copy as the linear control.",
-  "data_sha256": "b2882b288240b7cc456d1c0a113e340b3e764f5434d097800d98acb65591a949"
+  "url": "https://polarizetech-research-datasets.sfo3.digitaloceanspaces.com/derived/polarize-ui/ds005185-eesm19/b2882b288240b7cc/data.json",
+  "data_sha256": "b2882b288240b7cc456d1c0a113e340b3e764f5434d097800d98acb65591a949",
+  "bytes": 78460,
+  "reduction": "stories/datasets/ds005185-eesm19/reduce.py in polarize-ui"
 }

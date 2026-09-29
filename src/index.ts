@@ -13,6 +13,7 @@ export { SERIES, TIER_COLOR } from "./science/charts/common"
 export * from "./science/signals/Waveform"
 export * from "./science/signals/Heatmap"
 export * from "./science/signals/Comodulogram"
+export * from "./science/signals/EventRaster"
 // 3-D views (dependency-free canvas)
 export { Scene3D, type Scene3DProps, type Axis3, type Prim, type Pick, type Vec3, type View } from "./science/space/Scene3D"
 export * from "./science/space/views"

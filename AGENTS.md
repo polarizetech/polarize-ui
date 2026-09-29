@@ -40,9 +40,14 @@ you.
 - **`src/science/space/`** holds the 3-D views (`Scene3D` and the landscape, hodogram and
   event-aligned stack on it), drawn on a plain canvas with no 3-D dependency. Scene axes are
   right-handed; a left-handed data frame (north, east, up) is drawn mirrored.
-- **Real demo data** lives in `stories/datasets/<name>/` as `data.json` + `SOURCE.json`
-  (source, accession, licence, attribution, sha256) + the `reduce.py` that made it.
-  `dev_check.py` refuses a dataset without a redistributable licence or with a stale hash.
+- **Real demo data is NOT in this repository.** Each `stories/datasets/<name>/` holds a
+  `SOURCE.json` (source, accession, licence, attribution, public URL, sha256) and the `reduce.py`
+  that made the data from the public source. The data is published to Polarize's public bucket by
+  a private build step, and `import data from "virtual:dataset/<name>"` fetches it at Storybook build
+  time and refuses it if the hash differs. After a new reduction, regenerate the types with
+  `python3 scripts/dataset_types.py`. `dev_check.py` (add `--network` to re-verify the downloads)
+  refuses a dataset without a redistributable licence, a committed `data.json`, or a URL that is
+  not the content-addressed one.
 - **`src/components/`** holds the general UI: shadcn components (`ui/`), typography, page
   layouts and illustrations. Stories go under `stories/ui/`, titled `General UI/…`.
 - Science views follow the chart rules in `stories/Introduction.mdx`. They state their scale,

@@ -9,6 +9,7 @@ import { Slider } from "@/components/ui/slider"
 import { Eyebrow } from "@/components/typography"
 import { sharpSignal } from "../data"
 import { contrastResponse, population, type NormParams } from "../models/normalization"
+import { simulate, type JeffressParams } from "../models/jeffress"
 
 const meta: Meta = {
   title: "Science/Mechanisms",
@@ -156,4 +157,65 @@ function NormalizationLab() {
 export const SharedPopulation: StoryObj = {
   name: "Two stimuli sharing one population (normalization)",
   render: () => <NormalizationLab />,
+}
+
+// ── 3. Where a sound is, from when it arrives (Jeffress) ────────────────────────────
+const DELAYS = Array.from({ length: 141 }, (_, i) => -700 + i * 10)
+const HEAD_US = 660
+
+function JeffressLab() {
+  const [p, setP] = React.useState<JeffressParams>({ toneHz: 500, itdUs: 300, windowUs: 50, vectorStrength: 0.7, rateHz: 300, seconds: 2 })
+  const set = (k: keyof JeffressParams) => (v: number) => setP((q) => ({ ...q, [k]: v }))
+  const sim = React.useMemo(() => simulate(p, DELAYS), [p])
+  const periodUs = 1e6 / p.toneHz
+  const aliases = [-2, -1, 1, 2].map((k) => p.itdUs + k * periodUs).filter((d) => Math.abs(d) <= 700)
+  const pts = (ys: number[]) => DELAYS.map((d, i) => [d, ys[i]] as [number, number])
+
+  return (
+    <div className="grid gap-6">
+      <p className="m-0 max-w-3xl text-sm text-muted-foreground">
+        Each ear's nerve fires locked to the phase of a tone. A row of coincidence detectors delays the left ear's
+        spikes by a different amount each; the one whose delay cancels the interaural time difference fires most
+        (Jeffress 1948). The response repeats every period of the tone, so above roughly 1 kHz a second peak falls
+        inside the range a human head can produce, and the place alone becomes ambiguous. This is the textbook model:
+        in birds a delay-line map like this is well supported; in mammals it is contested (Brand et al. 2002;
+        McAlpine &amp; Grothe 2003).
+      </p>
+      <div className="grid gap-4 md:grid-cols-3">
+        <Control label="interaural time difference (µs, + = left first)" value={p.itdUs} min={-HEAD_US} max={HEAD_US} step={20} onCommit={set("itdUs")} />
+        <Control label="tone frequency (Hz)" value={p.toneHz} min={100} max={1500} step={50} onCommit={set("toneHz")} />
+        <Control label="phase locking (vector strength)" value={p.vectorStrength} min={0} max={0.95} step={0.05} onCommit={set("vectorStrength")} format={(v) => v.toFixed(2)} />
+        <Control label="coincidence window (µs)" value={p.windowUs} min={10} max={200} step={10} onCommit={set("windowUs")} />
+        <Control label="spike rate per ear (spikes/s)" value={p.rateHz} min={50} max={600} step={50} onCommit={set("rateHz")} />
+        <Control label="listening time (s)" value={p.seconds} min={0.5} max={5} step={0.5} onCommit={set("seconds")} format={(v) => v.toFixed(1)} />
+      </div>
+      <Readout items={[
+        { label: "true ITD", value: `${p.itdUs} µs`, source: "how the input was built" },
+        { label: "detector firing most", value: `${sim.best} µs`, source: "argmax of the simulated counts" },
+        { label: "other peaks in range", value: aliases.length ? aliases.map((a) => `${Math.round(a)}`).join(", ") + " µs" : "none", source: `ITD ± whole periods (${Math.round(periodUs)} µs) within ±700 µs` },
+        { label: "spikes (left / right)", value: `${sim.spikesLeft} / ${sim.spikesRight}`, source: `${p.rateHz}/s for ${p.seconds} s, Poisson` },
+      ]} />
+      <div>
+        <Eyebrow>Coincidences at each detector <Tier id="MODELLED" /></Eyebrow>
+        <LineChart title="Coincidence count across the row of detectors"
+          series={[
+            { label: "simulated count", points: pts(sim.counts), color: "var(--chart-1)" },
+            { label: "expected count (closed form)", points: pts(sim.expected), dash: true, color: "var(--chart-2)" },
+          ]}
+          x={{ label: "detector's internal delay on the left input (µs)", domain: [-700, 700] }}
+          y={{ label: "coincidences" }}
+          thresholds={[{ value: p.itdUs, axis: "x", label: "true ITD", tier: "predicted" }]}
+          height={260} />
+        <p className="mt-2 max-w-3xl text-[length:var(--text-xs)] text-muted-foreground">
+          The expected curve is R²·T·w·I₀(2κ·cos(πf·(ITD − d)))/I₀(κ)² for a von Mises phase-locking profile, so the
+          simulation can be checked against it. ±{HEAD_US} µs is about the largest ITD a human head produces.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+export const WhereFromWhen: StoryObj = {
+  name: "Where a sound is, from when it arrives (Jeffress)",
+  render: () => <JeffressLab />,
 }

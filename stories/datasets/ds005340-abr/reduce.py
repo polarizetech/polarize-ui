@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Reduce the click trials of OpenNeuro ds005340 (sub-01) to a per-trial brainstem response stack.
 
-    python3 reduce.py <bids-root> <pulses.npz>      # writes data.json beside this file
+    python3 reduce.py <bids-root> <pulses.npz>      --out data.json
 
 Standard click-evoked averaging, nothing more:
   * channel A1 (left earlobe; reference FCz, ground Fpz, per the dataset's own sidecar),
@@ -94,11 +94,16 @@ def main(root: Path, pulses: Path) -> None:
         "rows_uv": rows[:, ::step].round(4).tolist(),
         "control_rows_uv": ctrl[:, ::step].round(4).tolist(),
     }
-    dst = HERE / "data.json"
+    dst = OUT
     dst.write_text(json.dumps(out, separators=(",", ":")))
     print(f"wrote {dst} ({dst.stat().st_size / 1e3:.0f} kB): {rows.shape[0]} trials × {lags_ms.size} lags; "
           f"clicks per trial {min(counts)}–{max(counts)}")
 
 
 if __name__ == "__main__":
+    if "--out" not in sys.argv:
+        raise SystemExit("usage: reduce.py <inputs...> --out <data.json>")
+    i = sys.argv.index("--out")
+    OUT = Path(sys.argv[i + 1])
+    del sys.argv[i:i + 2]
     main(Path(sys.argv[1]), Path(sys.argv[2]))

@@ -84,9 +84,10 @@ Every science story uses one of:
 
 - **synthetic data**, generated in `stories/data.ts` with its ground truth written down, so
   the view can be checked against the answer it should give; or
-- **a public, licensed dataset**, as a small excerpt with its source, accession, licence and
-  the exact excerpt recorded next to it (for example OpenNeuro CC0, PhysioNet ODC-By, USGS
-  public domain, Zenodo CC-BY), with attribution rendered in the story.
+- **a public, licensed dataset**, as a small reduction of it (for example OpenNeuro CC0,
+  PhysioNet ODC-By, USGS public domain, Zenodo CC-BY), with attribution rendered in the story.
+  The reduction is served from outside this repository; its source, accession, licence, URL,
+  sha256 and the script that made it are recorded next to the story.
 
 Never a recording of a person made on a private bench, and never a result that has not
 been published. A story built on real data should show at least one case where the method

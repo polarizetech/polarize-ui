@@ -1,0 +1,11 @@
+{
+  "name": "MIT-BIH Arrhythmia Database, records 100 (clean) and 105 (noisy)",
+  "source": "PhysioNet mitdb 1.0.0, records 100 and 105, with the reference beat annotations",
+  "accession": "doi:10.13026/C2F305",
+  "licence": "ODC-By-1.0",
+  "attribution": "Moody, G. B., & Mark, R. G. (2001). The impact of the MIT-BIH Arrhythmia Database. IEEE Eng Med Biol 20(3):45–50. Goldberger, A. L., et al. (2000). PhysioBank, PhysioToolkit, and PhysioNet. Circulation 101(23):e215–e220. Data under the Open Data Commons Attribution License v1.0.",
+  "url": "https://polarizetech-research-datasets.sfo3.digitaloceanspaces.com/derived/polarize-ui/mitdb/47425eaa9f770c93/data.json",
+  "data_sha256": "47425eaa9f770c93e660c3db83f6d206b18be49cd47a7efaa7199243f9a85337",
+  "bytes": 47631,
+  "reduction": "stories/datasets/mitdb/reduce.py in polarize-ui"
+}

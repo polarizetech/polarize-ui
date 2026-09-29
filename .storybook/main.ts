@@ -1,6 +1,7 @@
 import type { StorybookConfig } from "@storybook/react-vite";
 import tailwindcss from "@tailwindcss/vite";
 import { fileURLToPath } from "node:url";
+import { datasets } from "./datasets";
 
 const config: StorybookConfig = {
   stories: ["../stories/**/*.mdx", "../stories/**/*.stories.@(ts|tsx)"],
@@ -11,7 +12,7 @@ const config: StorybookConfig = {
   core: { disableTelemetry: true, disableWhatsNewNotifications: true },
   features: { sidebarOnboardingChecklist: false, menuOnboardingChecklist: false },
   async viteFinal(cfg) {
-    cfg.plugins = [...(cfg.plugins ?? []), tailwindcss()];
+    cfg.plugins = [...(cfg.plugins ?? []), tailwindcss(), datasets(fileURLToPath(new URL("..", import.meta.url)))];
     cfg.resolve = {
       ...cfg.resolve,
       alias: { ...(cfg.resolve?.alias ?? {}), "@": fileURLToPath(new URL("../src", import.meta.url)) },
