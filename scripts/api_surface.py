@@ -24,7 +24,7 @@ from io import BytesIO
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent.parent
-CSS_ENTRIES = ["design.css", "publication.css", "specimens.css", "landing.css",
+CSS_ENTRIES = ["design.css", "publication.css", "specimens.css", "landing.css", "docs.css",
                "shadcn/theme.css", "shadcn/system.css", "shadcn/tier.css", "src/theme.css"]
 NOTE_KEYS = re.compile(r"(^|_)note$|^palette_provenance$|^why_not_a_component_library$")
 
@@ -91,6 +91,11 @@ def surface(root: Path) -> set[str]:
         js = root / name
         if js.is_file():
             out |= {f"element:{e}" for e in re.findall(r"customElements\.define\('([a-z-]+)'", js.read_text())}
+    docs_js = root / "docs.js"
+    if docs_js.is_file():  # docs.js is driven by data attributes and exports; both are public
+        src = docs_js.read_text()
+        out |= {f"attr:{a}" for a in re.findall(r"\[(data-ui-[a-z-]+)", src)}
+        out |= {f"docsjs:{n}" for n in re.findall(r"^export (?:const|function) (\w+)", src, re.M)}
     return out
 
 

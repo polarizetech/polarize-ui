@@ -111,6 +111,13 @@ def _vars(mode: str, indent: int = 2) -> str:
     return "\n".join(out)
 
 
+def code_rows() -> list[tuple[str, str]]:
+    """The always-dark code window (tokens.json `code`): theme-invariant, so it lives in the static block."""
+    c = TOKENS["code"]
+    rows = [(f"--code-{k}", c[k]) for k in ("background", "bar", "border", "foreground", "muted")]
+    return rows + [(f"--syntax-{k}", v) for k, v in c["syntax"].items()]
+
+
 def _static() -> str:
     t = TOKENS["type"]
     sp = TOKENS["space"]
@@ -124,6 +131,7 @@ def _static() -> str:
     scale_vars = "\n".join(f"  --text-{k}: {v};" for k, v in sc.items())
     space_vars = "\n".join(f"  --space-{k}: {v};" for k, v in sp.items())
     radius_vars = "\n".join(f"  --radius-{k}: {v};" for k, v in r.items())
+    code_vars = "\n".join(f"  {k}: {v};" for k, v in code_rows())
 
     return f"""
 :root {{
@@ -140,6 +148,7 @@ def _static() -> str:
 {space_vars}
 {radius_vars}
   --radius: {r['base']};
+{code_vars}
   --content-max: {lay['content-max']};
   --drawer-width: {lay['drawer-width']};
   --motion-fast: {m['fast']};

@@ -460,7 +460,10 @@ def check_layer(name: str) -> None:
     tracked = [s.strip() for s, b in blocks if "letter-spacing" in b
                and not any(k in b for k in ("var(--font-mono)", "uppercase", "var(--font-display)"))]
     ok(f"{name}: the sans is never tracked", not tracked, str(tracked[:3]))
-    names = set(re.findall(r"var\((--[a-z0-9-]+)", css)) - {"--pub-accent", "--measure", "--tier-color"}
+    # A layer may read a variable it defines itself (e.g. docs.css's --docsite-* layout sizes)
+    # and the two pointer coordinates docs.js writes (--mx/--my); every other name is a token.
+    own = set(re.findall(r"(--[a-z0-9-]+)\s*:", css))
+    names = set(re.findall(r"var\((--[a-z0-9-]+)", css)) - {"--pub-accent", "--measure", "--tier-color", "--mx", "--my"} - own
     system = (HERE / "shadcn" / "system.css").read_text() + (HERE / "shadcn" / "theme.css").read_text()
     for where, text in (("design.css", CSS), ("the React theme", system)):
         missing = sorted(n for n in names if f"{n}:" not in text)
@@ -478,6 +481,45 @@ def check_landing() -> None:
     css = (HERE / "landing.css").read_text() if (HERE / "landing.css").is_file() else ""
     ok("landing.css honours prefers-reduced-motion", "prefers-reduced-motion" in css)
     ok("landing.css imported by the React theme", '@import "../landing.css";' in (HERE / "src" / "theme.css").read_text())
+
+
+def check_docs() -> None:
+    """docs.css + docs.js: the documentation-site layer (DOCS-SITES.md)."""
+    check_layer("docs.css")
+    css = (HERE / "docs.css").read_text() if (HERE / "docs.css").is_file() else ""
+    ok("docs.css honours prefers-reduced-motion", "prefers-reduced-motion" in css)
+    ok("docs.css imported by the React theme", '@import "../docs.css";' in (HERE / "src" / "theme.css").read_text())
+    ok("docs.css code window reads only code/syntax tokens",
+       all(v in CSS for v in ("--code-background:", "--code-foreground:", "--syntax-keyword:")))
+    path = HERE / "docs.js"
+    ok("docs.js exists", path.is_file())
+    if not path.is_file():
+        return
+    js = path.read_text()
+    ok("docs.js exports renderPlot, highlight and init", all(f"export function {n}" in js for n in ("renderPlot", "highlight", "init")))
+    ok("docs.js has a type declaration", (HERE / "docs.d.ts").is_file())
+    ok("docs.js fetches only the search index the page names",
+       js.count("fetch(") == 1 and "fetch(box.dataset.uiSearch)" in js)
+    ok("docs.js never uses requestAnimationFrame or setInterval", "requestAnimationFrame" not in js and "setInterval" not in js)
+    ok("docs.js wraps every storage access in try",
+       all("try {" in line for line in js.splitlines() if "localStorage." in line))
+    ok("docs.js escapes what it writes into HTML", "const esc" in js and "innerHTML = highlight" in js)
+    ok("a verdict is always written as a word, not only a colour", "ui-verdicts__word" in js and "esc(i.verdict)" in js)
+
+    def lum(h: str) -> float:
+        c = [int(h.lstrip("#")[i:i + 2], 16) / 255 for i in (0, 2, 4)]
+        c = [x / 12.92 if x <= 0.03928 else ((x + 0.055) / 1.055) ** 2.4 for x in c]
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+
+    def ratio(a: str, b: str) -> float:
+        la, lb = sorted((lum(a), lum(b)), reverse=True)
+        return (la + 0.05) / (lb + 0.05)
+
+    code = TOKENS.get("code", {})
+    inks = {"foreground": code.get("foreground"), "muted": code.get("muted"), **code.get("syntax", {})}
+    low = {f"{k} on {s}": round(ratio(v, code[s]), 2) for k, v in inks.items() if v
+           for s in ("background", "bar") if ratio(v, code[s]) < 4.5}
+    ok("every code-window ink clears 4.5:1 on the panel and its bar (measured here)", bool(code) and not low, str(low))
 
 
 def check_cellfield() -> None:
@@ -595,6 +637,7 @@ def main() -> int:
     check_publication()
     check_landing()
     check_cellfield()
+    check_docs()
     check_react_mirror()
     check_package_imports()
     check_datasets()

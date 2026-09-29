@@ -477,6 +477,16 @@
   --radius-lg: 14px;
   --radius-pill: 999px;
   --radius: 10px;
+  --code-background: #0f1216;
+  --code-bar: #161a1f;
+  --code-border: #232830;
+  --code-foreground: #d6d9dd;
+  --code-muted: #8b939d;
+  --syntax-keyword: #c9a4ff;
+  --syntax-string: #8fd3a8;
+  --syntax-number: #f0b86e;
+  --syntax-comment: #7f8893;
+  --syntax-function: #7ec3ff;
   --content-max: 980px;
   --drawer-width: 460px;
   --motion-fast: 120ms;

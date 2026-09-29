@@ -45,7 +45,7 @@ const preview: Preview = {
         order: [
           "Introduction",
           "Science", ["Charts", "Signals", "Statistics", "Evidence"],
-          "General UI", ["Foundations", "Components", "Layouts", "Landing", "Illustrations"],
+          "General UI", ["Foundations", "Components", "Layouts", "Landing", "Docs", "Illustrations"],
         ],
       },
     },

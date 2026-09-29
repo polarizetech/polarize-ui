@@ -19,6 +19,7 @@
 @import "../publication.css";
 @import "../specimens.css";
 @import "../landing.css";
+@import "../docs.css";
 
 @custom-variant dark (&:is(.dark *));
 
