@@ -14,6 +14,8 @@ It comes in two forms that share one set of tokens:
 - **React** — shadcn/ui components on the same theme, plus publication layouts, evidence
   badges and [visx](https://visx.airbnb.tech/) charts.
 
+How we choose and judge a view for scientific data (the question first, five things every view states, forms for common data, simulation views, demo-data rules): **[`METHOD.md`](METHOD.md)**.
+
 ## What is in it
 
 ### Science: the charts and analysis views (the point of the library)

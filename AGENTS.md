@@ -3,6 +3,13 @@
 Instructions for coding agents working in this repository. The full context is in
 [`CLAUDE.md`](CLAUDE.md); **read its first section before committing anything.**
 
+## Nothing novel goes in here
+
+This repository is public. Do not add novel research, unpublished findings, or a new way of
+visualizing data that could be productized or patented. That stays in the private repo it
+came from. Views must use standard methods, and demos must use public licensed data or
+synthetic data, never recordings of people. If in doubt, don't push; ask.
+
 ## This is a public, versioned library
 
 Every push to `main` is released automatically: tagged, published on the Releases page,

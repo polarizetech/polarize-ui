@@ -1,5 +1,20 @@
 # CLAUDE.md — design
 
+> ## ⛔ PUBLIC REPO: nothing novel goes in here (operator, 2026-09-29)
+>
+> This repository is public. **Do not add novel research, unpublished findings, or a genuinely
+> new way of visualizing data that could be productized or patented**. That work stays in
+> the private repos it came from. Before porting any tool, component, story or dataset here:
+>
+> 1. **Findings:** anything the view shows or states must be established and published, or
+>    synthetic. No result from the group's own unpublished analyses.
+> 2. **Method:** the visualization technique must be standard (spectrogram, comodulogram,
+>    regression band, surrogate null, polarisation ellipse…), not a group invention.
+> 3. **Data:** demo data must be public and licensed (with attribution) or synthetic. Never a
+>    recording from a person on this bench.
+>
+> If any of the three is in doubt, **don't push; ask the operator.** Publishing can't be undone.
+>
 > ## ⛔ READ FIRST: this is a PUBLIC, VERSIONED library (since 2026-09-25)
 >
 > Every push to `main` is released automatically (`.github/workflows/release.yml`). The
