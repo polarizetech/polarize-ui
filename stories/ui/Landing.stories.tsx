@@ -48,7 +48,7 @@ const process = (
         body: "A protocol for studies and simulators across repositories, and a CLI that scaffolds and checks them.",
         files: ["STUDY.toml", "apps/vN-*", "scaffold check"], latest: { date: "Sep 25", text: "The study protocol, templates, and the scaffold CLI" },
         read: "Protocol →", href: "#" },
-      { num: "03", stage: "What the literature says", repo: "scientific-research-rag", title: "Evidence first, so the model can't make it up.",
+      { num: "03", stage: "What the literature says", repo: "retrieval-augmented-generation", title: "Evidence first, so the model can't make it up.",
         body: "Code controls search, evidence and verification; claims that fail a check are removed and counted, not softened.",
         files: ["answer.md", "run.json"], latest: { date: "Sep 27", text: "Present null-search results by what they show" },
         read: "Read the method →", href: "#" },
@@ -75,7 +75,7 @@ const projects = (
       finding={{ tier: <Tier id="C" />, text: "In-band 40 Hz power across six captures.", read: "Read: Can a $70 board tell me I'm wrong? →" }}
       plate={{ src: `${IMG}/schematics/galvani-frog-1792.jpg`, alt: "Galvani's frog legs on a metal arc, 1792.", caption: "Luigi Galvani, 1792 · Public domain" }} />
     <div style={{ marginTop: 24 }} className="ui-repocards">
-      <RepoCard href="#" name="paper-library" pitch="Every source, fetched legally and traced." description="Search, legal full-text fetch, provenance, and an MCP server." latest={{ date: "Sep 25", text: "Initial release of paperlib" }} />
+      <RepoCard href="#" name="paper-fetch" pitch="Every source, fetched legally and traced." description="Search, legal full-text fetch, provenance, and an MCP server." latest={{ date: "Sep 25", text: "Initial release of paperlib" }} />
     </div>
   </Section>
 )
