@@ -483,6 +483,23 @@ def check_landing() -> None:
     ok("landing.css imported by the React theme", '@import "../landing.css";' in (HERE / "src" / "theme.css").read_text())
 
 
+def check_tissue_field() -> None:
+    """<tissue-field>: the node suite (format refusals, grid, ramp, orbit, source rules) plus the packaging."""
+    import shutil
+    import subprocess
+    ok("tissue-field: component, types and format ship", all((HERE / "tissue-field" / f).is_file() for f in ("tissue-field.js", "tissue-field.d.ts", "src/format.mjs")))
+    pkg = json.loads((HERE / "package.json").read_text())
+    ok("tissue-field: exported and packed", pkg["exports"].get("./tissue-field.js") == "./tissue-field/tissue-field.js" and "tissue-field" in pkg["files"])
+    ok("tissue-field: three is an OPTIONAL peer dependency", "three" in pkg["peerDependencies"] and pkg.get("peerDependenciesMeta", {}).get("three", {}).get("optional") is True)
+    ok("tissue-field: the repo carries no data for it (demo is synthetic)", not (HERE / "tissue-field" / "data").exists())
+    node = shutil.which("node")
+    if not node:
+        print("SKIP (LOUD): node not found, so the tissue-field node suite did NOT run. This is not a pass.")
+        return
+    r = subprocess.run([node, str(HERE / "tissue-field" / "dev_check.mjs")], capture_output=True, text=True)
+    ok("tissue-field: node suite passes", r.returncode == 0, (r.stdout + r.stderr).strip().splitlines()[-1] if (r.stdout + r.stderr).strip() else "")
+
+
 def check_docs() -> None:
     """docs.css + docs.js: the documentation-site layer (DOCS-SITES.md)."""
     check_layer("docs.css")
@@ -637,6 +654,7 @@ def main() -> int:
     check_publication()
     check_landing()
     check_cellfield()
+    check_tissue_field()
     check_docs()
     check_react_mirror()
     check_package_imports()

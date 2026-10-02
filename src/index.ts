@@ -17,6 +17,8 @@ export * from "./science/signals/EventRaster"
 // 3-D views (dependency-free canvas)
 export { Scene3D, type Scene3DProps, type Axis3, type Prim, type Pick, type Vec3, type View } from "./science/space/Scene3D"
 export * from "./science/space/views"
+// WebGL volume of tissue activity (needs the optional peer dependency `three`)
+export { TissueField, type TissueFieldProps } from "./science/space/TissueField"
 // Statistics
 export * from "./science/stats/NullDistribution"
 export { linearFit, tQuantile, tTwoSidedP, type LinearFit, type Pair } from "./science/stats/regression"
