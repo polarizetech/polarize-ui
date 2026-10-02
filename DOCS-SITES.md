@@ -1,8 +1,25 @@
 # Docs sites: documenting an existing tool or repository
 
 How to give an existing library, tool or repository a documentation site built on polarize-ui's
-**docs layer** (`docs.css` + `docs.js`, React: `src/components/docs.tsx`). The layer supplies the
-page; the repository supplies a small generator that reads what the code already says about itself.
+**docs layer** (`docs.css` + `docs.js`, React: `src/components/docs.tsx`).
+
+**This repository holds the look only.** The tooling that reads a repository and generates its
+site, and the GitHub workflow that keeps it up to date, live in
+**[automatic-documentation-site](https://github.com/polarizetech/automatic-documentation-site)**:
+
+```bash
+pip install "git+https://github.com/polarizetech/automatic-documentation-site@v0.1.0"
+docsite init path/to/repo --write     # docs-site.toml + the workflow
+docsite build path/to/repo
+```
+
+It reads Markdown (a text-only repository needs nothing else), Python, TypeScript/JavaScript and
+Swift source, a JSON catalogue, and stories run at build time. Its
+[`docs/ONBOARDING.md`](https://github.com/polarizetech/automatic-documentation-site/blob/main/docs/ONBOARDING.md)
+is the procedure to follow. polarize-ui itself is documented with Storybook, not with it.
+
+What follows is the reasoning behind that tool and the markup contract it writes against, for
+anyone building a generator of their own or changing the layer.
 
 The shape is the familiar docs site (Tailwind's Syntax and Protocol templates are the reference):
 a top bar with search, a left nav, an "on this page" column, a home page with a hero and package
@@ -56,38 +73,10 @@ Rules:
   example does not rerun and a changed one always does. Never cache a failure.
 - Decimate long traces for display in the generator, and say so on the page.
 
-## Implementation plan for an existing repository
+## The markup contract
 
-Budget: a day for the first version of a mid-sized Python or TypeScript repository.
-
-**1. Decide where it lives and who may see it.** The generator and example files live **inside
-the repository they document** (`site/`), so a code change and its docs change land in one
-commit. The built output (`site/dist/`) is not committed. **A private repository gets a private
-site:** serve it locally or behind access control, never on a public host, and never put its
-content into a public repository (this one included).
-
-**2. Pin polarize-ui.** Fetch `design.css`, `design.js`, `tokens.json`, `publication.css`,
-`landing.css`, `docs.css`, `docs.js`, `cellfield.js` and `fonts/` from a **release tag** (as
-every consumer of this library does; see README § Versioning), with an environment override to a
-local checkout for developing polarize-ui itself. Copy them into `dist/assets/` at build time.
-
-**3. Inventory what the repository already says about itself.** List the catalogue or
-manifest, the package docstrings or READMEs, the public API, and the long-form docs worth
-rendering (a contract, a changelog). Anything that has no source yet is a gap to fix in the
-code, not a paragraph to write on the site.
-
-**4. Write the reader.** Stdlib only where possible:
-- the catalogue → one page per package, including packages that live in other repositories
-  (shown as catalogue-only, with a callout);
-- source → API entries (`.ui-apientry`: kind, name, signature, summary, full docstring behind a
-  disclosure, a link to the source line);
-- imports → a "uses from core" list linking to the core's own API anchors;
-- Markdown → HTML with a small renderer that escapes everything it does not recognise.
-
-**5. Register datasets, then write two or three examples per package.** Start with the function
-a new user would call first. Prefer one dataset reused across packages to many.
-
-**6. Render pages with the docs layer.** Markup contract:
+The procedure itself (inventory, config, stories, checks, workflow, hand-over) is
+automatic-documentation-site's `docs/ONBOARDING.md`. This is what a generator writes:
 
 ```html
 <body class="ui ui-docsite">
@@ -109,21 +98,11 @@ An example: `.ui-example` > `.ui-example__head` + `.ui-example__grid` (a `.ui-co
 Storybook page **General UI / Docs** shows every piece; the React components render the same
 classes.
 
-**7. Build a search index** (`[{t, s, h, k}]`: title, summary, href, kind) covering packages,
-modules, functions, examples and datasets.
-
-**8. Check it.** Build with a cold cache; every example passes or is visibly failed. Click
-through in light and dark and at phone width. Search for a function by its short name.
-
-**9. Hand it over.** A `site/README.md` with the build command, what each page is generated
-from, and how to add an example.
-
-**10. Extract later, not first.** The generator stays in its repository until a second
-repository needs one. Then the generic parts (page shell, Markdown renderer, example harness)
-move somewhere shared, because the second consumer is what shows which parts are generic.
+The search index is a JSON array of `{t, s, h, k}` (title, summary, href, kind) named by
+`data-ui-search` on the palette.
 
 ## Reference implementation
 
-The first site built this way documents a private Python library and its extensions; its
-generator is `site/build.py` in that repository. It is not linked here because the repository is
-private.
+[automatic-documentation-site](https://github.com/polarizetech/automatic-documentation-site)
+documents itself with itself; its `docs-site.toml` and `.github/workflows/` are the worked
+example.
