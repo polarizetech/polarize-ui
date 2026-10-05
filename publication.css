@@ -52,6 +52,24 @@
   }
 }
 
+/* Single column: no sidebar, and the main column centred on the page. For indexes and
+   articles that have nothing to put beside the content. */
+.ui-shell--single { grid-template-columns: minmax(0, 1fr); grid-template-areas: "brand" "main"; grid-template-rows: auto auto; }
+.ui-shell--single .ui-main { width: 100%; margin-inline: auto; }
+
+/* Filter index: the sidebar holds a .ui-filter. Once the layout stacks, the controls go
+   ABOVE the results, because on an index you filter you need them before the list.
+   The default order (content first, sidebar after) is unchanged for every other page. */
+/* A filter panel can be taller than the window. It stays pinned, so it scrolls by itself
+   rather than hiding its last controls until the end of the page. */
+@media (min-width: 901px) {
+  .ui-shell--filter .ui-sidebar { max-height: calc(100vh - 2 * var(--space-6)); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding-right: var(--space-2); }
+}
+@media (max-width: 900px) {
+  .ui-shell--filter { grid-template-areas: "brand" "side" "main"; }
+  .ui-shell--filter .ui-sidebar { border-top: 0; padding-top: 0; }
+}
+
 /* The main column's alignment anchor: its top edge matches the sidebar brand. */
 .ui-main__heading {
   margin: 0 0 var(--space-4);
@@ -468,3 +486,211 @@ a.ui-btn { text-decoration: none; }
 .ui-footer__brand { display: inline-flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-4); }
 .ui-footer__tag { font-family: var(--font-display); font-size: var(--display-3); color: var(--foreground); margin: 0 0 var(--space-3); }
 .ui-footer__fine { margin: 0; max-width: 46ch; }
+
+/* ============================================================
+   FILTERS — a faceted filter panel for an index, and the controls it is made of.
+   Each control stands alone: .ui-facet, .ui-check, .ui-histo, .ui-seg, .ui-chip and
+   .ui-tier--toggle can be used anywhere a set of results is narrowed.
+
+   Behaviour is filter.js (zero-build) or the React components in src/components/filter.tsx.
+   Without JavaScript the facet rows are plain links and [data-filter-js] parts stay hidden.
+
+   State is carried by aria-pressed on real <button>s (aria-current on a no-JS link), never
+   by a class alone. Bars and grids read these custom properties, set inline per element:
+     --share     0–1, the filled fraction of a facet bar or a histogram bar
+     --buckets   number of histogram columns
+     --segments  number of segments in a segmented control
+   No new colour: the selected state is the brand accent, and a tier toggle keeps the
+   colour its tier already has.
+   ============================================================ */
+.ui-facet__btn, .ui-histo__btn { --share: 0; }
+.ui-histo { --buckets: 3; }
+.ui-seg { --segments: 2; }
+
+.ui-filter { display: flex; flex-direction: column; gap: var(--space-6); }
+
+/* ---------- Panel header: label + live tally ---------- */
+.ui-filter__head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3);
+  padding-bottom: var(--space-3); border-bottom: 1px solid var(--border);
+}
+.ui-filter__head .ui-label { margin: 0; color: var(--muted-foreground); }
+.ui-filter__tally {
+  font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: .08em;
+  color: var(--faint-foreground); font-variant-numeric: tabular-nums;
+}
+.ui-filter__tally b { color: var(--pub-accent, var(--accent)); font-weight: 500; }
+
+/* ---------- Search ---------- */
+.ui-filter__search { position: relative; display: block; }
+.ui-filter__search svg {
+  position: absolute; left: 12px; top: 50%; width: 15px; height: 15px; margin-top: -7.5px;
+  fill: none; stroke: var(--faint-foreground); stroke-width: 1.8; stroke-linecap: round; pointer-events: none;
+}
+.ui-filter__search input {
+  width: 100%; height: 44px; padding: 0 12px 0 36px;
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--foreground); font: inherit; font-size: var(--text-sm);
+}
+.ui-filter__search input::placeholder { color: var(--faint-foreground); }
+.ui-filter__search input:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+
+/* ---------- Section ---------- */
+.ui-filter__section { display: flex; flex-direction: column; gap: var(--space-3); border: 0; margin: 0; padding: 0; min-width: 0; }
+.ui-filter__section[hidden] { display: none; }
+.ui-filter__section .ui-label { margin: 0; }
+.ui-filter__section-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); }
+.ui-filter__hint { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--faint-foreground); }
+.ui-filter__note { margin: 0; font-size: var(--text-sm); line-height: 1.5; color: var(--faint-foreground); }
+.ui-filter__note a { text-decoration: none; }
+
+/* ---------- Facet list: single-select, each row a count and a share bar ---------- */
+.ui-facet { list-style: none; margin: 0; padding: 0; }
+.ui-facet__item { border-top: 1px solid var(--border); }
+.ui-facet__btn {
+  display: flex; flex-direction: column; gap: 6px; width: 100%; min-height: 44px;
+  padding: 10px 0 8px; background: none; border: 0; cursor: pointer;
+  font: inherit; font-size: var(--text-base); color: var(--muted-foreground);
+  text-align: left; text-decoration: none;
+  transition: color var(--motion-fast) ease;
+}
+.ui-facet__btn:hover { color: var(--foreground); }
+.ui-facet__btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.ui-facet__row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); width: 100%; }
+.ui-facet__name { display: flex; align-items: center; gap: 10px; min-width: 0; }
+/* The brand-mark idiom: a short vertical accent bar marks the selected row. It slides in
+   from a negative margin, so an unselected name sits flush with the column edge. */
+.ui-facet__mark {
+  flex: none; width: 3px; height: 14px; border-radius: 1px; background: transparent;
+  margin-left: -13px; transition: margin var(--motion-base) ease, background var(--motion-base) ease;
+}
+.ui-facet__count { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--faint-foreground); font-variant-numeric: tabular-nums; }
+.ui-facet__bar { display: block; width: 100%; height: 2px; background: var(--muted); border-radius: 1px; overflow: hidden; }
+.ui-facet__fill {
+  display: block; height: 100%; width: calc(var(--share) * 100%);
+  background: var(--border-strong); transition: width var(--motion-base) ease;
+}
+.ui-facet__btn[aria-pressed="true"],
+.ui-facet__btn[aria-current] { color: var(--pub-accent, var(--accent)); }
+.ui-facet__btn[aria-pressed="true"] .ui-facet__mark,
+.ui-facet__btn[aria-current] .ui-facet__mark { margin-left: 0; background: var(--pub-accent, var(--accent)); }
+.ui-facet__btn[aria-pressed="true"] .ui-facet__fill,
+.ui-facet__btn[aria-current] .ui-facet__fill { background: var(--pub-accent, var(--accent)); }
+.ui-facet__btn.is-empty { color: var(--faint-foreground); }
+.ui-facet__btn.is-empty .ui-facet__name { opacity: .6; }
+
+/* ---------- Tier toggles: multi-select. A modifier on the tier badge, which keeps the
+   colour its family gives it; nothing here names a tier colour. ---------- */
+.ui-filter__tiers { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.ui-tier.ui-tier--toggle {
+  min-height: 32px; padding: 0 12px; gap: 6px; cursor: pointer; vertical-align: middle;
+  background: none; border: 1px solid var(--border-strong);
+  transition: background var(--motion-fast) ease, border-color var(--motion-fast) ease, opacity var(--motion-fast) ease;
+}
+.ui-tier--toggle:hover { border-color: currentColor; }
+.ui-tier--toggle:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.ui-tier.ui-tier--toggle[aria-pressed="true"] { border-color: currentColor; background: color-mix(in srgb, currentColor 14%, transparent); }
+.ui-tier--toggle.is-empty:not([aria-pressed="true"]) { opacity: .45; }
+.ui-tier__count { opacity: .7; font-variant-numeric: tabular-nums; }
+
+/* ---------- Check toggle: one boolean, full width. A <button aria-pressed>. ---------- */
+.ui-check {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 0 12px;
+  background: none; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--muted-foreground); font: inherit; font-size: var(--text-base); cursor: pointer; text-align: left;
+}
+.ui-check:hover { border-color: var(--border-strong); }
+.ui-check:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.ui-check__box {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: var(--radius-xs); border: 1px solid var(--border-strong);
+}
+.ui-check__box svg { width: 12px; height: 12px; fill: none; stroke: var(--background); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
+.ui-check__label { flex: 1; }
+.ui-check__count { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--faint-foreground); font-variant-numeric: tabular-nums; }
+.ui-check[aria-pressed="true"] { background: var(--muted); border-color: var(--border-strong); color: var(--foreground); }
+.ui-check[aria-pressed="true"] .ui-check__box { background: var(--pub-accent, var(--accent)); border-color: var(--pub-accent, var(--accent)); }
+.ui-check[aria-pressed="true"] .ui-check__box svg { opacity: 1; }
+
+/* ---------- Histogram: clickable buckets (months), one bar each ---------- */
+.ui-histo { display: grid; grid-template-columns: repeat(var(--buckets), minmax(0, 1fr)); gap: var(--space-2); align-items: end; }
+.ui-histo__btn {
+  display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-2); min-height: 44px;
+  background: none; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--muted-foreground); cursor: pointer; font: inherit;
+}
+.ui-histo__btn:hover { border-color: var(--border-strong); }
+.ui-histo__btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.ui-histo__plot { display: flex; align-items: flex-end; height: 56px; width: 100%; }
+/* An empty bucket keeps a 2px stub, so "none" is still a mark you can see and press. */
+.ui-histo__bar {
+  display: block; width: 100%; min-height: 2px; height: calc(var(--share) * 100%);
+  border-radius: 2px; background: var(--border-strong); transition: height var(--motion-base) ease;
+}
+.ui-histo__axis {
+  display: flex; justify-content: space-between; width: 100%;
+  font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: .08em; text-transform: uppercase;
+}
+.ui-histo__axis span + span { color: var(--faint-foreground); font-variant-numeric: tabular-nums; }
+.ui-histo__btn[aria-pressed="true"] { background: var(--muted); border-color: var(--border-strong); color: var(--pub-accent, var(--accent)); }
+.ui-histo__btn[aria-pressed="true"] .ui-histo__bar { background: var(--pub-accent, var(--accent)); }
+
+/* ---------- Segmented control: one of a few ---------- */
+.ui-seg {
+  display: grid; grid-template-columns: repeat(var(--segments), minmax(0, 1fr));
+  gap: 3px; padding: 3px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+}
+.ui-seg__btn {
+  min-height: 38px; border-radius: var(--radius-xs); border: 1px solid transparent; background: none;
+  color: var(--faint-foreground); font: inherit; font-size: var(--text-sm); cursor: pointer;
+}
+.ui-seg__btn:hover { color: var(--foreground); }
+.ui-seg__btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; }
+.ui-seg__btn[aria-pressed="true"] { background: var(--muted); border-color: var(--border-strong); color: var(--foreground); }
+
+/* ---------- Panel footer: icon links + a feed link for the current view ---------- */
+.ui-filter__foot { display: flex; align-items: center; gap: var(--space-2); padding-top: var(--space-4); border-top: 1px solid var(--border); }
+.ui-filter__foot .ui-sidebar__meta { margin: 0; padding: 0; border: 0; }
+.ui-filter__foot .ui-sidebar__meta-link { width: 44px; height: 44px; }
+.ui-filter__foot-spacer { flex: 1; }
+.ui-filter__feed { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: .1em; text-transform: uppercase; text-decoration: none; }
+
+/* ---------- Results header: heading left, removable chips right ---------- */
+.ui-results__head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap;
+  margin: 0 0 var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--border); min-height: 32px;
+}
+.ui-results__head .ui-main__heading { margin: 0; padding: 0; border: 0; }
+.ui-results__head + .ui-postlist .ui-postlist__item:first-child .ui-postlist__link { padding-top: var(--space-5); }
+.ui-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+.ui-chip {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 8px 0 10px;
+  background: var(--muted); border: 1px solid var(--border-strong); border-radius: var(--radius-pill);
+  color: var(--foreground); font: inherit; font-size: var(--text-sm); cursor: pointer;
+}
+.ui-chip svg { width: 12px; height: 12px; fill: none; stroke: var(--faint-foreground); stroke-width: 2.2; stroke-linecap: round; }
+.ui-chip:hover svg { stroke: var(--foreground); }
+.ui-chip:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.ui-chips__clear {
+  min-height: 28px; padding: 0 10px; background: none; border: 0; cursor: pointer;
+  color: var(--pub-accent, var(--accent)); font-family: var(--font-mono); font-size: var(--text-xs);
+  letter-spacing: .1em; text-transform: uppercase;
+}
+.ui-chips__clear:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+/* A finger needs more than 28px: on a touch screen the chip grows to a full target. */
+@media (pointer: coarse) {
+  .ui-chip, .ui-chips__clear { min-height: 44px; }
+  .ui-tier.ui-tier--toggle { min-height: 44px; }
+  .ui-seg__btn { min-height: 44px; }
+}
+
+/* ---------- Empty state ---------- */
+.ui-results__empty {
+  display: flex; flex-direction: column; gap: var(--space-3); align-items: flex-start;
+  padding: var(--space-7) 0; border-bottom: 1px solid var(--border);
+}
+.ui-results__empty[hidden] { display: none; }
+.ui-results__empty-title { margin: 0; font-family: var(--font-display); font-size: var(--display-2); line-height: 1.2; color: var(--foreground); }
+.ui-results__empty p { margin: 0; color: var(--muted-foreground); max-width: 52ch; }
+
+.ui-postlist__item[hidden] { display: none; }

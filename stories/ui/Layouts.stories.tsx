@@ -60,6 +60,21 @@ export const SiteShell: StoryObj = {
   ),
 }
 
+export const SingleColumn: StoryObj = {
+  name: "Single column (no sidebar, centred)",
+  render: () => (
+    <>
+      <Shell variant="single" brand={<Brand word="Polarize" />}>
+        <p className="ui-label ui-main__heading">Latest</p>
+        <PostList posts={posts} />
+      </Shell>
+      <Footer brand={<Brand word="Polarize" />} tagline="Reading and writing the body electric">
+        Placeholder fine print for the footer.
+      </Footer>
+    </>
+  ),
+}
+
 export const ArticlePage: StoryObj = {
   name: "Article",
   parameters: { layout: "padded" },

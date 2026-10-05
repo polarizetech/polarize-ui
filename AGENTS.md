@@ -48,6 +48,11 @@ you.
   `python3 scripts/dataset_types.py`. `dev_check.py` (add `--network` to re-verify the downloads)
   refuses a dataset without a redistributable licence, a committed `data.json`, or a URL that is
   not the content-addressed one.
+- **Filters** (a faceted panel for an index, and its controls) are three files that must agree:
+  the `FILTERS` section of `publication.css` (the classes), `filter.js` (zero-build behaviour
+  and the pure matching/counting logic) and `src/components/filter.tsx` (React, which imports
+  that logic from `filter.js`, never a copy). State is `aria-pressed` on a real button. A tier
+  toggle is the tier badge with `ui-tier--toggle`; it never names a tier colour.
 - **`src/components/`** holds the general UI: shadcn components (`ui/`), typography, page
   layouts and illustrations. Stories go under `stories/ui/`, titled `General UI/…`.
 - Science views follow the chart rules in `stories/Introduction.mdx`. They state their scale,

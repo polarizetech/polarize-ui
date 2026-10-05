@@ -12,11 +12,20 @@ const icon = "ui-icon size-[1em]"
 
 /* ---------- Shell ---------- */
 
-export function Shell({ brand, sidebar, children }: { brand: React.ReactNode; sidebar: React.ReactNode; children: React.ReactNode }) {
+/**
+ * The page frame. `sidebar` (the default) puts a sidebar beside the content; on a narrow
+ * screen it drops below. `filter` is the same with the sidebar ABOVE the content when it
+ * stacks, for an index whose sidebar is a filter panel. `single` has no sidebar and centres
+ * the main column.
+ */
+export function Shell({ brand, sidebar, children, variant = sidebar ? "sidebar" : "single" }: {
+  brand?: React.ReactNode; sidebar?: React.ReactNode; children: React.ReactNode
+  variant?: "sidebar" | "filter" | "single"
+}) {
   return (
-    <div className="ui-shell">
-      <div className="ui-shell__brand">{brand}</div>
-      <aside className="ui-sidebar">{sidebar}</aside>
+    <div className={cn("ui-shell", variant === "filter" && "ui-shell--filter", variant === "single" && "ui-shell--single")}>
+      {brand && <div className="ui-shell__brand">{brand}</div>}
+      {variant !== "single" && sidebar && <aside className="ui-sidebar">{sidebar}</aside>}
       <main className="ui-main">{children}</main>
     </div>
   )

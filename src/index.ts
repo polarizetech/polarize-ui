@@ -29,6 +29,7 @@ export * from "./science/evidence/docs"
 // ── General UI ──────────────────────────────────────────────────────────────────
 export * from "./components/typography"
 export * from "./components/publication"
+export * from "./components/filter"
 export * from "./components/landing"
 export * from "./components/cellfield"
 export * from "./components/docs"

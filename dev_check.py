@@ -522,6 +522,47 @@ def check_docs() -> None:
     ok("every code-window ink clears 4.5:1 on the panel and its bar (measured here)", bool(code) and not low, str(low))
 
 
+def check_filter() -> None:
+    """filter.js + the FILTERS section of publication.css: a filter panel for an index."""
+    path = HERE / "filter.js"
+    ok("filter.js exists", path.is_file())
+    if not path.is_file():
+        return
+    js = path.read_text()
+    code = re.sub(r"/\*.*?\*/|//[^\n]*", "", js, flags=re.S)
+    pub = (HERE / "publication.css").read_text()
+    ok("filter.js has a type declaration", (HERE / "filter.d.ts").is_file())
+    ok("filter.js exports its pure logic and the enhancer",
+       all(re.search(rf"export (function|const) {n}\b", js) for n in
+           ("emptyState", "matches", "visible", "facetCount", "isFiltered", "readQuery", "toQuery", "initFilter", "init")))
+    ok("filter.js fetches nothing and stores nothing",
+       not re.search(r"\bfetch\(|localStorage|sessionStorage|XMLHttpRequest", code))
+    ok("filter.js never uses requestAnimationFrame or setInterval",
+       "requestAnimationFrame" not in code and "setInterval" not in code)
+    ok("filter.js carries state in aria-pressed, not a class",
+       code.count("setAttribute('aria-pressed'") >= 5 and "is-active" not in code and "is-selected" not in code)
+    ok("filter.js writes text with textContent, never interpolating page text into innerHTML",
+       "innerHTML = `<span></span>${X}`" in code and code.count("innerHTML") == 1)
+    ok("filter.js names every removable chip for a screen reader", "Remove filter: " in code)
+    ok("filter.js is shipped and exported by the package",
+       '"filter.js"' in (HERE / "package.json").read_text() and '"./filter.js": "./filter.js"' in (HERE / "package.json").read_text())
+    react = (HERE / "src" / "components" / "filter.tsx").read_text()
+    ok("the React filter uses filter.js's logic rather than a second copy",
+       'from "../../filter.js"' in react and "facetCount(" in react and "function matches" not in react)
+    ok("every React filter control is a button with aria-pressed",
+       react.count("aria-pressed=") >= 5 and 'type="checkbox"' not in react)
+    for cls in (".ui-filter", ".ui-facet", ".ui-tier--toggle", ".ui-check", ".ui-histo", ".ui-seg", ".ui-chip",
+                ".ui-results__head", ".ui-results__empty", ".ui-shell--filter", ".ui-shell--single"):
+        ok(f"publication.css defines {cls}", re.search(re.escape(cls) + r"[\s,.:\[{]", pub) is not None)
+    block = pub[pub.index("FILTERS"):]
+    ok("a tier toggle names no tier colour (it inherits its family's)",
+       not re.search(r"--(measured|predicted|exploring|spec|refuted|tier-)", block))
+    ok("every filter control shows a focus ring",
+       all(f"{c}:focus-visible" in block for c in (".ui-facet__btn", ".ui-tier--toggle", ".ui-check", ".ui-histo__btn", ".ui-seg__btn", ".ui-chip")))
+    ok("the stacked filter layout puts the controls above the results",
+       re.search(r'\.ui-shell--filter\s*\{\s*grid-template-areas:\s*"brand"\s*"side"\s*"main"', pub) is not None)
+
+
 def check_cellfield() -> None:
     """cellfield.js: decoration only, so it must stop for reduced motion and fetch nothing."""
     path = HERE / "cellfield.js"
@@ -637,6 +678,7 @@ def main() -> int:
     check_publication()
     check_landing()
     check_cellfield()
+    check_filter()
     check_docs()
     check_react_mirror()
     check_package_imports()
