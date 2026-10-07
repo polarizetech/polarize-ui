@@ -577,6 +577,33 @@ def check_cellfield() -> None:
     ok("cellfield.js has a type declaration for React", (HERE / "cellfield.d.ts").is_file())
 
 
+def check_trajectory3d() -> None:
+    """trajectory3d.js: a data view on a canvas, so it takes its colour from tokens and fetches nothing."""
+    path = HERE / "trajectory3d.js"
+    ok("trajectory3d.js exists", path.is_file())
+    if not path.is_file():
+        return
+    js = path.read_text()
+    code = re.sub(r"/\*.*?\*/|//[^\n]*", "", js, flags=re.S)
+    ok("trajectory3d.js exports mountTrajectory3D", "export function mountTrajectory3D(" in code)
+    for method in ("update", "setTime", "show", "resetView", "destroy"):
+        ok(f"trajectory3d.js handle has {method}()", re.search(rf"^    {method}\(", code, re.M) is not None)
+    ok("trajectory3d.js imports and fetches nothing", "fetch(" not in code and not re.search(r"^\s*import\b", code, re.M))
+    for token in ("--foreground", "--muted-foreground", "--series-1", "--series-4", "--font-mono"):
+        ok(f"trajectory3d.js reads {token}, which design.css defines", f"'{token}'" in code and f"{token}:" in CSS)
+    ok("trajectory3d.js names no tier colour (a series colour never impersonates a tier)",
+       not re.search(r"--(measured|predicted|exploring|spec|refuted|tier-)", code))
+    ok("trajectory3d.js has an accessible name and takes the keyboard", "aria-label" in code and "keydown" in code)
+    ok("trajectory3d.js leaves a plain scroll to the page", "if (!e.ctrlKey && !e.metaKey) return" in code)
+    ok("trajectory3d.js redraws on a theme change and cleans up after itself",
+       "MutationObserver" in code and "mo.disconnect()" in code and "ro.disconnect()" in code)
+    ok("trajectory3d.js has a type declaration", (HERE / "trajectory3d.d.ts").is_file())
+    pkg = json.loads((HERE / "package.json").read_text())
+    ok("package.json ships and exports trajectory3d.js",
+       {"trajectory3d.js", "trajectory3d.d.ts"} <= set(pkg["files"]) and pkg["exports"].get("./trajectory3d.js") == "./trajectory3d.js")
+    ok("INTEGRATION.md documents trajectory3d.js", "trajectory3d.js" in (HERE / "INTEGRATION.md").read_text())
+
+
 def check_react_mirror() -> None:
     """src/theme.css re-declares a few design.css classes for React documents; they must match."""
     path = HERE / "src" / "theme.css"
@@ -678,6 +705,7 @@ def main() -> int:
     check_publication()
     check_landing()
     check_cellfield()
+    check_trajectory3d()
     check_filter()
     check_docs()
     check_react_mirror()

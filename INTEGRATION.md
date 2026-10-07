@@ -17,6 +17,7 @@ DESIGN_PUBLIC = {
     "/design/design.css":  DESIGN / "design.css",
     "/design/design.js":   DESIGN / "design.js",
     "/design/tokens.json": DESIGN / "tokens.json",
+    "/design/trajectory3d.js": DESIGN / "trajectory3d.js",   # only if you draw a 3-D path (section 5)
     # The UI font is a SYSTEM STACK -- nothing to serve. These two are the
     # optional serif (Literata), needed only if your project asks for
     # var(--font-serif). Serve them or don't; design.css degrades to Georgia.
@@ -173,6 +174,58 @@ Fixed order, never cycled. **Cap at three** for scatter / bubble / small
 multiples — only the first three slots clear the all-pairs colour-blindness
 floors; past three, fold to "Other" or facet. Never use a tier colour for a
 series, or a series colour for a tier.
+
+### A path through three dimensions: `trajectory3d.js`
+
+A phase portrait or state-space trajectory with a marker at the current time, on a plain 2-D
+canvas. No dependencies. Add it to the allow-list in section 1, then:
+
+```html
+<div id="path"></div>
+<script type="module">
+  import { mountTrajectory3D } from './design/trajectory3d.js';
+  const view = mountTrajectory3D(document.getElementById('path'), {
+    paths: [{ points: [[x, y, z], /* ... */], label: 'PCA' }],
+    duration: 10,              // seconds the points span, evenly spaced
+    axes: ['PC 1', 'PC 2', 'PC 3'],
+    trail: 1,                  // seconds before the marker drawn heavier
+    height: 360,               // CSS pixels; the width is the host's
+    label: 'Population activity as a path through its first three components',
+  });
+  video.addEventListener('timeupdate', () => view.setTime(video.currentTime));
+</script>
+```
+
+| Handle | |
+|---|---|
+| `setTime(seconds)` | moves the marker; the part already played is drawn stronger, the last `trail` seconds heaviest |
+| `update({...})` | new options or data, same view angle |
+| `show(index)` | which of `paths` is drawn. One at a time |
+| `resetView()` | back to the starting angle and zoom |
+| `destroy()` | removes the canvas and its observers |
+
+It returns `null` when a 2-D canvas is unavailable. Types are in `trajectory3d.d.ts`.
+
+**Input.** Drag turns it, a two-finger pinch or Ctrl/Cmd-scroll zooms, and the arrow keys and
+`+`/`-` do the same when the canvas has focus. A plain scroll is left to the page. The canvas
+takes every touch that starts on it (`touch-action: none`), so on a phone leave some page beside
+or below it to scroll by, and keep `height` under the viewport's.
+
+**What it does not say. Put these next to it, not in a drawer:**
+
+- Each path is centred and scaled to fill the view **on its own**, one scale for all three axes.
+  Shapes are true. Sizes of two paths are not comparable, and the axes have no units or ticks.
+- Points are taken as evenly spaced over `duration`. Resample first if yours are not.
+- Axes are right-handed (x right, y up, z toward you at the starting yaw of zero). A left-handed
+  frame, such as north, east, up, is drawn mirrored and turns the wrong way.
+- A trajectory is a way to draw a signal. It is not by itself a measurement of anything, so the
+  tier badge for whatever produced the points belongs beside it.
+
+**Colour** is read from the host: `--foreground`, `--muted-foreground`, `--series-1` (the path),
+`--series-4` (the marker) and `--font-mono`, so it follows the theme and is redrawn when the theme
+changes. On a page that loads the React theme instead of `design.css` it uses `--chart-1` and
+`--chart-4`. A React project that wants units, ticks and hover values should use `Trajectory3D`
+from `@polarizetech/polarize-ui/react`, which is a different, fuller view.
 
 ## 6. Check it
 
