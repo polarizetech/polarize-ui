@@ -4,6 +4,8 @@ import { Surface3D, Trajectory3D, Waterfall3D } from "@/science/space/views"
 import { Heatmap } from "@/science/signals/Heatmap"
 import { LineChart } from "@/science/charts/LineChart"
 import { Slider } from "@/components/ui/slider"
+import { Button } from "@/components/ui/button"
+import { mountTrajectory3D, type Trajectory3DHandle } from "../../trajectory3d.js"
 import { Eyebrow } from "@/components/typography"
 import cmo from "virtual:dataset/usgs-cmo-hour"
 import cmoSource from "../datasets/usgs-cmo-hour/SOURCE.json"
@@ -17,7 +19,8 @@ const meta: Meta = {
       description: {
         component:
           "Three standard 3-D views — a spectrogram landscape, a hodogram and an event-aligned stack — drawn on a " +
-          "dependency-free canvas. All data here are real public recordings; each story names its source and licence.",
+          "dependency-free canvas. The data are real public recordings, and each story names its source and licence. The one " +
+          "exception is the path with a time marker, which is a synthetic textbook system and says so.",
       },
     },
   },
@@ -95,6 +98,65 @@ function HodogramStory() {
 export const Hodogram: StoryObj = {
   name: "Hodogram (magnetometer, band-passed)",
   render: () => <HodogramStory />,
+}
+
+// The Lorenz system (Lorenz 1963), σ = 10, ρ = 28, β = 8/3, by fourth-order Runge–Kutta. Synthetic.
+const LORENZ_S = 20
+function lorenz(n: number, dt: number): [number, number, number][] {
+  const f = ([x, y, z]: number[]) => [10 * (y - x), x * (28 - z) - y, x * y - (8 / 3) * z]
+  const step = (p: number[], k: number[], h: number) => p.map((v, i) => v + k[i] * h)
+  let p = [1, 1, 20]
+  const out: [number, number, number][] = []
+  for (let i = 0; i < n; i++) {
+    out.push([p[1], p[2], p[0]]) // z drawn upward; (y, z, x) keeps the frame right-handed
+    const k1 = f(p), k2 = f(step(p, k1, dt / 2)), k3 = f(step(p, k2, dt / 2)), k4 = f(step(p, k3, dt))
+    p = p.map((v, j) => v + (dt / 6) * (k1[j] + 2 * k2[j] + 2 * k3[j] + k4[j]))
+  }
+  return out
+}
+const lorenzPath = lorenz(2000, LORENZ_S / 2000)
+
+function TimeMarkerStory() {
+  const host = React.useRef<HTMLDivElement>(null)
+  const view = React.useRef<Trajectory3DHandle | null>(null)
+  const [time, setTime] = React.useState(6)
+  const [playing, setPlaying] = React.useState(false)
+  React.useEffect(() => {
+    if (!host.current) return
+    view.current = mountTrajectory3D(host.current, {
+      paths: [{ points: lorenzPath, label: "Lorenz" }], duration: LORENZ_S, axes: ["y", "z", "x"], trail: 1.5,
+      label: "The Lorenz attractor as a path through three dimensions, with a marker at the current time",
+    })
+    return () => { view.current?.destroy(); view.current = null }
+  }, [])
+  React.useEffect(() => { view.current?.setTime(time) }, [time])
+  React.useEffect(() => {
+    if (!playing) return
+    const id = setInterval(() => setTime((t) => (t + 0.05) % LORENZ_S), 50)
+    return () => clearInterval(id)
+  }, [playing])
+  return (
+    <div className="grid max-w-3xl gap-3">
+      <div className="flex items-center gap-3">
+        <Button size="sm" variant="outline" aria-pressed={playing} onClick={() => setPlaying((p) => !p)}>{playing ? "Pause" : "Play"}</Button>
+        <Slider min={0} max={LORENZ_S} step={0.05} value={[time]} onValueChange={([t]) => setTime(t)} aria-label="Time" />
+        <span className="whitespace-nowrap font-mono text-[length:var(--text-xs)] text-muted-foreground tabular-nums">{time.toFixed(1)} / {LORENZ_S} s</span>
+        <Button size="sm" variant="ghost" onClick={() => view.current?.resetView()}>Reset view</Button>
+      </div>
+      <div ref={host} />
+      <p className="text-[length:var(--text-xs)] text-muted-foreground">
+        <span className="font-mono">Data · synthetic.</span> The Lorenz system (σ = 10, ρ = 28, β = 8/3), integrated in the
+        story; nothing was recorded. The path is scaled to fill the view, one scale on all three axes, so there are no units
+        or ticks. Drag to turn, pinch or Ctrl-scroll to zoom, arrow keys when focused. This is the zero-build module{" "}
+        <span className="font-mono">trajectory3d.js</span>; for units, ticks and hover values use the hodogram above.
+      </p>
+    </div>
+  )
+}
+
+export const PathWithTimeMarker: StoryObj = {
+  name: "Path with a time marker (zero-build, synthetic)",
+  render: () => <TimeMarkerStory />,
 }
 
 const pts = (vals: number[]) => abr.lags_ms.map((l, i) => [l, vals[i]] as [number, number])
