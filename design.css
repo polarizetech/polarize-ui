@@ -259,6 +259,125 @@
   color-scheme: dark;
 }
 
+/* fieldguide: white and magenta, Geist for the sans (2026-10-15). Opt-in by stamp. */
+:root[data-theme="fieldguide"] {
+  --background: #ffffff;
+  --foreground: #16181c;
+  --card: #ffffff;
+  --card-foreground: #16181c;
+  --popover: #f4f3f0;
+  --muted: #f4f3f0;
+  --muted-foreground: #4d5259;
+  --faint-foreground: #636970;
+  --border: #e2e0da;
+  --border-strong: #d0cec6;
+  --ring: #923b69;
+  --accent: #923b69;
+  --shadow: 0 1px 2px rgba(20,22,26,.05), 0 8px 24px -16px rgba(20,22,26,.25);
+  --overlay: rgba(20,22,26,.55);
+  --font-primary: "Geist", ui-sans-serif, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Geist", ui-sans-serif, -apple-system, "Segoe UI", sans-serif;
+  --measured: #15875e;
+  --predicted: #2976d3;
+  --exploring: #9f6c00;
+  --spec: #4a3aa7;
+  --refuted: #df3231;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-6: #008300;
+  --series-7: #4a3aa7;
+  --series-8: #e34948;
+  --seq-1: #cde2fb;
+  --seq-2: #b7d3f6;
+  --seq-3: #9ec5f4;
+  --seq-4: #86b6ef;
+  --seq-5: #6da7ec;
+  --seq-6: #5598e7;
+  --seq-7: #3987e5;
+  --seq-8: #2a78d6;
+  --seq-9: #256abf;
+  --seq-10: #1c5cab;
+  --seq-11: #184f95;
+  --seq-12: #104281;
+  --seq-13: #0d366b;
+  --div-1: #0d366b;
+  --div-2: #184f95;
+  --div-3: #256abf;
+  --div-4: #3987e5;
+  --div-5: #6da7ec;
+  --div-6: #9ec5f4;
+  --div-7: #f0efec;
+  --div-8: #ffa69f;
+  --div-9: #ff6f69;
+  --div-10: #fa082c;
+  --div-11: #c90020;
+  --div-12: #9a0016;
+  --div-13: #6e000d;
+  color-scheme: light;
+}
+
+:root[data-theme="fieldguide-dark"] {
+  --background: #101317;
+  --foreground: #e8e9ea;
+  --card: #171b20;
+  --card-foreground: #e8e9ea;
+  --popover: #1e232a;
+  --muted: #1e232a;
+  --muted-foreground: #a7adb5;
+  --faint-foreground: #868d96;
+  --border: #262c33;
+  --border-strong: #333b44;
+  --ring: #ed9fc4;
+  --accent: #ed9fc4;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.8);
+  --overlay: rgba(4,6,8,.68);
+  --font-primary: "Geist", ui-sans-serif, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: "Geist", ui-sans-serif, -apple-system, "Segoe UI", sans-serif;
+  --measured: #199e70;
+  --predicted: #3987e5;
+  --exploring: #c98500;
+  --spec: #9085e9;
+  --refuted: #e66767;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+  --series-7: #9085e9;
+  --series-8: #e66767;
+  --seq-1: #0d366b;
+  --seq-2: #104281;
+  --seq-3: #184f95;
+  --seq-4: #1c5cab;
+  --seq-5: #256abf;
+  --seq-6: #2a78d6;
+  --seq-7: #3987e5;
+  --seq-8: #5598e7;
+  --seq-9: #6da7ec;
+  --seq-10: #86b6ef;
+  --seq-11: #9ec5f4;
+  --seq-12: #b7d3f6;
+  --seq-13: #cde2fb;
+  --div-1: #9ec5f4;
+  --div-2: #86b6ef;
+  --div-3: #5598e7;
+  --div-4: #2a78d6;
+  --div-5: #1c5cab;
+  --div-6: #104281;
+  --div-7: #383835;
+  --div-8: #830011;
+  --div-9: #b1001b;
+  --div-10: #e20026;
+  --div-11: #ff4b4c;
+  --div-12: #ff8c85;
+  --div-13: #ffa69f;
+  color-scheme: dark;
+}
+
 /* Previous defaults, kept as explicit opt-ins. */
 :root[data-theme="polarize"] {
   --background: #100d0b;
@@ -543,6 +662,13 @@
   font-weight: 100 900;
   font-display: swap;
   src: url("fonts/inter-variable.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Geist";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/geist-400.woff2") format("woff2");
 }
 @font-face {
   font-family: "IBM Plex Mono";

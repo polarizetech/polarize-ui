@@ -147,12 +147,12 @@ g.innerHTML = Object.keys(SPECIMENS).map(k => `<div class="c">${svg(k)}<div>${k}
 
 ## Existing keys (don't reuse)
 
-`prism` `mic` `paper` `iron` `scope` `plug` `guitar` `pencil` `desk` `lock` `bee`
+`prism` `mic` `paper` `iron` `scope` `plug` `guitar` `pencil` `desk` `lock` `bee` `crab` `neuron` `magnet`
 
 Add each new key to this list once it is in `src/specimens.ts`.
 
 ## Ideas queue
 
-Drawn for an earlier site but never kept, so free to draw again: pyramidal neuron, brain, heart, bacterium, EEG trace, bone, crab, feather, shark, eel, swallow, honeycomb, spider web, magnet, wave, catalogue card.
+Drawn for an earlier site but never kept, so free to draw again: brain, heart, bacterium, EEG trace, bone, feather, shark, eel, swallow, honeycomb, spider web, wave, catalogue card.
 
 Other subjects that fit the set: tuning fork, jellyfish, electric ray, platypus bill, octopus, axolotl, planarian flatworm, frog embryo, neuromuscular junction, ion channel, synapse, Purkinje cell, cochlea, retina / eye, spinal cord, DNA helix, fluxgate core, Helmholtz coil, op-amp triangle, BNC connector, electrode pad, breadboard, multimeter, compass, magnifying glass, petri dish, test tube rack, microscope, turntable, reel-to-reel, speaker cone, waveform envelope.
