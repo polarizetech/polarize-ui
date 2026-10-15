@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import * as React from "react"
 import { Brand } from "@/components/publication"
 import { Cta } from "@/components/landing"
-import { CellField } from "@/components/cellfield"
 import {
   ApiEntry, Callout, Chip, Chips, CodeWindow, DatasetCard, DocsPageHead, DocsSection, DocsShell, DocsThemeToggle,
   Example, ExampleFailed, HowTo, PkgCard, PkgCards, StatRow, type PlotSpec,
@@ -135,8 +134,7 @@ export const HomePage: StoryObj = {
     <DocsShell brand={<Brand word="polarize-ui" href="#" />} wide
       nav={[{ title: "Introduction", items: [{ label: "Overview", href: "#", current: true }] },
             { title: "Packages", items: [{ label: "science", href: "#", meta: "0.5" }, { label: "landing", href: "#", meta: "0.5" }] }]}>
-      <section className="ui-docsite__hero ui-cellfield-host" id="docs-hero">
-        <CellField hero="#docs-hero" density={0.6} intensity={0.8} />
+      <section className="ui-docsite__hero" id="docs-hero">
         <div>
           <p className="ui-docsite__kicker">polarize-ui · docs layer</p>
           <h1 className="ui-display ui-display--1 ui-docsite__hero-title">One core, and layers that each add one job.</h1>

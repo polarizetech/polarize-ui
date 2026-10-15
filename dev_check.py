@@ -573,20 +573,6 @@ def check_filter() -> None:
        re.search(r'\.ui-shell--filter\s*\{\s*grid-template-areas:\s*"brand"\s*"side"\s*"main"', pub) is not None)
 
 
-def check_cellfield() -> None:
-    """cellfield.js: decoration only, so it must stop for reduced motion and fetch nothing."""
-    path = HERE / "cellfield.js"
-    ok("cellfield.js exists", path.is_file())
-    if not path.is_file():
-        return
-    js = path.read_text()
-    ok("cellfield.js defines <ui-cellfield>", "customElements.define('ui-cellfield'" in js)
-    ok("cellfield.js stops for prefers-reduced-motion", "prefers-reduced-motion: reduce" in js)
-    ok("cellfield.js fetches nothing", "fetch(" not in js)
-    ok("cellfield.js is hidden from assistive tech", "aria-hidden" in js)
-    ok("cellfield.js has a type declaration for React", (HERE / "cellfield.d.ts").is_file())
-
-
 def check_trajectory3d() -> None:
     """trajectory3d.js: a data view on a canvas, so it takes its colour from tokens and fetches nothing."""
     path = HERE / "trajectory3d.js"
@@ -741,7 +727,6 @@ def main() -> int:
     check_shadcn()
     check_publication()
     check_landing()
-    check_cellfield()
     check_trajectory3d()
     check_bandprominence()
     check_filter()

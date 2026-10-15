@@ -166,11 +166,13 @@ export function Promises({ items }: { items: { title: string; text: React.ReactN
 
 export type Change = { date: string; num?: string; title: React.ReactNode }
 
-/** A project: the question it asks, its latest finding, its latest changes, and a plate. */
-export function ProjectFeature({ href, repo, meta = [], question, description, finding, changes = [], plate, flip = false }: {
+/** A project: the question it asks, its latest finding, its latest changes, and a plate or specimen. */
+export function ProjectFeature({ href, repo, meta = [], question, description, finding, changes = [], plate, media, flip = false }: {
   href: string; repo: string; meta?: string[]; question: React.ReactNode; description?: React.ReactNode
   finding?: { tier?: React.ReactNode; text: React.ReactNode; read?: React.ReactNode }
   changes?: Change[]; plate?: PlateProps; flip?: boolean
+  /** Anything else in the media slot, usually a specimen; used when there is no `plate`. */
+  media?: React.ReactNode
 }) {
   return (
     <a className={cn("ui-project", flip && "ui-project--flip")} href={href}>
@@ -204,6 +206,7 @@ export function ProjectFeature({ href, repo, meta = [], question, description, f
         )}
       </div>
       {plate && <Plate {...plate} className={cn("ui-project__media", plate.className)} />}
+      {!plate && media && <div className="ui-project__media ui-specimen-tile">{media}</div>}
     </a>
   )
 }

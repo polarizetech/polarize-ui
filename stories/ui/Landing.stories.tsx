@@ -1,10 +1,11 @@
+import * as React from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Brand } from "@/components/publication"
 import {
-  ArticleCard, ChangeFeed, Cta, FeaturedArticle, Hero, MetaLine, Principle, ProcessSteps, ProjectFeature,
-  Promises, RepoCard, Section, SiteFooter, StoryCard, StoryRow, TierLegend, TopNav,
+  Action, ArticleCard, ChangeFeed, Cta, FeaturedArticle, Hero, MetaLine, Principle, ProcessSteps, ProjectFeature,
+  Promises, RepoCard, Section, SiteFooter, Stats, StoryCard, StoryRow, TierLegend, Topics, TopNav,
 } from "@/components/landing"
-import { CellField } from "@/components/cellfield"
+import { Specimen } from "@/components/specimen"
 import { Tier } from "@/science/evidence/tier"
 
 // Real content from polarize.tech, for layout. Images are served from the live site.
@@ -23,7 +24,7 @@ const nav = (
       { label: "Speculations", href: "#speculations" },
       { label: "Changelog", href: "#changelog" },
     ]}
-    actions={<Cta href="#contact" solid>Get in touch</Cta>}
+    actions={<Action href="#contact" small>Get in touch</Action>}
   />
 )
 
@@ -32,14 +33,22 @@ const hero = (
     id="hero"
     title={<>Reading and writing the <em>body electric.</em></>}
     lede="An independent research lab building open instruments and software for bioelectric sensing — and publishing what they find, including when the answer is no."
-    actions={<><Cta href="#process" icon>Our process</Cta><Cta href="#contact" solid>Get in touch</Cta></>}
+    actions={<><Action href="#contact">Get in touch</Action><Action href="#process" outline>Our process</Action></>}
   />
+)
+
+const stats = (
+  <div style={{ padding: "0 clamp(20px, 4vw, 48px)", marginBottom: 64 }}>
+    <Stats note="Counted when the site is built; these are polarize.tech's on October 15, 2026."
+      items={[{ value: 16, label: "articles, each with its sources" }, { value: 5, label: "research topics" },
+              { value: 11, label: "public repositories" }, { value: 37, label: "merged changes" }]} />
+  </div>
 )
 
 const process = (
   <Section id="process" eyebrow="Process" title="Built to show where we were wrong."
     lede="Every study borrows the discipline of a clinical trial: the inputs and the predictions are preregistered before anything runs, so a result can fail in public and stay on the record.">
-    <ProcessSteps steps={[
+    <ProcessSteps rows steps={[
       { num: "01", stage: "Before anything runs", repo: "adaptive-preregistration", version: "v0.1.1", title: "Predict first, then run the code.",
         body: "Predictions and pass criteria are tagged in git before the code runs. Every later change is dated and can't turn a fail into a pass.",
         files: ["PREREG.md", "DEVIATIONS.md", "RESULTS.md"], latest: { date: "Sep 25", text: "ARCHIVING.md: when to use OSF, Zenodo, both or neither" },
@@ -69,11 +78,11 @@ const projects = (
       description="Falsification benches for how a memory of a sound could be held in neural tissue."
       finding={{ tier: <Tier id="SPEC" />, text: "Sound went in readably. Nothing came back out.", read: "Read: A spiking network built to lose →" }}
       changes={[{ date: "Sep 25", num: "#8", title: "singlecell: labile recycling factor switches" }, { date: "Sep 25", num: "#7", title: "model-v0.3.0: single-cell habituation (Stentor)" }]}
-      plate={{ src: `${IMG}/schematics/vicq-dazyr-brain-1798.jpg`, alt: "The brain in section, 1798.", caption: "The brain in section, after Vicq-d'Azyr, 1798 · Public domain" }} />
+      media={<Specimen name="neuron" />} />
     <ProjectFeature href="#" repo="olimex-shield" meta={["v0.2.0", "Hardware"]} flip
       question="What can a $70 amplifier actually hear?"
       finding={{ tier: <Tier id="C" />, text: "In-band 40 Hz power across six captures.", read: "Read: Can a $70 board tell me I'm wrong? →" }}
-      plate={{ src: `${IMG}/schematics/galvani-frog-1792.jpg`, alt: "Galvani's frog legs on a metal arc, 1792.", caption: "Luigi Galvani, 1792 · Public domain" }} />
+      media={<Specimen name="iron" />} />
     <div style={{ marginTop: 24 }} className="ui-repocards">
       <RepoCard href="#" name="paper-fetch" pitch="Every source, fetched legally and traced." description="Search, legal full-text fetch, provenance, and an MCP server." latest={{ date: "Sep 25", text: "Initial release of paperlib" }} />
     </div>
@@ -98,6 +107,18 @@ const changelog = (
 
 const findings = (
   <Section id="findings" eyebrow="Findings" title="What the work turned up." action={<Cta href="#">All articles →</Cta>}>
+    <Topics items={[
+      { href: "#", meta: "01 · 4 posts", title: "Audio-evoked potentials", media: <Specimen name="scope" />,
+        text: "Whether a designed acoustic protocol can put a specified structure into a recorded evoked response — and what a $70 amplifier can and cannot hear." },
+      { href: "#", meta: "02 · 2 posts", title: "Bioelectromagnetic propagation", media: <Specimen name="magnet" />,
+        text: "What carries a biological signal out of a body and through the world — and what it takes to read it once it is out there." },
+      { href: "#", meta: "03 · 1 post", title: "Biosignal translation", media: <Specimen name="bee" />,
+        text: "Reading structure out of a waveform without assuming what produced it." },
+      { href: "#", meta: "04 · 2 posts", title: "Invasive species & bioelectricity", media: <Specimen name="crab" />,
+        text: "What a European green crab can and cannot sense." },
+      { href: "#", meta: "05 · 7 posts", title: "Method", media: <Specimen name="paper" />,
+        text: "How the work is done: build first and narrow later." },
+    ]} />
     <FeaturedArticle href="#" image={{ src: `${IMG}/posts/golgi-pyramidal-neuron.jpg`, alt: "A Golgi-stained pyramidal neuron.", caption: "Photograph: MethoxyRoxy", photo: true }}
       meta={<MetaLine tier={<Tier id="SPEC" />}>Sep 25 · Audio-evoked potentials</MetaLine>}
       title="A spiking network built to lose: what it would and would not remember"
@@ -117,7 +138,7 @@ const findings = (
 
 const speculations = (
   <Section id="speculations">
-    <StoryRow intro={<>
+    <div className="ui-plate--ink"><StoryRow intro={<>
       <div className="ui-section__titles">
         <p className="ui-section__eyebrow">Speculations</p>
         <h2 className="ui-section__title">Thinking out loud.</h2>
@@ -133,7 +154,7 @@ const speculations = (
         image={{ src: `${IMG}/schematics/cajal-vestibular.jpg`, alt: "Cajal's vestibular nerve fibres." }}
         title="Something has to glue this together"
         excerpt="There's something about polarity and polarization that I think has not been tapped into yet." />
-    </StoryRow>
+    </StoryRow></div>
   </Section>
 )
 
@@ -155,33 +176,41 @@ const principle = (
 const footer = (
   <SiteFooter id="contact" title="Follow the work as it happens."
     lede="New posts, speculations and merged changes, as they land. Questions, corrections and collaborations are welcome."
-    actions={<><Cta href="#" icon>Subscribe via RSS</Cta><Cta href="#" solid>Get in touch</Cta></>}
+    actions={<><Action href="#" outline>Subscribe via RSS</Action><Action href="#">Get in touch</Action></>}
     links={[{ label: "Posts", href: "#" }, { label: "Speculations", href: "#" }, { label: "Changelog", href: "#" }, { label: "GitHub", href: "#" }]}
     word="Polarize"
     fine={<><span className="ui-label">© 2026 Polarize · Victoria, BC</span><span className="ui-label">Falsification-first · citation-gated</span></>} />
 )
 
-const page = (field: boolean) => (
-  <div className="ui-cellfield-host">
-    {field && <CellField hero="#hero" />}
-    {nav}{hero}{process}{projects}{changelog}{findings}{speculations}{principle}{footer}
-  </div>
+// The homepage in the fieldguide look sets data-theme on the document while it is shown.
+const fieldguide = (Story: () => React.ReactElement) => {
+  React.useEffect(() => {
+    const root = document.documentElement, was = root.dataset.theme
+    root.dataset.theme = "fieldguide"
+    return () => { if (was) root.dataset.theme = was; else delete root.dataset.theme }
+  }, [])
+  return <Story />
+}
+
+const page = () => (
+  <div>{nav}{hero}{stats}{process}{projects}{changelog}{findings}{speculations}{principle}{footer}</div>
 )
 
-/** The whole homepage, with the cell field behind it. */
-export const Homepage: StoryObj = { name: "Homepage", render: () => page(true) }
+/** The whole homepage, as it ships on polarize.tech. */
+export const Homepage: StoryObj = { name: "Homepage", render: page, decorators: [fieldguide] }
 
 /** The same page at phone width. */
 export const HomepageMobile: StoryObj = {
   name: "Homepage (phone)",
-  render: () => page(true),
+  render: page,
+  decorators: [fieldguide],
   parameters: { viewport: { defaultViewport: "mobile1" } },
   globals: { viewport: { value: "mobile1", isRotated: false } },
 }
 
-export const HeroOnly: StoryObj = { name: "Hero + cell field", render: () => <div className="ui-cellfield-host"><CellField hero="#hero" />{hero}</div> }
-export const Steps: StoryObj = { name: "Process steps", render: () => process }
+export const Counts: StoryObj = { name: "Counts strip", render: () => stats }
+export const Steps: StoryObj = { name: "Process rows", render: () => process }
 export const Projects: StoryObj = { name: "Project features", render: () => projects }
-export const Articles: StoryObj = { name: "Article cards", render: () => findings }
+export const Articles: StoryObj = { name: "Topics and article cards", render: () => findings }
 export const Stories: StoryObj = { name: "Story cards", render: () => speculations }
 export const Footer: StoryObj = { name: "Site footer", render: () => footer }
