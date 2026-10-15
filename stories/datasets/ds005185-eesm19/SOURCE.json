@@ -4,8 +4,8 @@
   "accession": "doi:10.18112/openneuro.ds005185.v1.0.2",
   "licence": "CC0",
   "attribution": "Mikkelsen, K. B., Kidmose, P., & Rezaei Tabar, Y. Ear-EEG Sleep Monitoring 2019 (EESM19), Aarhus University. OpenNeuro ds005185, CC0.",
-  "url": "https://polarizetech-research-datasets.sfo3.digitaloceanspaces.com/derived/polarize-ui/ds005185-eesm19/b2882b288240b7cc/data.json",
-  "data_sha256": "b2882b288240b7cc456d1c0a113e340b3e764f5434d097800d98acb65591a949",
-  "bytes": 78460,
+  "url": "https://polarizetech-research-datasets.sfo3.digitaloceanspaces.com/derived/polarize-ui/ds005185-eesm19/03998d66be7c91e0/data.json",
+  "data_sha256": "03998d66be7c91e0f7e21c64364aa088a1ae06e77b1a128ede40e1dcac7c0142",
+  "bytes": 216789,
   "reduction": "stories/datasets/ds005185-eesm19/reduce.py in polarize-ui"
 }

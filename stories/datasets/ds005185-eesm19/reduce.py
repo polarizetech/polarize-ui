@@ -10,7 +10,7 @@ Inputs, both from ds005185 v1.0.2 (CC0):
                     the first run of epochs the dataset's own scoring (column Scoring1) marks
                     wake: keys data (samples × channels, µV), labels, rate_hz, start_s.
 
-Three reductions, all standard methods:
+Four reductions, all standard methods:
   steady_state  one FFT over 130–240 s of the ASSR run, channel F3: power in dB, 20–60 Hz, and
                 the classic spectral F-test (power in a bin against the mean of 20 bins either
                 side, skipping the adjacent one; F(2, 80)) at 40 Hz, at two control frequencies
@@ -21,6 +21,9 @@ Three reductions, all standard methods:
                 against three linear nulls: phase-randomised (FT), amplitude-adjusted (AAFT) and
                 iterated AAFT (IAAFT), 199 each; and the same test on a phase-randomised copy of
                 the data, a linear signal by construction, as the control that must NOT reject.
+  excerpt       the raw signal for components that ingest samples (BandProminence): channel F3 of
+                the ASSR segment above and of the wake window, each zero-phase band-passed
+                0.5–45 Hz (4th-order Butterworth), decimated to 125 Hz, µV to 0.1.
 Needs numpy, scipy, mne and specparam.
 """
 from __future__ import annotations
@@ -132,6 +135,15 @@ def ladder(x, n=199):
     return {"observed": round(obs, 5), "nulls": out}
 
 
+def excerpt(x, fs, rate=125.0):
+    sos = butter(4, [0.5, 45], btype="band", fs=fs, output="sos")
+    y = sosfiltfilt(sos, x - x.mean())
+    step = fs / rate
+    if abs(step - round(step)) > 1e-9:
+        raise SystemExit(f"cannot decimate {fs} Hz to {rate} Hz by an integer")
+    return {"rate_hz": rate, "uv": y[:: int(round(step))].round(1).tolist()}
+
+
 def main(assr_set: Path, wake_npz: Path):
     import mne
     raw = mne.io.read_raw_eeglab(assr_set, preload=True, verbose=False)
@@ -156,6 +168,11 @@ def main(assr_set: Path, wake_npz: Path):
         "surrogates": {"data": ladder(w30), "linear_control": ladder(lin),
                        "segment": "first 30 s of the wake window, band-passed 1–40 Hz, 125 Hz",
                        "statistic": "time-reversal asymmetry, lag 1 sample (8 ms)"},
+        "excerpt": {"channel": CH, "filter": "0.5–45 Hz zero-phase Butterworth (4th order), decimated to 125 Hz",
+                    "assr": {**excerpt(seg, fs), "segment_s": list(SEG_S),
+                             "note": "40 Hz amplitude-modulated noise was playing"},
+                    "wake": {**excerpt(w, wfs), "segment_s": [float(z["start_s"]), float(z["start_s"]) + w.size / wfs],
+                             "note": "scored wake (Scoring1), overnight PSG, no stimulus"}},
     }
     dst = OUT
     dst.write_text(json.dumps(out, separators=(",", ":")))

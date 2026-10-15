@@ -604,6 +604,33 @@ def check_trajectory3d() -> None:
     ok("INTEGRATION.md documents trajectory3d.js", "trajectory3d.js" in (HERE / "INTEGRATION.md").read_text())
 
 
+def check_bandprominence() -> None:
+    """bandprominence.js: a live data view, so it takes colour from tokens, fetches nothing, and labels its limits."""
+    path = HERE / "bandprominence.js"
+    ok("bandprominence.js exists", path.is_file())
+    if not path.is_file():
+        return
+    js = path.read_text()
+    code = re.sub(r"/\*.*?\*/|//[^\n]*", "", js, flags=re.S)
+    for name in ("mountBandProminence", "createBandProminence"):
+        ok(f"bandprominence.js exports {name}", f"export function {name}(" in code)
+    for method in ("push", "listenTo", "stopListening", "state", "update", "reset", "destroy"):
+        ok(f"bandprominence.js handle has {method}()", re.search(rf"^    {method}\(", code, re.M) is not None)
+    ok("bandprominence.js imports and fetches nothing", "fetch(" not in code and not re.search(r"^\s*import\b", code, re.M))
+    for token in ("--foreground", "--muted-foreground", "--font-mono"):
+        ok(f"bandprominence.js reads {token}, which design.css defines", f"'{token}'" in code and f"{token}:" in CSS)
+    ok("bandprominence.js colours bands from --series-1..5, which design.css defines",
+       "`--series-${i + 1}`" in code and all(f"--series-{k}:" in CSS for k in range(1, 6)))
+    ok("bandprominence.js names no tier colour", not re.search(r"--(measured|predicted|exploring|spec|refuted|tier-)", code))
+    ok("bandprominence.js marks a band above Nyquist instead of drawing it as zero", "above Nyquist" in code and "0.45 * rate" in code)
+    ok("bandprominence.js follows <signal-panel>'s event", "'signal-samples'" in code and "e.detail.values" in code)
+    ok("bandprominence.js dims a stale readout rather than hiding it", "STALE_S" in code and "opacity" in code)
+    ok("bandprominence.js draws on a timer, not requestAnimationFrame", "setInterval(" in code and "requestAnimationFrame" not in code)
+    ok("bandprominence.js has a type declaration", (HERE / "bandprominence.d.ts").is_file())
+    ok("the React BandProminence wraps bandprominence.js rather than copying it",
+       'from "../../../bandprominence.js"' in (HERE / "src/science/signals/BandProminence.tsx").read_text())
+
+
 def check_react_mirror() -> None:
     """src/theme.css re-declares a few design.css classes for React documents; they must match."""
     path = HERE / "src" / "theme.css"
@@ -706,6 +733,7 @@ def main() -> int:
     check_landing()
     check_cellfield()
     check_trajectory3d()
+    check_bandprominence()
     check_filter()
     check_docs()
     check_react_mirror()

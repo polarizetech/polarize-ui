@@ -53,6 +53,10 @@ you.
   and the pure matching/counting logic) and `src/components/filter.tsx` (React, which imports
   that logic from `filter.js`, never a copy). State is `aria-pressed` on a real button. A tier
   toggle is the tier badge with `ui-tier--toggle`; it never names a tier colour.
+- **Band prominence** (a live per-band readout of one channel) is `bandprominence.js` (zero-build:
+  the arithmetic, the drawing and `listenTo(<signal-panel>)`) and `src/science/signals/BandProminence.tsx`
+  (React, which mounts that module, never a copy). Its demo data is the raw excerpt in
+  `ds005185-eesm19`.
 - **`src/components/`** holds the general UI: shadcn components (`ui/`), typography, page
   layouts and illustrations. Stories go under `stories/ui/`, titled `General UI/…`.
 - Science views follow the chart rules in `stories/Introduction.mdx`. They state their scale,

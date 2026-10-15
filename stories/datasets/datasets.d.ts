@@ -115,6 +115,22 @@ declare module "virtual:dataset/ds005185-eesm19" {
       segment: string
       statistic: string
     }
+    excerpt: {
+      channel: string
+      filter: string
+      assr: {
+        rate_hz: number
+        uv: number[]
+        segment_s: number[]
+        note: string
+      }
+      wake: {
+        rate_hz: number
+        uv: number[]
+        segment_s: number[]
+        note: string
+      }
+    }
   }
   export default data
 }
