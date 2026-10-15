@@ -15,8 +15,6 @@
     "landing.css",
     "docs.css",
     "design.js",
-    "cellfield.js",
-    "cellfield.d.ts",
     "trajectory3d.js",
     "trajectory3d.d.ts",
     "bandprominence.js",
@@ -34,7 +32,6 @@
   "exports": {
     "./design.css": "./design.css",
     "./design.js": "./design.js",
-    "./cellfield.js": "./cellfield.js",
     "./trajectory3d.js": "./trajectory3d.js",
     "./bandprominence.js": "./bandprominence.js",
     "./docs.js": "./docs.js",

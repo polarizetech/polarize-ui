@@ -87,7 +87,7 @@ def surface(root: Path) -> set[str]:
     tokens = root / "tokens.json"
     if tokens.is_file():
         out |= {f"token:{k}" for k in _token_keys(json.loads(tokens.read_text()))}
-    for name in ("design.js", "cellfield.js"):
+    for name in ("design.js",):
         js = root / name
         if js.is_file():
             out |= {f"element:{e}" for e in re.findall(r"customElements\.define\('([a-z-]+)'", js.read_text())}

@@ -6,8 +6,7 @@
    article and story cards, archival plates, the principle block and the site
    footer. Drawn from the polarize.tech homepage redesign (2026-09-28).
 
-   Load AFTER design.css (zero-build) or after src/index.css (React). Pair with
-   cellfield.js for the animated speck background (<ui-cellfield>).
+   Load AFTER design.css (zero-build) or after src/index.css (React).
 
    Rules, the same as design.css and publication.css, checked by dev_check.py:
      · every colour is a token — no hex, no rgb()
@@ -377,14 +376,6 @@ a.ui-story:hover { border-color: var(--pub-accent, var(--accent)); }
   .ui-sitefooter__cta { grid-template-columns: minmax(0, 1fr); }
   .ui-sitefooter__actions { align-items: flex-start; }
 }
-
-/* ---------- Cell field host ---------- */
-/* <ui-cellfield> / <CellField> fills its nearest positioned ancestor, behind
-   everything else in it. */
-.ui-cellfield { position: absolute; inset: 0; display: block; pointer-events: none; z-index: 0; overflow: hidden; color: var(--foreground); }
-.ui-cellfield > canvas { display: block; width: 100%; height: 100%; }
-.ui-cellfield-host { position: relative; isolation: isolate; }
-.ui-cellfield-host > :not(.ui-cellfield) { position: relative; z-index: 1; }
 
 /* ============================================================
    fieldguide (2026-10-15): the first homepage design, in magenta.

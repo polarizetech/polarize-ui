@@ -12,7 +12,7 @@
    The code window is always dark in both themes (tokens.json `code`).
 
    Load AFTER design.css (zero-build) or after src/index.css (React), with
-   landing.css if you use its .ui-cta / .ui-brand / <ui-cellfield> in the hero.
+   landing.css if you use its .ui-cta / .ui-brand in the hero.
    Behaviour (search, copy, tabs, scroll-spy, theme toggle, plots) is docs.js.
    Guide: DOCS-SITES.md.
 
@@ -201,7 +201,7 @@ html:has(.ui-docsite) { scroll-padding-top: calc(var(--docsite-bar-h, 64px) + 24
 .ui-tok--com { color: var(--syntax-comment); font-style: italic; }
 .ui-tok--fn { color: var(--syntax-function); }
 
-/* ---------- Home hero: copy beside a code window, optional cell field behind ---------- */
+/* ---------- Home hero: copy beside a code window ---------- */
 .ui-docsite__hero {
   position: relative; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 40px; align-items: center;
   padding: clamp(28px, 5vw, 64px) clamp(20px, 4vw, 48px); margin: -8px 0 28px;
