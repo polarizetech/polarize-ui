@@ -86,6 +86,9 @@ export const SPECIMENS = {
     <ellipse class="l" cx="100" cy="136" rx="24" ry="32"/><path class="k" d="M96 166 L100 178 L104 166 Z"/>
     <circle class="b" cx="100" cy="92" r="19"/><circle class="a" cx="100" cy="60" r="13"/>
     <circle class="k" cx="93" cy="58" r="2.5"/><circle class="k" cx="107" cy="58" r="2.5"/>`,
+  crab: `<path class="l" d="M60 104 L30 96 L16 108 M62 116 L32 118 L20 134 M68 126 L44 138 L36 156 M80 134 L62 152 L60 170"/><path class="l" d="M140 104 L170 96 L184 108 M138 116 L168 118 L180 134 M132 126 L156 138 L164 156 M120 134 L138 152 L140 170"/><path class="l" style="stroke-width:4" d="M68 82 L50 64 M132 82 L150 64"/><ellipse class="b" cx="42" cy="54" rx="18" ry="12" transform="rotate(-40 42 54)"/><path class="l" d="M32 42 L24 26 M40 40 L40 24"/><ellipse class="b" cx="158" cy="54" rx="18" ry="12" transform="rotate(40 158 54)"/><path class="l" d="M168 42 L176 26 M160 40 L160 24"/><path class="a" d="M100 62 C130 62 152 74 154 96 C156 118 132 142 100 142 C68 142 44 118 46 96 C48 74 70 62 100 62 Z"/><path class="t" d="M52 80 l-8 -4 M50 90 l-8 -1 M50 100 l-7 2 M148 80 l8 -4 M150 90 l8 -1 M150 100 l7 2"/><path class="t" d="M72 98 C84 110 116 110 128 98 M100 74 V132 M80 120 C90 128 110 128 120 120"/><path class="d" d="M84 80 C92 74 108 74 116 80 C110 90 90 90 84 80 Z"/><path class="l" d="M90 64 L88 52 M110 64 L112 52"/><circle class="k" cx="88" cy="50" r="3.5"/><circle class="k" cx="112" cy="50" r="3.5"/>`,
+  neuron: `<path class="l" d="M100 72 V22 M100 46 L78 28 M100 36 L122 18 M100 56 L124 42 M78 28 L66 20 M122 18 L132 14"/><path class="t" d="M100 30 l-5 -2 M100 40 l5 -2 M100 50 l-5 -2 M88 36 l-3 3 M112 28 l3 3 M112 49 l3 3"/><path class="l" d="M80 112 L50 124 L32 118 M50 124 L42 142 M120 112 L150 124 L168 118 M150 124 L158 142 M88 118 L74 150"/><path class="t" d="M40 121 l-2 -4 M62 119 l-2 -4 M160 121 l2 -4 M138 119 l2 -4"/><path class="a" d="M100 64 C108 64 128 104 126 114 C124 122 76 122 74 114 C72 104 92 64 100 64 Z"/><circle class="b" cx="100" cy="102" r="9"/><circle class="k" cx="102" cy="100" r="2.5"/><path class="l" d="M100 120 V186"/><rect class="b" x="94" y="130" width="12" height="14" rx="5"/><rect class="b" x="94" y="150" width="12" height="14" rx="5"/><rect class="b" x="94" y="170" width="12" height="14" rx="5"/>`,
+  magnet: `<path class="t" stroke-dasharray="4 6" d="M62 156 C22 166 26 192 100 192 C174 192 178 166 138 156"/><path class="t" stroke-dasharray="4 6" d="M62 156 C42 168 58 178 100 178 C142 178 158 168 138 156"/><path d="M62 150 V92 a38 38 0 0 1 76 0 V150" fill="none" stroke="var(--specimen-stroke)" stroke-width="30"/><path d="M62 150 V92 a38 38 0 0 1 76 0 V150" fill="none" stroke="var(--specimen-tile)" stroke-width="26"/><path class="t" d="M62 110 V92 a38 38 0 0 1 76 0 V110"/><rect class="b" x="47" y="128" width="30" height="26" rx="2"/><rect class="b" x="123" y="128" width="30" height="26" rx="2"/><text x="62" y="146" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="13" fill="var(--specimen-stroke)">N</text><text x="138" y="146" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="13" fill="var(--specimen-stroke)">S</text><path class="l" d="M36 28 c8-12 16 12 24 0 s16 12 24 0 s16 12 24 0 s16 12 24 0 s16 12 24 0"/><circle class="d" cx="30" cy="60" r="5"/><circle class="a" cx="172" cy="56" r="3"/>`,
 } as const
 
 export type SpecimenKey = keyof typeof SPECIMENS
@@ -103,6 +106,9 @@ export const SPECIMEN_LABELS: Record<SpecimenKey, string> = {
   desk: "Workstation",
   lock: "Padlock",
   bee: "Bumblebee",
+  crab: "Green Crab",
+  neuron: "Pyramidal Neuron",
+  magnet: "Horseshoe Magnet",
 }
 
 export function isSpecimenKey(key: unknown): key is SpecimenKey {

@@ -38,7 +38,9 @@ BANNER = """/* design.css -- GENERATED from tokens.json by build_css.py. Do not 
 
 
 def _font_stack(key: str) -> str:
-    return TOKENS["type"]["serif"] if key == "serif" else TOKENS["type"]["sans"]
+    if key in ("serif", "geist"):
+        return TOKENS["type"][key]
+    return TOKENS["type"]["sans"]
 
 
 # Themes without their own epistemic/series palette borrow a validated one of matching
@@ -48,10 +50,12 @@ _FAMILY_BORROW = {
     "polarize": "dark",
     "instrument": "light",
     "instrument-dark": "dark",
+    "fieldguide": "light",
+    "fieldguide-dark": "dark",
 }
 
 
-DARK_MODES = {"polarize", "dark", "instrument-dark"}
+DARK_MODES = {"polarize", "dark", "instrument-dark", "fieldguide-dark"}
 
 
 def _vars(mode: str, indent: int = 2) -> str:
@@ -77,6 +81,9 @@ def _vars(mode: str, indent: int = 2) -> str:
     out.append(f"  --shadow: {c['shadow']};")
     out.append(f"  --overlay: {c['overlay']};")
     out.append(f"  --font-primary: {_font_stack(primary_key)};")
+    if primary_key == "geist":
+        # A theme with its own sans swaps it everywhere the sans is named, not just the body.
+        out.append(f"  --font-sans: {_font_stack('geist')};")
     for name, v in fam.items():
         out.append(f"  --{name}: {v[fam_mode]};")
     for i, hex_ in enumerate(series, 1):
@@ -205,6 +212,13 @@ def _static() -> str:
   font-weight: 100 900;
   font-display: swap;
   src: url("fonts/inter-variable.woff2") format("woff2");
+}}
+@font-face {{
+  font-family: "Geist";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/geist-400.woff2") format("woff2");
 }}
 @font-face {{
   font-family: "IBM Plex Mono";
@@ -666,6 +680,9 @@ def render() -> str:
             + "\n    color-scheme: dark;\n  }\n}\n\n"
             + ":root[data-theme=\"instrument\"] {\n" + _vars("instrument") + "\n  color-scheme: light;\n}\n\n"
             + ":root[data-theme=\"instrument-dark\"] {\n" + _vars("instrument-dark") + "\n  color-scheme: dark;\n}\n\n"
+            + "/* fieldguide: white and magenta, Geist for the sans (2026-10-15). Opt-in by stamp. */\n"
+            + ":root[data-theme=\"fieldguide\"] {\n" + _vars("fieldguide") + "\n  color-scheme: light;\n}\n\n"
+            + ":root[data-theme=\"fieldguide-dark\"] {\n" + _vars("fieldguide-dark") + "\n  color-scheme: dark;\n}\n\n"
             + "/* Previous defaults, kept as explicit opt-ins. */\n"
             + ":root[data-theme=\"polarize\"] {\n" + _vars("polarize") + "\n  color-scheme: dark;\n}\n\n"
             + ":root[data-theme=\"light\"] {\n" + _vars("light") + "\n  color-scheme: light;\n}\n\n"

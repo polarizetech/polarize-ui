@@ -91,12 +91,12 @@ export function Section({ id, eyebrow, title, lede, action, stack = false, class
   )
 }
 
-export type PlateProps = { src: string; alt: string; caption?: React.ReactNode; photo?: boolean; className?: string }
+export type PlateProps = { src: string; alt: string; caption?: React.ReactNode; photo?: boolean; ink?: boolean; className?: string }
 
 /** An archival plate (cream line on near-black, which drops out on a dark page) or a photograph. */
-export function Plate({ src, alt, caption, photo = false, className }: PlateProps) {
+export function Plate({ src, alt, caption, photo = false, ink = false, className }: PlateProps) {
   return (
-    <figure className={cn("ui-plate", className)}>
+    <figure className={cn("ui-plate", ink && "ui-plate--ink", className)}>
       <div className="ui-plate__frame">
         <img className={cn("ui-plate__img", photo && "ui-plate__img--photo")} src={src} alt={alt} loading="lazy" />
       </div>
@@ -122,9 +122,10 @@ export type ProcessStep = {
 }
 
 /** Numbered steps joined by arrows (downward on a phone). */
-export function ProcessSteps({ steps }: { steps: ProcessStep[] }) {
+/** Numbered steps joined by arrows; `rows` lays them out as ruled rows instead. */
+export function ProcessSteps({ steps, rows = false }: { steps: ProcessStep[]; rows?: boolean }) {
   return (
-    <ol className="ui-steps">
+    <ol className={cn("ui-steps", rows && "ui-steps--rows")}>
       {steps.map((s) => (
         <li key={s.num}>
           <a className="ui-step" href={s.href}>
@@ -385,4 +386,46 @@ export function SiteFooter({ id, title, lede, actions, links = [], word, fine }:
 /** A mono "GitHub ↗" style external marker. */
 export function External({ children = "GitHub" }: { children?: React.ReactNode }) {
   return <span className="ui-label" style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>{children}<ArrowUpRight className="ui-icon" aria-hidden="true" /></span>
+}
+
+/** A plain button in the sans, sentence case. `outline` for the secondary action. */
+export function Action({ href, children, outline = false, small = false, className }: {
+  href: string; children: React.ReactNode; outline?: boolean; small?: boolean; className?: string
+}) {
+  return <a className={cn("ui-action", outline && "ui-action--outline", small && "ui-action--sm", className)} href={href}>{children}</a>
+}
+
+/** A ruled strip of counts. Pass computed numbers, never typed-in ones. */
+export function Stats({ items, note }: { items: { value: React.ReactNode; label: React.ReactNode }[]; note?: React.ReactNode }) {
+  return (
+    <div>
+      <div className="ui-stats">
+        {items.map((it, i) => (
+          <div key={i} className="ui-stat"><span className="ui-stat__num">{it.value}</span><span className="ui-stat__label">{it.label}</span></div>
+        ))}
+      </div>
+      {note && <p className="ui-stats__note">{note}</p>}
+    </div>
+  )
+}
+
+export type TopicItem = { href: string; meta: string; title: React.ReactNode; text?: React.ReactNode; media?: React.ReactNode; go?: React.ReactNode; wide?: boolean }
+
+/** A numbered grid of topics: the first two wide, the rest in threes. `media` is usually a specimen tile. */
+export function Topics({ items }: { items: TopicItem[] }) {
+  return (
+    <div className="ui-topics">
+      {items.map((t, i) => (
+        <a key={i} className={cn("ui-topic", (t.wide ?? i < 2) && "ui-topic--wide")} href={t.href}>
+          {t.media && <div className="ui-topic__media ui-specimen-tile">{t.media}</div>}
+          <div className="ui-topic__body">
+            <p className="ui-topic__meta">{t.meta}</p>
+            <h3 className="ui-topic__title">{t.title}</h3>
+            {t.text && <p className="ui-topic__text">{t.text}</p>}
+            <span className="ui-topic__go">{t.go ?? "Read the posts →"}</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  )
 }

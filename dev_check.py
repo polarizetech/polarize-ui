@@ -50,7 +50,7 @@ def luminance(hex_):
 # EVERY theme carrying a palette, so a newly added one cannot slip past the contrast checks
 # unverified. `instrument` was added 2026-08-19 and the loops named three themes literally,
 # so it was skipped on the day it became the default.
-ALL_THEMES = ("polarize", "dark", "light", "instrument", "instrument-dark")
+ALL_THEMES = ("polarize", "dark", "light", "instrument", "instrument-dark", "fieldguide", "fieldguide-dark")
 
 from build_css import _FAMILY_BORROW  # noqa: E402  -- single source of truth for palette borrowing
 
@@ -310,9 +310,19 @@ def check_type_rule():
     """
     t = TOKENS["type"]
 
+    # A theme may name its own sans (fieldguide: Geist); it must still be a sans, never the serif.
+    SANS_FACES = {"sans": "Inter", "geist": "Geist"}
     for theme, which in t["primaryByTheme"].items():
-        ok(f"theme '{theme}' uses a sans primary face", which == "sans",
+        ok(f"theme '{theme}' uses a sans primary face", which in SANS_FACES,
            f"got {which!r}")
+    ok("every alternative sans is a sans stack",
+       all(t[k].strip().startswith(f'"{v}"') and t[k].rstrip().endswith("sans-serif")
+           for k, v in SANS_FACES.items() if k != "sans"))
+    ok("an alternative sans ships one weight, so it can never be faux-bolded",
+       '"Geist";' in (HERE / "design.css").read_text() and "font-weight: 400;" in
+       (HERE / "design.css").read_text().split('font-family: "Geist";')[1][:200])
+    ok("the Geist face is self-hosted with its licence",
+       (HERE / "fonts" / "geist-400.woff2").exists() and (HERE / "fonts" / "GEIST-OFL.txt").exists())
 
     ok("the sans stack names Inter first", t["sans"].strip().startswith("Inter"))
     ok("the sans stack falls back to the system stack",
@@ -327,8 +337,8 @@ def check_type_rule():
     css = (HERE / "design.css").read_text()
     for block_ in css.split("--font-primary:")[1:]:
         decl = block_.split(";")[0]
-        ok("every --font-primary in the built CSS is the sans stack",
-           "Inter" in decl and "serif" not in decl.replace("sans-serif", ""),
+        ok("every --font-primary in the built CSS is a sans stack",
+           ("Inter" in decl or "Geist" in decl) and "serif" not in decl.replace("sans-serif", ""),
            decl.strip()[:60])
 
     # Fonts referenced by @font-face must exist on disk. This was stale: the
