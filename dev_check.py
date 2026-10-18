@@ -600,6 +600,31 @@ def check_trajectory3d() -> None:
     ok("INTEGRATION.md documents trajectory3d.js", "trajectory3d.js" in (HERE / "INTEGRATION.md").read_text())
 
 
+def check_network3d() -> None:
+    """network3d.js: a token-driven, dependency-free spatial node-link view."""
+    path = HERE / "network3d.js"
+    ok("network3d.js exists", path.is_file())
+    if not path.is_file():
+        return
+    js = path.read_text()
+    code = re.sub(r"/\*.*?\*/|//[^\n]*", "", js, flags=re.S)
+    ok("network3d.js exports mountNetwork3D", "export function mountNetwork3D(" in code)
+    for method in ("update", "resetView", "destroy"):
+        ok(f"network3d.js handle has {method}()", re.search(rf"^    {method}\(", code, re.M) is not None)
+    ok("network3d.js imports and fetches nothing", "fetch(" not in code and not re.search(r"^\s*import\b", code, re.M))
+    for token in ("--muted-foreground", "--series-", "--font-mono"):
+        ok(f"network3d.js reads {token}", f"'{token}" in code or f"`{token}" in code)
+    ok("network3d.js names no tier colour", not re.search(r"--(measured|predicted|exploring|spec|refuted|tier-)", code))
+    ok("network3d.js has an accessible name and keyboard controls", "aria-label" in code and "keydown" in code)
+    ok("network3d.js leaves plain scrolling to the page by default", "wheelZoom: false" in code)
+    ok("network3d.js redraws on theme changes and cleans up", "MutationObserver" in code and "mo.disconnect()" in code and "ro.disconnect()" in code)
+    ok("network3d.js has a type declaration", (HERE / "network3d.d.ts").is_file())
+    pkg = json.loads((HERE / "package.json").read_text())
+    ok("package.json ships and exports network3d.js",
+       {"network3d.js", "network3d.d.ts"} <= set(pkg["files"]) and pkg["exports"].get("./network3d.js") == "./network3d.js")
+    ok("INTEGRATION.md documents network3d.js", "network3d.js" in (HERE / "INTEGRATION.md").read_text())
+
+
 def check_bandprominence() -> None:
     """bandprominence.js: a live data view, so it takes colour from tokens, fetches nothing, and labels its limits."""
     path = HERE / "bandprominence.js"
@@ -728,6 +753,7 @@ def main() -> int:
     check_publication()
     check_landing()
     check_trajectory3d()
+    check_network3d()
     check_bandprominence()
     check_filter()
     check_docs()
