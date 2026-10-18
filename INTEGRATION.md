@@ -18,6 +18,7 @@ DESIGN_PUBLIC = {
     "/design/design.js":   DESIGN / "design.js",
     "/design/tokens.json": DESIGN / "tokens.json",
     "/design/trajectory3d.js": DESIGN / "trajectory3d.js",   # only if you draw a 3-D path (section 5)
+    "/design/network3d.js": DESIGN / "network3d.js",         # only if you draw a spatial network (section 5)
     # The UI font is a SYSTEM STACK -- nothing to serve. These two are the
     # optional serif (Literata), needed only if your project asks for
     # var(--font-serif). Serve them or don't; design.css degrades to Georgia.
@@ -226,6 +227,30 @@ or below it to scroll by, and keep `height` under the viewport's.
 changes. On a page that loads the React theme instead of `design.css` it uses `--chart-1` and
 `--chart-4`. A React project that wants units, ticks and hover values should use `Trajectory3D`
 from `@polarizetech/polarize-ui/react`, which is a different, fuller view.
+
+### A spatial node-link network: `network3d.js`
+
+Use this for a standard network whose nodes already have 3-D positions. The component renders
+the supplied visual state; it does not calculate layout, connectivity or activity.
+
+```html
+<div id="network"></div>
+<script type="module">
+  import { mountNetwork3D } from './design/network3d.js';
+  const view = mountNetwork3D(document.getElementById('network'), {
+    nodes: [{ position: [0, 0, 0], intensity: .8, radius: 5, rings: 1 }],
+    edges: [], axes: ['x', 'y', 'z'], height: 420,
+    label: 'Modelled spatial network',
+  });
+  view.update({ nodes, edges }); // preserve the current view while data change
+</script>
+```
+
+Drag or pinch to orbit and zoom; arrow keys and `+`/`-` work when focused. Plain-wheel zoom is
+off by default so the page can scroll. Set `wheelZoom: true` only when the surrounding interface
+clearly says that the wheel controls the view. Positions are centred and scaled together, with no
+units or ticks. `intensity`, `rings`, edge `width` and edge `marker` are display encodings supplied
+by the caller and must be explained beside the view. Types are in `network3d.d.ts`.
 
 ## 6. Check it
 

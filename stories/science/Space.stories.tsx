@@ -6,7 +6,9 @@ import { LineChart } from "@/science/charts/LineChart"
 import { Slider } from "@/components/ui/slider"
 import { Button } from "@/components/ui/button"
 import { mountTrajectory3D, type Trajectory3DHandle } from "../../trajectory3d.js"
+import { mountNetwork3D, type Network3DHandle, type Network3DNode, type Network3DEdge } from "../../network3d.js"
 import { Eyebrow } from "@/components/typography"
+import { Tier } from "@/science/evidence/tier"
 import cmo from "virtual:dataset/usgs-cmo-hour"
 import cmoSource from "../datasets/usgs-cmo-hour/SOURCE.json"
 import abr from "virtual:dataset/ds005340-abr"
@@ -157,6 +159,61 @@ function TimeMarkerStory() {
 export const PathWithTimeMarker: StoryObj = {
   name: "Path with a time marker (zero-build, synthetic)",
   render: () => <TimeMarkerStory />,
+}
+
+const networkNodes: Network3DNode[] = Array.from({ length: 18 }, (_, i) => {
+  const ring = i < 6 ? 0.55 : 1
+  const angle = i * 2.399963
+  return {
+    position: [Math.cos(angle) * ring, ((i % 5) - 2) * 0.22, Math.sin(angle) * ring],
+    radius: i % 6 === 0 ? 6 : 4,
+    series: i % 7 === 0 ? 1 : 0,
+    rings: i % 7 === 0 ? 1 : 0,
+    intensity: 0.25 + (i % 5) * 0.13,
+  }
+})
+const networkEdges: Network3DEdge[] = networkNodes.flatMap((_, i) => [
+  { source: i, target: (i + 1) % networkNodes.length, intensity: 0.35 },
+  ...(i % 3 === 0 ? [{ source: i, target: (i + 7) % networkNodes.length, intensity: 0.7 }] : []),
+])
+
+function NodeLinkStory() {
+  const host = React.useRef<HTMLDivElement>(null)
+  const view = React.useRef<Network3DHandle | null>(null)
+  const phase = React.useRef(0)
+  React.useEffect(() => {
+    if (!host.current) return
+    view.current = mountNetwork3D(host.current, {
+      nodes: networkNodes, edges: networkEdges, axes: ["x", "y", "z"], height: 420,
+      label: "Synthetic spatial node-link network with moving flow markers",
+    })
+    const id = window.setInterval(() => {
+      phase.current = (phase.current + 0.012) % 1
+      view.current?.update({ edges: networkEdges.map((edge, i) => ({ ...edge, marker: phase.current + i / networkEdges.length })) })
+    }, 50)
+    return () => { window.clearInterval(id); view.current?.destroy(); view.current = null }
+  }, [])
+  return (
+    <div className="grid max-w-3xl gap-3">
+      <div className="flex items-center justify-between gap-3">
+        <Eyebrow>Synthetic node-link example <Tier id="MODELLED" /></Eyebrow>
+        <span className="font-mono text-[length:var(--text-xs)] text-muted-foreground">
+          {networkNodes.length} nodes · {networkEdges.length} edges
+        </span>
+      </div>
+      <div ref={host} />
+      <p className="text-[length:var(--text-xs)] text-muted-foreground">
+        <span className="font-mono">Data · synthetic.</span> Positions and connections are deterministic display data.
+        Line strength and moving markers are caller-supplied encodings, not inferred flow. Nodes are centred and scaled
+        together; axes have no units or ticks. Drag to turn, pinch or Ctrl-scroll to zoom, arrow keys when focused.
+      </p>
+    </div>
+  )
+}
+
+export const SpatialNodeLinkNetwork: StoryObj = {
+  name: "Spatial node-link network (zero-build, synthetic)",
+  render: () => <NodeLinkStory />,
 }
 
 const pts = (vals: number[]) => abr.lags_ms.map((l, i) => [l, vals[i]] as [number, number])

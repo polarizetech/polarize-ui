@@ -96,6 +96,11 @@ def surface(root: Path) -> set[str]:
         src = t3d.read_text()
         out |= {f"trajectory3djs:{n}" for n in re.findall(r"^export (?:const|function) (\w+)", src, re.M)}
         out |= {f"trajectory3djs:handle.{n}" for n in re.findall(r"^    (\w+)\([^)]*\) \{", src[src.rindex("return {"):], re.M)}
+    n3d = root / "network3d.js"
+    if n3d.is_file():
+        src = n3d.read_text()
+        out |= {f"network3djs:{n}" for n in re.findall(r"^export (?:const|function) (\w+)", src, re.M)}
+        out |= {f"network3djs:handle.{n}" for n in re.findall(r"^    (\w+)\([^)]*\) \{", src[src.rindex("return {"):], re.M)}
     docs_js = root / "docs.js"
     if docs_js.is_file():  # docs.js is driven by data attributes and exports; both are public
         src = docs_js.read_text()
