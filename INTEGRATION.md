@@ -252,7 +252,93 @@ clearly says that the wheel controls the view. Positions are centred and scaled 
 units or ticks. `intensity`, `rings`, edge `width` and edge `marker` are display encodings supplied
 by the caller and must be explained beside the view. Types are in `network3d.d.ts`.
 
-## 6. Check it
+## 6. Controls: knobs, faders, timelines (`controls.css` + `controls.js`)
+
+Hardware-style controls for audio and instrument interfaces. Link the layer after
+`design.css`, and the module once:
+
+```html
+<html data-theme="polarize">   <!-- the controls are drawn for Polarize; other themes fall back -->
+<link rel="stylesheet" href="design/design.css">
+<link rel="stylesheet" href="design/controls.css">
+<script type="module" src="design/controls.js"></script>
+```
+
+Add both files to the server's allow-list (§ 1). A fader or knob is a **native range input**
+inside a marked element; without the script it still works from the keyboard and a screen
+reader, and with it it is drawn as hardware:
+
+```html
+<div class="ui-control">
+  <div class="ui-control__head">
+    <label class="ui-control__name" for="itd">ITD</label>
+    <button type="button" class="ui-control__value"></button>   <!-- the value is printed here; tap to type one -->
+  </div>
+  <div class="ui-fader ui-fader--ribbon" data-ui-control
+       data-unit="µs" data-digits="0" data-signed data-detents="0" data-mark="-40" data-mark-label="me −40">
+    <input id="itd" type="range" min="-660" max="660" step="1" value="120">
+  </div>
+  <div class="ui-control__range"><span>−660 µs</span><span class="ui-control__max">+660 µs max</span></div>
+</div>
+```
+
+| Attribute | |
+|---|---|
+| `data-scale="log"` | log travel (rates, frequencies); min must be above 0 |
+| `data-detents="0,40"` | values a drag snaps to; PageUp / PageDown jump between them |
+| `data-mark="-40"` + `data-mark-label` | the person's own value, drawn in the human ink (ochre) and also a detent |
+| `data-unit`, `data-digits`, `data-signed` | how the value is printed; a number always carries its unit |
+| `data-ticks="10"` | minor ticks across the travel |
+| `.ui-fader--vertical`, `.ui-fader--ribbon`, `.ui-knob` (`--sm`, `--lg`) | the other forms |
+| `data-ui-hold` on a `.ui-hold` button | switches on only after a held press, off with a tap |
+
+**Fine adjust**: drag away from the control's axis and the gain falls, down to 1/20.
+**Numeric entry**: tap the printed value, or long-press the control. **Hard limits** are
+never applied silently: the end-stops are always drawn, the limits are printed under the
+control, and the shell gets `data-at-limit` while the value sits on one.
+
+**Haptics.** Every crossed detent dispatches a bubbling **`ui-detent`** event, detail
+`{ value, index, kind }`. `navigator.vibrate` is called where it exists, which is not iOS. In
+a native shell around a WKWebView, listen for the event and fire the platform's feedback:
+
+```js
+document.addEventListener('ui-detent', (e) => window.webkit?.messageHandlers?.haptic?.postMessage(e.detail.kind));
+```
+
+**Three SVG views**, each a mount function returning `{ update, destroy }` plus a way to move
+time. Nothing animates by itself (no `requestAnimationFrame`, which stops in a hidden tab):
+the caller calls `setTime` / `setPhase` from its own clock.
+
+```js
+import { mountTimeline, mountLane, mountPanner } from './design/controls.js'
+const scenes = [{ label: 'Settle', hold: 360, transition: 0 }, { label: 'Drift', hold: 480, transition: 90 }]
+const tl = mountTimeline(host, { scenes, selected: 1, editable: true, curves: [{ label: 'rate', values: [9.7, 6.5] }],
+                                 onChange: (e) => save(e.scenes) })
+tl.setTime(seconds)
+mountLane(laneHost, { scenes, values: [9.7, 6.5], domain: [0.5, 45], scale: 'log', unit: 'Hz', notches: [8, 40], editable: true })
+mountPanner(padHost, { azimuth: 60, distance: 1.6, path: 'orbit', onChange: ({ azimuth, distance }) => … }).setPhase(0.25)
+```
+
+A scene's `transition` is the glide **into** it and comes before its hold. Edits are applied
+by the view itself and then reported, so a page can ignore `onChange` and still work; a
+controlled caller passes the new state back with `update()`. The pure functions behind them
+(`layoutScenes`, `valueAt`, `pathPoint`, `snap`, `fineGain`, …) are exported for a page that
+needs the same arithmetic, e.g. a "now" readout of a value mid-glide.
+
+The other pieces are CSS only: `.ui-tag--linked`, `.ui-delta`, `.ui-sync[data-state]`,
+`.ui-glide`, `.ui-meter`, `.ui-strip`, `.ui-hazard`, `<dialog class="ui-sheet">` (a bottom
+sheet: open it with `showModal()`), `.ui-tabbar` and `.ui-night`. In React they are
+`Fader`, `Knob`, `LinkedValue`, `Delta`, `SyncPill`, `Glide`, `Meter`, `ChannelStrip`,
+`Hazard`, `HoldButton`, `SceneTimeline`, `AutomationLane`, `Panner`, `TabBar` and `NightView`;
+the shadcn `Sheet` with `side="bottom"` stands in for the dialog. React gets the Polarize theme
+with `<html class="dark" data-theme="polarize">`.
+
+**The inks.** Under Polarize, clay is signal and action, ochre is what a person placed or
+owns, lichen is machine state. Other themes have no validated values for those inks, so the
+controls fall back to the brand colour and plain ink there. A limit is never drawn in a tier
+colour: the epistemic palette is reserved for evidence.
+
+## 7. Check it
 
 ```bash
 python3 design/dev_check.py

@@ -366,10 +366,44 @@ impersonates a series and a series colour never impersonates a tier.
 | `INTEGRATION.md` | **how to wire a project in** — read that one to do the work |
 | `fonts/` | self-hosted **Literata**, the OPTIONAL serif (`var(--font-serif)`); two `.woff2` files. The UI face is a system stack and needs no file. |
 | `icons/` | self-hosted Phosphor icon sprite (Polarize's icon set) |
+| `controls.css` + `controls.js` | hardware-style controls (knob, faders, timeline, lane, panner, strips, chips, sheet, tab bar, night view); see § Controls below |
 
 Edit `tokens.json`, never `design.css`. `dev_check.py` fails if they have drifted.
 
 ---
+
+## Controls (`controls.css` + `controls.js`, added 2026-10-20)
+
+Ported from a studio redesign for a sequence-building audio app (keyframes that glide and
+hold), generalised so nothing in it names that app. Everything here is a standard control: a
+knob, a fader, a ribbon, a panner, a DAW-style clip lane and automation lane.
+
+- **A fader or knob is a native `<input type="range">`.** The script draws it and adds fine
+  adjust, detents and numeric entry; without the script the input still works. Do not replace
+  the input with a div: keyboard and screen-reader support come from it.
+- **The three audio inks keep one job each**, as the Polarize section says: clay for the
+  value and the live thing, ochre for what a person placed or owns (their calibrated mark, a
+  value linked to it, a hand-drawn curve), lichen for machine state (saved, met, replaced).
+  `controls.css` reads them with fallbacks, so the controls still render in themes that have
+  none.
+- **A hard limit is an end-stop in the foreground ink, never a tier colour.** The first draft
+  of the studio drew limits and conflicts in `--refuted`; that colour means "a claim this
+  project does not make", and `dev_check.py` now fails the layer if it names any tier colour.
+- **Nothing animates by itself.** The views take `setTime` / `setPhase` from the caller's
+  clock. No `requestAnimationFrame` (it stops in a hidden tab, and these are apps people use
+  with the screen off) and no `setInterval`; the hold button's timeout is the only timer.
+- **`ui-detent` is the haptics hook.** iOS Safari has no `navigator.vibrate`; a native shell
+  listens for the event instead.
+- **The React Polarize theme** is new with this: `shadcn/build_shadcn.py` now emits a
+  `:root[data-theme="polarize"]` block (clay on `--primary`, 4.83:1 against the ground, checked)
+  and the audio inks in `system.css`. Stamp `<html class="dark" data-theme="polarize">`.
+- **Not built:** finger-drawing a curve on a lane (the lane draws `drawn` points but does not
+  capture them), a pulley that edits two lanes at once (the lane draws a `linked` curve; the
+  arithmetic linking them is the app's), and drag-to-dismiss on the sheet.
+- **Contrast notes, computed:** clay text on `surface-2` is 4.23:1, so clay is used for fills,
+  marks and large type, not small text on raised panels. `.ui-control__name` uses
+  `--muted-foreground` (4.79:1 on a card) rather than `.ui-label`'s `--faint-foreground`
+  (3.03:1), because the control labels are 10.5 px.
 
 ## Conventions this inherits
 

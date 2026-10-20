@@ -652,6 +652,76 @@ def check_bandprominence() -> None:
        'from "../../../bandprominence.js"' in (HERE / "src/science/signals/BandProminence.tsx").read_text())
 
 
+def check_controls() -> None:
+    """controls.css + controls.js: hardware-style controls. The inks keep their one job each,
+    a hard limit is drawn rather than applied silently, and no tier colour is borrowed."""
+    check_layer("controls.css")
+    css = (HERE / "controls.css").read_text() if (HERE / "controls.css").is_file() else ""
+    body = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    ok("controls.css honours prefers-reduced-motion", "prefers-reduced-motion" in css)
+    ok("controls.css imported by the React theme", '@import "../controls.css";' in (HERE / "src" / "theme.css").read_text())
+    ok("controls.css names no tier colour (the epistemic palette is reserved; a limit is an end-stop)",
+       not re.search(r"--(measured|predicted|exploring|spec|refuted|tier-)", body))
+    for ink in ("--clay", "--ochre", "--lichen-text"):
+        ok(f"controls.css reads {ink} with a fallback for themes that have no audio inks",
+           re.search(r"var\(" + ink + r",\s*var\(", body) is not None)
+    for cls in (".ui-control", ".ui-fader", ".ui-fader--ribbon", ".ui-fader--vertical", ".ui-fader__stop", ".ui-fader__mark",
+                ".ui-knob", ".ui-tag--linked", ".ui-delta", ".ui-sync", ".ui-glide", ".ui-meter", ".ui-strip",
+                ".ui-hazard", ".ui-hold", ".ui-timeline", ".ui-lane", ".ui-panner", ".ui-sheet", ".ui-tabbar", ".ui-night"):
+        ok(f"controls.css defines {cls}", re.search(re.escape(cls) + r"[\s,.:\[{>]", body) is not None)
+    ok("every sync state carries a glyph as well as its word",
+       all(re.search(r'\.ui-sync\[data-state="' + st + r'"\]::before\s*\{\s*content:', body) for st in ("saved", "saving", "offline", "conflict")))
+    ok("the end-stops are always drawn in the foreground ink",
+       re.search(r"\.ui-fader__stop\s*\{[^}]*background:\s*var\(--foreground\)", body) is not None)
+    ok("the control label clears 4.5:1 (muted, not faint)",
+       re.search(r"\.ui-control__name\s*\{[^}]*color:\s*var\(--muted-foreground\)", body) is not None)
+
+    path = HERE / "controls.js"
+    ok("controls.js exists", path.is_file())
+    if not path.is_file():
+        return
+    js = path.read_text()
+    code = re.sub(r"/\*.*?\*/|//[^\n]*", "", js, flags=re.S)
+    for name in ("toFrac", "fromFrac", "quantize", "snap", "fineGain", "formatValue", "parseEntry", "layoutScenes", "valueAt",
+                 "pathPoint", "pathSamples", "initControl", "initHold", "mountTimeline", "mountLane", "mountPanner", "init"):
+        ok(f"controls.js exports {name}", re.search(rf"export (function|const) {name}\b", code) is not None)
+    ok("controls.js imports, fetches and stores nothing",
+       not re.search(r"^\s*import\b", code, re.M) and not re.search(r"\bfetch\(|localStorage|sessionStorage|XMLHttpRequest", code))
+    ok("controls.js never uses requestAnimationFrame or setInterval (the caller moves time)",
+       "requestAnimationFrame" not in code and "setInterval" not in code)
+    ok("controls.js writes page text with textContent, never innerHTML", "innerHTML" not in code)
+    ok("controls.js announces every detent with a bubbling ui-detent event",
+       "new CustomEvent('ui-detent', { bubbles: true" in code)
+    ok("controls.js keeps the native range input as the source of truth", "input[type=\"range\"]" in code and "aria-valuetext" in code)
+    ok("controls.js marks a control sitting on a hard limit", "data-at-limit" in code)
+    ok("controls.js names every timeline ending in words", all(w in code for w in ("met:", "timeout:", "no_data:", "open_loop:")))
+    ok("controls.js names no tier colour", not re.search(r"--(measured|predicted|exploring|spec|refuted|tier-)", code))
+    ok("controls.js has a type declaration", (HERE / "controls.d.ts").is_file())
+    pkg = json.loads((HERE / "package.json").read_text())
+    ok("package.json ships and exports controls.css and controls.js",
+       {"controls.css", "controls.js", "controls.d.ts"} <= set(pkg["files"])
+       and pkg["exports"].get("./controls.js") == "./controls.js" and pkg["exports"].get("./controls.css") == "./controls.css")
+    ok("INTEGRATION.md documents controls.js and its ui-detent event",
+       all(w in (HERE / "INTEGRATION.md").read_text() for w in ("controls.js", "ui-detent")))
+    react = (HERE / "src" / "components" / "controls.tsx")
+    ok("the React controls wrap controls.js rather than copying it",
+       react.is_file() and 'from "../../controls.js"' in react.read_text() and "function snap" not in react.read_text())
+
+    # The React Polarize theme: clay is the brand colour, and it is legible on the ground.
+    theme = (HERE / "shadcn" / "theme.css").read_text()
+    pol = TOKENS["color"]["polarize"]
+    blk = theme[theme.find(':root[data-theme="polarize"]'):]
+    blk = blk[:blk.find("}")]
+    ok("the React theme has a Polarize block", bool(blk))
+    ok("...whose --primary is clay and --accent the hover surface",
+       f"--primary: {pol['accent']};" in blk and f"--accent: {pol['surface-2']};" in blk)
+    ok("...with the ground as the text on clay, at AA", f"--primary-foreground: {pol['background']};" in blk
+       and contrast(pol["accent"], pol["background"]) >= 4.5, f"{contrast(pol['accent'], pol['background']):.2f}:1")
+    system = (HERE / "shadcn" / "system.css").read_text()
+    ok("the React system layer defines Polarize's three audio inks",
+       ':root[data-theme="polarize"]' in system and all(f"--{k}:" in system for k in ("clay", "ochre", "lichen", "lichen-text")))
+
+
 def check_react_mirror() -> None:
     """src/theme.css re-declares a few design.css classes for React documents; they must match."""
     path = HERE / "src" / "theme.css"
@@ -756,6 +826,7 @@ def main() -> int:
     check_network3d()
     check_bandprominence()
     check_filter()
+    check_controls()
     check_docs()
     check_react_mirror()
     check_package_imports()

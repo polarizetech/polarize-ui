@@ -110,8 +110,11 @@ The tier list is generated from `tokens.json`, so a badge vocabulary cannot drif
 - **Never rendered.** No project imports any of this; `npx shadcn init` has never been run
   against `components.json`, and `tier.tsx` has never been compiled or seen on a screen. The
   contrast figures are computed from hex, not sampled from a browser.
-- **Only the `instrument` theme is bridged** — the current default. `polarize`, `dark` and
-  `light` are in `tokens.json` and would each need a `.dark`-style block.
+- **Two themes are bridged**: `instrument` (light `:root`, dark `.dark`) and `polarize`
+  (`:root[data-theme="polarize"]`, used together with `.dark`). Polarize's brand colour, clay,
+  goes to `--primary` exactly as the teal does, and `system.css` adds its three audio inks
+  (`--clay`, `--ochre`, `--lichen*`) under the same names `design.css` uses. `dark` and
+  `light` are still not bridged.
 - **No dark-mode toggle.** The files define `.dark`; putting that class on `<html>` is the
   project's job.
 - **`components.json` pins `style: new-york` and `lucide` icons** — a default, not a decision.

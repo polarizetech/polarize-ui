@@ -90,8 +90,15 @@ def series(dark: bool) -> list[str]:
     return list(s)[:5]
 
 
-def pairs(dark: bool) -> list[tuple[str, str, str]]:
-    t = theme(DARK if dark else LIGHT)
+POLARIZE = "polarize"
+#: The selector a React document stamps to get Polarize: <html class="dark" data-theme="polarize">.
+#: :root[...] outranks .dark whatever the order, and .dark stays on so Tailwind's dark: variants
+#: and tier.css's dark steps still apply (Polarize is a dark theme).
+POLARIZE_SEL = ':root[data-theme="polarize"]'
+
+
+def pairs(dark: bool, name: str | None = None) -> list[tuple[str, str, str]]:
+    t = theme(name or (DARK if dark else LIGHT))
     out = [(var, t[src], note) for var, src, note in MAP if src in t]
     out.append(("destructive", destructive(dark), "epistemic REFUTED -- one red, one meaning"))
     out.append(("destructive-foreground", t["background"], ""))
@@ -101,7 +108,11 @@ def pairs(dark: bool) -> list[tuple[str, str, str]]:
 
 
 def hex_to_hsl(h: str) -> str:
-    """Tailwind v3's shadcn convention stores bare `H S% L%` and wraps in hsl() at use."""
+    """Tailwind v3's shadcn convention stores bare `H S% L%` and wraps in hsl() at use.
+    An rgba() value (Polarize's hairlines) becomes `H S% L% / a`, which hsl() also accepts."""
+    if h.startswith("rgba("):
+        r_, g_, b_, a_ = (x.strip() for x in h[5:-1].split(","))
+        return f"{hex_to_hsl('#%02x%02x%02x' % (int(r_), int(g_), int(b_)))} / {a_}"
     h = h.lstrip("#")
     if len(h) == 3:
         h = "".join(c * 2 for c in h)
@@ -123,6 +134,7 @@ def css_v4() -> str:
     rad = TOKENS["radius"]
     L = "\n".join(f"  --{v}: {c};" + (f"  /* {n} */" if n else "") for v, c, n in pairs(False))
     D = "\n".join(f"    --{v}: {c};" for v, c, _ in pairs(True))
+    P = "\n".join(f"  --{v}: {c};" for v, c, _ in pairs(True, POLARIZE))
     names = [v for v, _, _ in pairs(False)]
     theme_map = "\n".join(f"  --color-{v}: var(--{v});" for v in names)
     return f"""{BANNER}
@@ -133,6 +145,12 @@ def css_v4() -> str:
 
 .dark {{
 {D}
+}}
+
+/* Polarize: the warm-dark theme with clay as the brand colour. Stamp it with
+   <html class="dark" data-theme="polarize">. --primary is clay; --accent is still the hover surface. */
+{POLARIZE_SEL} {{
+{P}
 }}
 
 @theme inline {{
@@ -149,6 +167,7 @@ def css_v3() -> str:
     rad = TOKENS["radius"]
     L = "\n".join(f"    --{v}: {hex_to_hsl(c)};" for v, c, _ in pairs(False))
     D = "\n".join(f"    --{v}: {hex_to_hsl(c)};" for v, c, _ in pairs(True))
+    P = "\n".join(f"    --{v}: {hex_to_hsl(c)};" for v, c, _ in pairs(True, POLARIZE))
     return f"""{BANNER}
 @layer base {{
   :root {{
@@ -157,6 +176,9 @@ def css_v3() -> str:
   }}
   .dark {{
 {D}
+  }}
+  {POLARIZE_SEL} {{
+{P}
   }}
 }}
 """
@@ -250,6 +272,18 @@ def tier_css() -> str:
 """
 
 
+def audio_ink() -> list[tuple[str, str]]:
+    """Polarize's three spot inks, under the same names design.css gives them. Polarize only:
+    tokens.json says so, and no other theme has validated values for them."""
+    ink = TOKENS["audioInk"]
+    return [("clay", ink["clay"]["value"]), ("clay-hover", ink["clay"]["hover"]),
+            ("clay-press", ink["clay"]["press"]), ("clay-tint", ink["clay"]["tint"]),
+            ("ochre", ink["ochre"]["value"]), ("ochre-tint", ink["ochre"]["tint"]),
+            ("lichen", ink["lichen"]["value"]), ("lichen-text", ink["lichen"]["onTint"]),
+            ("lichen-tint", ink["lichen"]["tint"]), ("line-row", ink["line"]["row"]),
+            ("wash-hover", ink["wash"]["hover"]), ("wash-selection", ink["wash"]["selection"])]
+
+
 def system_css() -> str:
     """The design-system scales design.css defines and shadcn's theme does not.
 
@@ -261,8 +295,8 @@ def system_css() -> str:
     fam = TOKENS["epistemic"]["families"]
     ser = TOKENS["series"]
 
-    def colours(dark: bool, ind: str) -> str:
-        t = theme(DARK if dark else LIGHT)
+    def colours(dark: bool, ind: str, name: str | None = None) -> str:
+        t = theme(name or (DARK if dark else LIGHT))
         mode = "dark" if dark else "light"
         rows = [("faint-foreground", t["faint-foreground"]), ("border-strong", t["border-strong"])]
         rows += [(k, v[mode]) for k, v in fam.items()]
@@ -270,6 +304,8 @@ def system_css() -> str:
         seq = list(TOKENS["sequential"]["steps"].values())
         rows += [(f"seq-{i}", c) for i, c in enumerate(seq[::-1] if dark else seq, 1)]
         rows += [(f"div-{i}", c) for i, c in enumerate(TOKENS["diverging"]["steps"]["dark" if dark else "light"], 1)]
+        if name == POLARIZE:
+            rows += audio_ink()
         return "\n".join(f"{ind}--{k}: {v};" for k, v in rows)
 
     scales = "\n".join(
@@ -292,6 +328,9 @@ def system_css() -> str:
 }}
 .dark {{
 {colours(True, "    ")}
+}}
+{POLARIZE_SEL} {{
+{colours(True, "  ", POLARIZE)}
 }}
 """
 
