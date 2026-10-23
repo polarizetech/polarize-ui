@@ -95,7 +95,7 @@ def surface(root: Path) -> set[str]:
     if t3d.is_file():  # a mount function and its handle; both are public
         src = t3d.read_text()
         out |= {f"trajectory3djs:{n}" for n in re.findall(r"^export (?:const|function) (\w+)", src, re.M)}
-        out |= {f"trajectory3djs:handle.{n}" for n in re.findall(r"^    (\w+)\([^)]*\) \{", src[src.rindex("return {"):], re.M)}
+        out |= {f"trajectory3djs:handle.{n}" for n in re.findall(r"^    (\w+)\([^)]*\) \{", "\n".join(re.findall(r"^  return \{\n(.*?)^  \};", src, re.M | re.S)), re.M)}
     docs_js = root / "docs.js"
     if docs_js.is_file():  # docs.js is driven by data attributes and exports; both are public
         src = docs_js.read_text()
