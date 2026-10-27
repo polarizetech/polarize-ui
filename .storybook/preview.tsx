@@ -15,6 +15,7 @@ const preview: Preview = {
           { value: "auto", title: "follow OS" },
           { value: "light", title: "light" },
           { value: "dark", title: "dark" },
+          { value: "polarize", title: "polarize (warm dark)" },
         ],
         dynamicTitle: true,
       },
@@ -24,8 +25,11 @@ const preview: Preview = {
   decorators: [
     (Story, ctx) => {
       const t = ctx.globals.theme;
-      const dark = t === "dark" || (t !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      const dark = t === "dark" || t === "polarize" || (t !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
       document.documentElement.classList.toggle("dark", dark);
+      // Polarize is a dark theme with its own block (clay brand, audio inks): stamp both.
+      if (t === "polarize") document.documentElement.dataset.theme = "polarize";
+      else delete document.documentElement.dataset.theme;
       return (
         <TooltipProvider>
           <DocsProvider>
@@ -45,7 +49,7 @@ const preview: Preview = {
         order: [
           "Introduction",
           "Science", ["Charts", "Signals", "Statistics", "Evidence"],
-          "General UI", ["Foundations", "Components", "Layouts", "Landing", "Docs", "Illustrations"],
+          "General UI", ["Foundations", "Components", "Controls", "Layouts", "Landing", "Docs", "Illustrations"],
         ],
       },
     },

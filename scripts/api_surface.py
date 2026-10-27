@@ -24,7 +24,7 @@ from io import BytesIO
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent.parent
-CSS_ENTRIES = ["design.css", "publication.css", "specimens.css", "landing.css", "docs.css",
+CSS_ENTRIES = ["design.css", "publication.css", "specimens.css", "landing.css", "docs.css", "controls.css",
                "shadcn/theme.css", "shadcn/system.css", "shadcn/tier.css", "src/theme.css"]
 NOTE_KEYS = re.compile(r"(^|_)note$|^palette_provenance$|^why_not_a_component_library$")
 
@@ -101,6 +101,11 @@ def surface(root: Path) -> set[str]:
         src = n3d.read_text()
         out |= {f"network3djs:{n}" for n in re.findall(r"^export (?:const|function) (\w+)", src, re.M)}
         out |= {f"network3djs:handle.{n}" for n in re.findall(r"^    (\w+)\([^)]*\) \{", src[src.rindex("return {"):], re.M)}
+    ctl = root / "controls.js"
+    if ctl.is_file():  # pure functions, enhancers and mount functions; all public
+        src = ctl.read_text()
+        out |= {f"controlsjs:{n}" for n in re.findall(r"^export (?:const|function) (\w+)", src, re.M)}
+        out |= {f"attr:{a}" for a in re.findall(r"\[(data-ui-[a-z-]+)\]", src)}
     docs_js = root / "docs.js"
     if docs_js.is_file():  # docs.js is driven by data attributes and exports; both are public
         src = docs_js.read_text()

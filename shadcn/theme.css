@@ -58,6 +58,35 @@
     --chart-5: #d55181;
 }
 
+/* Polarize: the warm-dark theme with clay as the brand colour. Stamp it with
+   <html class="dark" data-theme="polarize">. --primary is clay; --accent is still the hover surface. */
+:root[data-theme="polarize"] {
+  --background: #100d0b;
+  --foreground: #ece2d2;
+  --card: #181310;
+  --card-foreground: #ece2d2;
+  --popover: #221b16;
+  --popover-foreground: #ece2d2;
+  --primary: #c4643c;
+  --primary-foreground: #100d0b;
+  --secondary: #221b16;
+  --secondary-foreground: #ece2d2;
+  --muted: #221b16;
+  --muted-foreground: #8f8069;
+  --accent: #221b16;
+  --accent-foreground: #ece2d2;
+  --border: rgba(236,226,210,.07);
+  --input: rgba(236,226,210,.07);
+  --ring: #c4643c;
+  --destructive: #e66767;
+  --destructive-foreground: #100d0b;
+  --chart-1: #3987e5;
+  --chart-2: #d95926;
+  --chart-3: #199e70;
+  --chart-4: #c98500;
+  --chart-5: #d55181;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
