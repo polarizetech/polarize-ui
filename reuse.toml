@@ -1,0 +1,49 @@
+# Build-vs-reuse register: our own scientific code, and the open-source, peer-reviewed tool that
+# does (or could do) the same job. States: tandem | candidate | none-found | replaced.
+# Format: https://github.com/polarizetech/retrieval-augmented-generation/blob/main/docs/reuse-register.md
+# Seeded from the 2026-10-28 review of this repo; check entries as you touch the code.
+
+[[custom]]
+name = "Phase-amplitude coupling"
+path = "src/science/stats/pac.ts"
+does = "Tort modulation index with circular-shift surrogates and family-wise max; own FFT/Hilbert"
+state = "candidate"
+alternative = "tensorpac"
+check = ""
+note = "Hand re-implementation of Tort et al. 2010; compare MI and surrogate p with tensorpac (Combrisson et al. 2020) on Tort 2010 simulated-coupling cases; no numeric test now"
+
+[[custom]]
+name = "OLS regression"
+path = "src/science/stats/regression.ts"
+does = "OLS with exact t intervals; own incomplete-beta t"
+state = "candidate"
+alternative = "statsmodels"
+check = ""
+note = "Compare coefficients, SEs and CIs with statsmodels OLS on fixed datasets; no test now"
+
+[[custom]]
+name = "Permutation p-value"
+path = "src/science/stats/NullDistribution.tsx"
+does = "permutation p = (1 + k)/(1 + n)"
+state = "candidate"
+alternative = "scipy"
+check = ""
+note = "Phipson & Smyth 2010 estimator; compare with scipy.stats.permutation_test on the same null draws"
+
+[[custom]]
+name = "LTTB decimation"
+path = "src/science/charts/decimate.ts"
+does = "largest-triangle-three-buckets downsampling (Steinarsson 2013)"
+state = "candidate"
+alternative = "plotly-resampler"
+check = ""
+note = "Compare selected indices with plotly-resampler / tsdownsample LTTB (Van Der Donckt et al., IEEE VIS 2022) on the same series"
+
+[[custom]]
+name = "Band prominence"
+path = "bandprominence.js"
+does = "4th-order Butterworth from RBJ biquads, relative band power, adaptive threshold and lead rules"
+state = "candidate"
+alternative = "scipy"
+check = ""
+note = "Filter response vs scipy.signal.butter/sosfreqz; band power vs mne psd_array_welch. dev_check.py:628 checks structure only; threshold and lead rules have no alternative"
