@@ -381,10 +381,41 @@ export function seriesColors() {
   return (TOKENS?.series?.[dark ? 'dark' : 'light']) || [];
 }
 
+/* ---------------------------------------------------------------- navbar -- */
+
+/** Wire a `.ui-navbar`: the menu toggle below the tablet breakpoint, and, with
+ *  `data-autohide`, hide-on-scroll-down / show-on-scroll-up. Runs on every
+ *  `.ui-navbar` at load; call it yourself for one added later. */
+export function initNavbar(nav) {
+  if (nav.__uiNavbar) return;
+  nav.__uiNavbar = true;
+  const toggle = nav.querySelector('.ui-navbar__toggle');
+  const items = nav.querySelector('.ui-navbar__items');
+  const setOpen = (o) => { nav.toggleAttribute('data-open', o); toggle?.setAttribute('aria-expanded', String(o)); };
+  toggle?.addEventListener('click', () => setOpen(!nav.hasAttribute('data-open')));
+  nav.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && nav.hasAttribute('data-open')) { setOpen(false); toggle?.focus(); }
+  });
+  document.addEventListener('click', (e) => { if (!nav.contains(e.target)) setOpen(false); });
+  items?.addEventListener('click', (e) => { if (e.target.closest('a')) setOpen(false); });
+  matchMedia('(min-width: 768px)').addEventListener('change', (e) => { if (e.matches) setOpen(false); });
+  if (!nav.hasAttribute('data-autohide')) return;
+  let last = scrollY;
+  const show = () => nav.classList.remove('is-hidden');
+  nav.addEventListener('focusin', (e) => { if (e.target.matches(':focus-visible')) show(); });
+  addEventListener('scroll', () => {
+    const y = Math.max(0, scrollY), d = y - last;
+    if (y <= 8 || nav.hasAttribute('data-open') || nav.querySelector(':focus-visible')) { show(); last = y; }
+    else if (d > 6) { nav.classList.add('is-hidden'); last = y; }
+    else if (d < -6) { show(); last = y; }
+  }, { passive: true });
+}
+
 customElements.define('ui-tier', UiTier);
 customElements.define('ui-note', UiNote);
 customElements.define('ui-docs', UiDocs);
 
 wireTooltips();
+document.querySelectorAll('.ui-navbar').forEach(initNavbar);
 await loadTokens();
 await loadIconSprite();

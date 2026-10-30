@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+import { Play } from "lucide-react"
+import { Navbar, NavbarLink } from "@/components/navbar"
 import {
   Article, AuthorNote, Badges, Brand, Cite, Claims, Footer, Pager, Parts, PostList, Prose,
   References, Shell, SidebarMeta, SidebarSection, Source, Summary, type PostSummary,
@@ -125,5 +127,24 @@ export const ArticlePage: StoryObj = {
         note={<>Every field above is machine-copied from the ledger; the key is <code>example2024</code>.</>}
       />
     </Article>
+  ),
+}
+
+export const NavbarAutohide: StoryObj = {
+  name: "Navbar (hides on scroll down)",
+  render: () => (
+    <>
+      <Navbar
+        brand="Field notes"
+        version="v1"
+        items={<><NavbarLink href="#a" current>Colour</NavbarLink><NavbarLink href="#b">Structure</NavbarLink><NavbarLink href="#c">Tests</NavbarLink></>}
+        wide={<span className="ui-label">8.9 / 64.0 s</span>}
+        actions={<button type="button" className="ui-btn ui-btn--primary" aria-label="Play"><Play size={14} aria-hidden /></button>}
+      />
+      <div className="ui-wrap">
+        <p className="ui-lede">Scroll down: the bar slides up out of view. Scroll up and it slides back. At the top it is always shown. Below 768px the links fold into a menu and the readout is hidden.</p>
+        {Array.from({ length: 24 }, (_, i) => <p key={i}>Paragraph {i + 1}. Placeholder text so the page is long enough to scroll.</p>)}
+      </div>
+    </>
   ),
 }
