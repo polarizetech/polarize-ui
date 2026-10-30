@@ -1,0 +1,1 @@
+`.ui-readout` is a definition list of value cells separated by hairlines. Always give a unit in `<small>` and style the value as measured or predicted. Provide `dt` / `dd` pairs wrapped in a `div`.

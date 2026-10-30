@@ -1,0 +1,1 @@
+`.ui-card` is a surface with a hairline border and `radius-base`. A plain `h2` becomes a mono uppercase kicker; give a `.ui-display` heading to get the serif instead. Never add a shadow or a coloured side border to a card; use `.ui-rule--<family>` only to mark a claim's tier in running text.

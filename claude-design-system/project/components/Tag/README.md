@@ -1,0 +1,1 @@
+`.ui-pill` is a neutral chip. `.ui-tag--clay` marks signal or action, `--ochre` marks a human annotation, `--lichen` marks machine state; each ink has exactly one job. Tags are for metadata, not evidence quality; use Tier for that.

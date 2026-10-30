@@ -1,0 +1,1 @@
+Buttons are `.ui-btn` with `--primary` or `--ghost`; a toggle sets `aria-pressed="true"`. Use one primary button per view, because `accent` is the single dominant colour. Labels are short verbs in regular weight. Focus shows a 2px `ring` outline. The consumer provides the label and click handler.

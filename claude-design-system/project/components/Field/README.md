@@ -1,0 +1,1 @@
+`.ui-field` stacks a `.ui-label` over a native `select` or `input`. Keep the native control so keyboard and screen-reader support stay intact. The consumer provides the options and value handling.

@@ -1,0 +1,1 @@
+`.ui-table` has mono uppercase headers and hairline rows. Put units in the header and the tier in its own column. Wrap a wide table in `.ui-scroll-x`. Numeric cells use tabular figures via `.ui-measured` / `.ui-predicted`.

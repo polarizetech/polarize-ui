@@ -1,0 +1,1 @@
+`.ui-tabs` holds buttons with `role="tab"` and `aria-selected`. The active tab gets an `accent` underline. Provide the panels and keyboard handling yourself; the CSS carries only the look.
