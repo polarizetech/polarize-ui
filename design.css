@@ -755,6 +755,111 @@ body.ui {
 }
 @media (prefers-reduced-motion: reduce) { .ui-navbar { transition: none; } }
 
+/* ---------------------------------------------------------- dashboards ---- */
+/* A dashboard view: KPI strip, stacked panels on a shared gutter, an exponent/category strip,
+   event cards, a p-value table and a disclosure. Marks are drawn by the consumer (canvas or SVG);
+   these classes carry the frame, the type and the legend. Tier and measured/predicted styling
+   still apply inside them: see .ui-tier, .ui-measured, .ui-predicted. */
+.ui-kpis {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1px;
+  background: var(--border); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+}
+.ui-kpi { background: var(--surface); padding: var(--space-4) 18px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.ui-kpi__label {
+  font: 500 var(--text-xs)/1.25 var(--font-mono); letter-spacing: .12em; text-transform: uppercase;
+  color: var(--faint-foreground);
+}
+.ui-kpi__value {
+  font-family: var(--font-display); font-size: var(--text-hero); line-height: 1.05;
+  color: var(--foreground); text-transform: none; text-wrap: balance;
+}
+.ui-kpi__value small { font-family: var(--font-primary); font-size: var(--text-sm); color: var(--faint-foreground); margin-left: var(--space-1); }
+.ui-kpi__note { margin: 0; font-size: var(--text-sm); color: var(--muted-foreground); }
+
+.ui-panels {
+  --panel-gutter: 56px;
+  display: flex; flex-direction: column;
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); overflow: hidden;
+}
+.ui-panel { border-top: 1px solid var(--border); padding-top: var(--space-3); min-width: 0; }
+.ui-panel:first-child { border-top: 0; }
+.ui-panel__head {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px var(--space-3);
+  padding: 0 var(--space-4) var(--space-2) var(--panel-gutter);
+}
+.ui-panel__title {
+  margin: 0; font: 500 var(--text-xs)/1.25 var(--font-mono); letter-spacing: .12em;
+  text-transform: uppercase; color: var(--foreground);
+}
+.ui-panel__sub { font-size: var(--text-sm); color: var(--faint-foreground); }
+.ui-panel canvas, .ui-panel svg { display: block; width: 100%; }
+.ui-panels__keys {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) 18px;
+  padding: 10px var(--space-4); border-top: 1px solid var(--border);
+  background: var(--surface-2); font-size: var(--text-sm); color: var(--muted-foreground);
+}
+.ui-key { display: inline-flex; align-items: center; gap: 6px; }
+.ui-key::before { content: ""; width: 18px; border-top: 2px solid var(--foreground); }
+.ui-key[data-kind="dash"]::before { border-top-style: dashed; border-color: var(--faint-foreground); }
+.ui-key[data-kind="fill"]::before { height: 10px; width: 14px; border: 1px solid var(--accent); background: var(--surface-2); }
+
+.ui-strip {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: var(--space-4) 18px 14px; display: flex; flex-direction: column; gap: var(--space-3);
+}
+.ui-strip__legend {
+  display: flex; flex-wrap: wrap; gap: 6px var(--space-4);
+  font: 500 var(--text-xs)/1.25 var(--font-mono); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.ui-strip__legend span { display: inline-flex; align-items: center; gap: 6px; }
+.ui-strip__legend i {
+  width: 12px; height: 12px; border-radius: 3px; display: inline-block;
+  border: 1px solid var(--border-strong); background: var(--swatch, var(--surface-2));
+}
+.ui-strip__legend em { font-style: normal; color: var(--faint-foreground); }
+.ui-strip__well { display: block; width: 100%; border-radius: var(--radius-xs); }
+.ui-strip__now { margin: 0; color: var(--foreground); max-width: 90ch; }
+
+.ui-events { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: var(--space-3); }
+.ui-event {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px var(--space-4); display: flex; flex-direction: column; gap: var(--space-2);
+  min-width: 0; margin: 0; font: inherit; color: inherit; text-align: left;
+}
+button.ui-event { cursor: pointer; }
+button.ui-event:hover { border-color: var(--foreground); }
+.ui-event[aria-current], .ui-event[data-hit] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.ui-event__head { display: flex; justify-content: space-between; align-items: center; gap: var(--space-2); }
+.ui-event__title { font-family: var(--font-display); font-size: var(--text-xl); line-height: 1.1; color: var(--foreground); text-transform: none; }
+.ui-event__trace { display: block; width: 100%; height: 48px; color: var(--foreground); }
+.ui-event__trace path { fill: none; stroke: currentColor; stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+.ui-event__trace .axis { stroke: var(--border-strong); vector-effect: non-scaling-stroke; }
+.ui-event dl { display: grid; grid-template-columns: auto 1fr; gap: 2px var(--space-3); margin: 0; font-size: var(--text-sm); }
+.ui-event dt { color: var(--faint-foreground); }
+.ui-event dd { margin: 0; text-align: right; color: var(--foreground); font-variant-numeric: tabular-nums; }
+
+/* p-value cell: a rejected cell is outlined in the accent and keeps its number. */
+.ui-table .ui-pcell { font-family: var(--font-mono); text-align: center; font-variant-numeric: tabular-nums; }
+.ui-table .ui-pcell[data-reject] { background: var(--surface-2); color: var(--foreground); box-shadow: inset 0 0 0 1px var(--accent); }
+
+details.ui-disclosure { border-top: 1px solid var(--border); padding-top: var(--space-2); max-width: 84ch; }
+details.ui-disclosure > summary {
+  cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: var(--space-2);
+  font: 500 var(--text-xs)/1.25 var(--font-mono); letter-spacing: .12em; text-transform: uppercase;
+  color: var(--faint-foreground);
+}
+details.ui-disclosure > summary::-webkit-details-marker { display: none; }
+details.ui-disclosure > summary::before {
+  content: "?"; display: inline-grid; place-items: center; width: 16px; height: 16px;
+  border: 1px solid var(--border-strong); border-radius: 50%;
+}
+details.ui-disclosure[open] > summary::before { background: var(--accent); border-color: var(--accent); color: var(--background); }
+details.ui-disclosure > summary:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+details.ui-disclosure > :not(summary) { margin: var(--space-2) 0 0; font-size: var(--text-sm); color: var(--muted-foreground); }
+
 .ui-tabs {
   display: flex; gap: 2px; overflow-x: auto;
   padding: var(--space-2) var(--space-4) 0;
