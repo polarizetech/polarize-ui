@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Play } from "lucide-react"
 import { Navbar, NavbarLink } from "@/components/navbar"
+import { ColorStrip, Disclosure, EventCard, Events, Key, Kpi, Kpis, PCell, Panel, Panels } from "@/components/dashboard"
 import {
   Article, AuthorNote, Badges, Brand, Cite, Claims, Footer, Pager, Parts, PostList, Prose,
   References, Shell, SidebarMeta, SidebarSection, Source, Summary, type PostSummary,
@@ -146,5 +147,43 @@ export const NavbarAutohide: StoryObj = {
         {Array.from({ length: 24 }, (_, i) => <p key={i}>Paragraph {i + 1}. Placeholder text so the page is long enough to scroll.</p>)}
       </div>
     </>
+  ),
+}
+
+const wave = (f: number, a: number) => Array.from({ length: 120 }, (_, i) => 30 - a * Math.sin(i / f) * Math.exp(-((i - 60) ** 2) / 900))
+const path = (z: number[]) => z.map((y, i) => `${i ? "L" : "M"}${(i / 119) * 200},${y.toFixed(1)}`).join("")
+
+// Every number below is a PLACEHOLDER for layout only.
+export const DashboardFrames: StoryObj = {
+  name: "Dashboard frames (KPIs, panels, strip, events, p-table)",
+  render: () => (
+    <div className="ui-wrap" style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <Kpis>
+        <Kpi label="Noise colour" value={<>brown<small>exponent 2.01</small></>} note="Window 5.0–9.0 s" />
+        <Kpi label="Battery verdict" value={<>Structured<small>2 of 3 windows</small></>} note={<span className="ui-tier" data-family="exploring"><span className="ui-tier__glyph">●</span>EXPLORATORY</span>} />
+        <Kpi label="Episodes" value={<><span className="ui-measured">3</span><small>recording</small> · <span className="ui-predicted">1</span><small>twin</small></>} note="No group has enough episodes to test" />
+      </Kpis>
+      <ColorStrip legend={[{ label: "violet", swatch: "var(--series-1, #3987e5)", note: "−2" }, { label: "white", swatch: "var(--surface-2)", note: "0" }, { label: "brown", swatch: "var(--series-2, #d95926)", note: "2" }]}
+        now="Now (8.9 s): brown, exponent 2.01.">
+        <svg className="ui-strip__well" viewBox="0 0 960 40" preserveAspectRatio="none" height="40" role="img" aria-label="Colour by window">
+          {Array.from({ length: 48 }, (_, i) => <rect key={i} x={i * 20} width={19} height={40} fill="var(--series-2, #d95926)" />)}
+        </svg>
+      </ColorStrip>
+      <Panels keys={<><Key>recording</Key><Key kind="dash">twin</Key><Key kind="fill">episode</Key></>}>
+        <Panel title="Raw" sub="counts"><svg viewBox="0 0 200 60" preserveAspectRatio="none" height="90"><path d={path(wave(2, 24))} fill="none" stroke="currentColor" vectorEffect="non-scaling-stroke" /></svg></Panel>
+        <Panel title="Departures z" sub="floor SDs"><svg viewBox="0 0 200 60" preserveAspectRatio="none" height="90"><path d={path(wave(1.2, 20))} fill="none" stroke="currentColor" vectorEffect="non-scaling-stroke" /></svg></Panel>
+      </Panels>
+      <Events>
+        <EventCard title="burst" badge={<span className="ui-tier" data-family="exploring"><span className="ui-tier__glyph">●</span>EXPLORATORY</span>}
+          trace={<svg className="ui-event__trace" viewBox="0 0 200 60" preserveAspectRatio="none"><line className="axis" x1="0" x2="200" y1="30" y2="30" /><path d={path(wave(3, 22))} /></svg>}
+          rows={[["When", "9.9–14.5 s"], ["Length", "4.6 s"], ["Group", "1 vs 0 twin · too few to test"]]} hit />
+        <EventCard title="swell" rows={[["When", "21.5–26.6 s"], ["Length", "5.1 s"]]} onClick={() => undefined} />
+      </Events>
+      <div className="ui-scroll-x">
+        <table className="ui-table"><thead><tr><th>Statistic</th><th>Window 1</th><th>Window 2</th></tr></thead>
+          <tbody><tr><td>excess kurtosis</td><PCell p={0.025} /><PCell p={0.4} /></tr><tr><td>irreversibility</td><PCell p={0.15} /><PCell p={0.04} /></tr></tbody></table>
+      </div>
+      <Disclosure label="How the tests work"><p>Each cell is a rank p-value among surrogates of the same window. Outlined cells are rejected at 0.05.</p></Disclosure>
+    </div>
   ),
 }

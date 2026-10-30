@@ -35,6 +35,8 @@ Source: `src/science/`. Every view is in the [live Storybook](https://polarizete
 |---|---|
 | `tokens.json` | The single source of truth: colour, type, spacing, the tier ladder, a colour-blind-validated categorical palette and a one-hue sequential ramp. |
 | `design.css` + `design.js` | The zero-build form, generated from the tokens: link it and set `<body class="ui">`. Custom elements: `<ui-tier>`, `<ui-note>`, `<ui-docs>`. |
+| Navbar | `.ui-navbar` (React `Navbar`): a 44px sticky bar that slides away while scrolling down and returns on scroll up (`data-autohide`). Below 768px the items fold into a menu and `.ui-navbar__wide` content is hidden. |
+| Dashboard frames | `.ui-kpis`, `.ui-panels` (stacked panels on one gutter), `.ui-strip` (category strip with legend), `.ui-events` (event cards), `.ui-pcell` (p-value cell), `.ui-disclosure`. The frame and type only; marks are drawn by the caller. React versions in `components/dashboard`. |
 | `publication.css` | Layouts for a research blog: sidebar shell, post list, article, prose, source cards, citations, claims, references, pager, footer. React versions render the same classes. |
 | `landing.css` | A lab's front door: top bar, hero, section heads, process steps, project features, repository cards, a changelog feed, article and story cards, archival plates, the principle block and the site footer. React: `src/components/landing.tsx`. |
 | `trajectory3d.js` | A path through three dimensions with a marker at the current time, on a plain canvas: `mountTrajectory3D(host, options)`. Drag to turn, pinch to zoom. No dependencies; colour from the tokens. See [`INTEGRATION.md`](INTEGRATION.md) § 5. |
