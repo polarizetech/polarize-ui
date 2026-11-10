@@ -1,7 +1,9 @@
 import json,re,os,shutil,datetime
-R='/Users/joshuaanderton/Sites/polarize-ui/'
+HERE=os.path.dirname(os.path.abspath(__file__))
+R=os.path.dirname(HERE)+'/'  # the repo root, found from this script's location
+VER=json.load(open(R+'package.json'))['version']
 t=json.load(open(R+'tokens.json'))
-P='project/'
+P=os.path.join(HERE,'project')+'/'
 def w(p,s):
     os.makedirs(os.path.dirname(P+p),exist_ok=True); open(P+p,'w').write(s)
 themes=[('instrument','Instrument (light)','light'),('instrument-dark','Instrument (dark)','dark'),('polarize','Polarize (warm dark)','dark'),('fieldguide','Field guide (light)','light'),('fieldguide-dark','Field guide (dark)','dark')]
@@ -46,7 +48,7 @@ tokens={'name':'Polarize UI','version':1,
 'spacing':{'tokens':[{'name':f'space-{k}','value':v,'usage':u} for (k,v),u in zip(t['space'].items(),['Icon gaps.','Inline gaps, pill padding.','Control padding.','Card padding.','Section gaps.','Between blocks.','Page sections.','Large separation.','Hero spacing.']) if k.isdigit()]},
 'radius':{'tokens':[{'name':f'radius-{k}','value':v,'usage':u} for (k,v),u in zip(t['radius'].items(),['Badges, inputs.','Buttons.','Cards.','Panels, drawers.','Pills and tags.'])]},
 'shadow':{'tokens':[{'name':'shadow-raised','value':{th:col[th]['shadow'] if 'rgba' in col[th]['shadow'] and ' ' in col[th]['shadow'] and not col[th]['shadow'].startswith('rgba') else '0 8px 24px -16px '+col[th]['shadow'] for th,_,_ in themes},'usage':'Drawers and raised panels. Structure elsewhere comes from hairlines, not shadow.'}]},
-'meta':{'source':'polarizetech/polarize-ui tokens.json @ v0.6.2'}}
+'meta':{'source':f'polarizetech/polarize-ui tokens.json @ v{VER}'}}
 json.dump(tokens,open(P+'tokens.json','w'),indent=1) if os.makedirs(P,exist_ok=True) is None else 0
 os.makedirs(P+'fonts',exist_ok=True)
 for f in fonts: shutil.copy(R+f['file'],P+f['file'])
