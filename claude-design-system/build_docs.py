@@ -1,5 +1,8 @@
 import os,json,datetime
-P='project/'
+HERE=os.path.dirname(os.path.abspath(__file__))
+R=os.path.dirname(HERE)+'/'  # the repo root, found from this script's location
+VER=json.load(open(R+'package.json'))['version']
+P=os.path.join(HERE,'project')+'/'
 def w(p,s):
     os.makedirs(os.path.dirname(P+p),exist_ok=True); open(P+p,'w').write(s)
 w('README.md','''Polarize UI is a design system for interfaces that show scientific data honestly. Every measured, modelled or speculative value carries a label, and the label can never be hidden.
@@ -76,22 +79,13 @@ The consumer provides the tier id and puts the explanation in a `ui-note`.
 }
 for n,(g,sub,h,body,readme) in comps.items():
     w(f'components/{n}/preview.html',card(g,h,sub,body)); w(f'components/{n}/README.md',readme)
-# cover
-w('components/Cover/preview.html','''<!-- @dsCard height=300 -->
-<!-- blocks: accent(instrument teal) 192x240 radius-lg, foreground slab 96x144 radius-base, measured 96x96, predicted 96x96, spec 96x48; arrangement: staggered stack right of x=480
- pattern: hairline baseline rules (editorial, "hairlines not boxes") 4 rules at border-strong; steps space-6, radii radius-base/lg -->
-<style>html,body{margin:0}body{background:var(--background);font-family:var(--font-display,"Instrument Serif",Georgia,serif)}svg{display:block}
-.a{fill:var(--accent)}.f{fill:var(--foreground)}.m{fill:var(--measured)}.p{fill:var(--predicted)}.s{fill:var(--spec)}.h{stroke:var(--border-strong);stroke-width:1}
-.n{font:400 96px/0.95 "Instrument Serif",Georgia,serif;fill:var(--foreground)}.t{font:400 13px Inter,system-ui,sans-serif;fill:var(--muted-foreground)}</style>
-<svg width="960" height="300" viewBox="0 0 960 300">
-<line class="h" x1="480" x2="960" y1="60" y2="60"/><line class="h" x1="480" x2="960" y1="120" y2="120"/><line class="h" x1="480" x2="960" y1="180" y2="180"/><line class="h" x1="480" x2="960" y1="240" y2="240"/>
-<rect class="a" x="528" y="36" width="192" height="228" rx="14"/>
-<rect class="f" x="720" y="108" width="96" height="144" rx="10"/>
-<rect class="m" x="816" y="36" width="96" height="96" rx="10"/>
-<rect class="p" x="816" y="132" width="96" height="96" rx="10"/>
-<rect class="s" x="432" y="204" width="0" height="0"/>
-<text class="n" x="32" y="214">Polarize</text><text class="n" x="32" y="272">UI</text>
-<text class="t" x="32" y="292" style="display:none">x</text>
-</svg>''')
-now=datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
-w('design-system.json',json.dumps({"v":3,"layout":"files","createdOnFiles":{"v":1,"at":now},"title":"Polarize UI","namespace":"PolarizeUI","libraries":[],"sections":{},"groups":[],"assetGroups":{},"blobs":{},"docs":{"readme":"project/README.md","sections":[]},"lastChange":{"by":"Joshua Anderton","at":now,"via":"Claude Code","note":"Imported from polarizetech/polarize-ui v0.6.2"}},indent=1))
+# cover (as edited on the published system; keep this in step with it)
+w('components/Cover/preview.html','<!-- @dsCard height=300 -->\n<!-- blocks: accent(instrument teal) 192x240 radius-lg, foreground slab 96x144 radius-base, measured 96x96, predicted 96x96, spec 96x48 (sits above the foreground slab); arrangement: staggered stack right of x=480\n pattern: hairline baseline rules (editorial, "hairlines not boxes") 4 rules at border-strong; steps space-6, radii radius-base/lg -->\n<style>html,body{margin:0}body{background:var(--background);font-family:var(--font-display,"Instrument Serif",Georgia,serif)}svg{display:block}\n.a{fill:var(--accent)}.f{fill:var(--foreground)}.m{fill:var(--measured)}.p{fill:var(--predicted)}.s{fill:var(--spec)}.h{stroke:var(--border-strong);stroke-width:1}\n.n{font:400 84px/0.95 "Instrument Serif",Georgia,serif;fill:var(--foreground)}.t{font:400 13px Inter,system-ui,sans-serif;fill:var(--muted-foreground)}</style>\n<svg width="960" height="300" viewBox="0 0 960 300">\n<line class="h" x1="480" x2="960" y1="60" y2="60"/><line class="h" x1="480" x2="960" y1="120" y2="120"/><line class="h" x1="480" x2="960" y1="180" y2="180"/><line class="h" x1="480" x2="960" y1="240" y2="240"/>\n<rect class="a" x="528" y="36" width="192" height="228" rx="14"/>\n<rect class="f" x="720" y="108" width="96" height="144" rx="10"/>\n<rect class="m" x="816" y="36" width="96" height="96" rx="10"/>\n<rect class="p" x="816" y="132" width="96" height="96" rx="10"/>\n<rect class="s" x="720" y="36" width="96" height="48" rx="10"/>\n<text class="n" x="32" y="176">Polarize</text><text class="n" x="32" y="252">UI</text>\n<text class="t" x="32" y="280">Honest design for scientific data.</text>\n</svg>')
+# Navbar (added in v0.6.6)
+w('components/Navbar/README.md','`.ui-navbar` is a 44px sticky bar: brand (display face, with an optional mono `.ui-navbar__version`), `.ui-navbar__items` links, and `.ui-navbar__actions` at the right.\n\nAdd `data-autohide` and the bar slides up out of view while scrolling down and returns when scrolling up; at the top of the page it is always shown. It stays visible while its menu is open or a control has keyboard focus. `design.js` wires it (`initNavbar`); React uses `Navbar` and `NavbarLink`.\n\nBelow 768px the items fold into a menu behind `.ui-navbar__toggle`, and `.ui-navbar__wide` (readouts, clocks) is hidden. Keep tier badges and other long labels out of the bar. Actions stay visible: use an icon-only button at phone width. Mark the current link with `aria-current`.\n')
+w('components/Navbar/preview.html','<!-- @dsCard group="Navigation" height=150 subtitle="Short sticky bar; folds into a menu below 768px" -->\n<style>body{margin:0}.ui-navbar{position:static}</style>\n<body class="ui">\n<header class="ui-navbar" data-autohide><div class="ui-navbar__bar">\n<span class="ui-navbar__brand">Field notes<span class="ui-navbar__version">v1</span></span>\n<div class="ui-navbar__items"><a class="ui-navbar__link" href="#" aria-current="true">Colour</a><a class="ui-navbar__link" href="#">Structure</a><a class="ui-navbar__link" href="#">Tests</a></div>\n<div class="ui-navbar__actions"><span class="ui-navbar__wide ui-label">8.9 / 64.0 s</span><button class="ui-btn ui-btn--primary" aria-label="Play">Play</button></div>\n<button class="ui-navbar__toggle" aria-label="Menu" aria-expanded="false"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 4h12M2 8h12M2 12h12"/></svg></button>\n</div></header>\n</body>\n')
+now=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+# keep the system's creation record; only lastChange moves
+try: created=json.load(open(P+'design-system.json'))['createdOnFiles']
+except (OSError,KeyError,ValueError): created={"v":1,"at":now}
+w('design-system.json',json.dumps({"v":3,"layout":"files","createdOnFiles":created,"title":"Polarize UI","namespace":"PolarizeUI","libraries":[],"sections":{},"groups":[],"assetGroups":{},"blobs":{},"docs":{"readme":"project/README.md","sections":[]},"lastChange":{"by":"Joshua Anderton","at":now,"via":"Claude Code","note":f"Updated from polarizetech/polarize-ui v{VER}"}},indent=1))
