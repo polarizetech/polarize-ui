@@ -959,6 +959,264 @@ export function mountPanner(host, options = {}) {
   };
 }
 
+/* ---------- Keyboard and key lane ---------- */
+/* Interface components (owner: "Yes, mark them exploratory — we're trying this out"). A black key spans from the centre of the white key below it to the centre of the white key above, so it sits on the boundary and is sized by its neighbours; there is no default note range: the caller gives low and high. */
+
+const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
+
+/** True for a black key (C♯ D♯ F♯ G♯ A♯ by pitch class). */
+export const isBlack = (midi) => [1, 3, 6, 8, 10].includes(((midi % 12) + 12) % 12);
+
+/** Note name with octave, MIDI 60 → "C4", 61 → "C♯4". */
+export function noteName(midi) {
+  return `${NOTE_NAMES[((midi % 12) + 12) % 12]}${Math.floor(midi / 12) - 1}`;
+}
+
+/**
+ * Percent layout of the keys from `low` to `high` (inclusive), in MIDI order.
+ * White keys share the row equally; a black key spans from the centre of the white key below it to the centre of the white key above. Returns [{ midi, black, left, width }] in percent.
+ */
+export function keyLayout(low, high) {
+  let whites = 0;
+  for (let m = low; m <= high; m++) if (!isBlack(m)) whites++;
+  const w = 100 / whites;
+  const out = [];
+  let whiteIndex = 0;
+  for (let m = low; m <= high; m++) {
+    if (isBlack(m)) {
+      out.push({ midi: m, black: true, left: whiteIndex * w - w / 2, width: w });
+    } else {
+      out.push({ midi: m, black: false, left: whiteIndex * w, width: w });
+      whiteIndex++;
+    }
+  }
+  return out;
+}
+
+/** Left and width (percent) from the left of key `lo` to the right edge of key `hi`, or null. */
+export function spanLayout(layout, lo, hi) {
+  const a = layout.find((k) => k.midi === lo);
+  const b = layout.find((k) => k.midi === hi);
+  if (!a || !b) return null;
+  return { left: a.left, width: b.left + b.width - a.left };
+}
+
+/**
+ * An on-screen piano keyboard in `host`. Keys are buttons with aria-pressed; a disabled key
+ * (options.disabled[midi] = reason) is aria-disabled and names its reason. Returns
+ * { setHeld(midi, on), setDisabled(map), setBusy(bool), update(next), destroy() }, or null.
+ */
+export function mountKeyboard(host, options = {}) {
+  if (!host) return null;
+  if (!Number.isFinite(options.low) || !Number.isFinite(options.high)) return null;
+  let opts = { disabled: {}, busy: false, labels: 'c', label: 'Piano keys', onNote: null, ...options };
+  const keys = new Map();
+  const pointers = new Map(); // pointerId → midi
+  const keyHeld = new Set(); // midi held from the keyboard
+  let scrollEl = null;
+  let keysEl = null;
+  let reasonEl = null;
+
+  const playable = (b) => !opts.busy && b.getAttribute('aria-disabled') !== 'true';
+  const press = (midi, b) => { b.setAttribute('aria-pressed', 'true'); if (opts.onNote) opts.onNote(midi, true); };
+  const release = (midi, b) => { b.setAttribute('aria-pressed', 'false'); if (opts.onNote) opts.onNote(midi, false); };
+
+  function applyNames() {
+    const reasons = [];
+    for (const [midi, b] of keys) {
+      const reason = opts.disabled[midi];
+      const isDis = typeof reason === 'string';
+      b.setAttribute('aria-label', isDis ? `${noteName(midi)}, unavailable: ${reason}` : noteName(midi));
+      if (isDis) {
+        b.setAttribute('aria-disabled', 'true');
+        if (!reasons.includes(reason)) reasons.push(reason);
+      } else {
+        b.removeAttribute('aria-disabled');
+      }
+    }
+    reasonEl.textContent = reasons.join(' · ');
+  }
+
+  function applyBusy() {
+    if (opts.busy) host.setAttribute('data-busy', 'true');
+    else host.removeAttribute('data-busy');
+  }
+
+  function build() {
+    if (scrollEl) scrollEl.remove();
+    if (reasonEl) reasonEl.remove();
+    keys.clear();
+    host.classList.add('ui-keyboard');
+    scrollEl = document.createElement('div');
+    scrollEl.className = 'ui-keyboard__scroll';
+    keysEl = document.createElement('div');
+    keysEl.className = 'ui-keyboard__keys';
+    keysEl.setAttribute('role', 'group');
+    keysEl.setAttribute('aria-label', opts.label);
+    for (const k of keyLayout(opts.low, opts.high)) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'ui-keyboard__key' + (k.black ? ' ui-keyboard__key--black' : '');
+      b.style.left = `${k.left}%`;
+      b.style.width = `${k.width}%`;
+      b.dataset.midi = String(k.midi);
+      b.setAttribute('aria-pressed', 'false');
+      const white0 = !k.black && (opts.labels === 'all' || (opts.labels === 'c' && k.midi % 12 === 0));
+      b.textContent = white0 ? noteName(k.midi) : '';
+      keysEl.append(b);
+      keys.set(k.midi, b);
+    }
+    scrollEl.append(keysEl);
+    reasonEl = document.createElement('p');
+    reasonEl.className = 'ui-keyboard__reason';
+    host.append(scrollEl, reasonEl);
+    applyNames();
+    applyBusy();
+  }
+
+  const onPointerDown = (e) => {
+    const b = e.target.closest?.('.ui-keyboard__key');
+    if (!b || !keysEl.contains(b) || !playable(b)) return;
+    b.setPointerCapture(e.pointerId);
+    const midi = Number(b.dataset.midi);
+    pointers.set(e.pointerId, midi);
+    press(midi, b);
+  };
+  const endPointer = (e) => {
+    const midi = pointers.get(e.pointerId);
+    if (midi === undefined) return;
+    pointers.delete(e.pointerId);
+    const b = keys.get(midi);
+    if (b) release(midi, b);
+  };
+  const onKeyDown = (e) => {
+    if (e.key !== ' ' && e.key !== 'Enter') return;
+    const b = e.target.closest?.('.ui-keyboard__key');
+    if (!b || !keysEl.contains(b) || e.repeat || !playable(b)) return;
+    e.preventDefault();
+    const midi = Number(b.dataset.midi);
+    if (keyHeld.has(midi)) return;
+    keyHeld.add(midi);
+    press(midi, b);
+  };
+  const onKeyUp = (e) => {
+    if (e.key !== ' ' && e.key !== 'Enter') return;
+    const b = e.target.closest?.('.ui-keyboard__key');
+    if (!b || !keysEl.contains(b)) return;
+    const midi = Number(b.dataset.midi);
+    if (!keyHeld.has(midi)) return;
+    keyHeld.delete(midi);
+    release(midi, b);
+  };
+
+  host.addEventListener('pointerdown', onPointerDown);
+  host.addEventListener('pointerup', endPointer);
+  host.addEventListener('pointercancel', endPointer);
+  host.addEventListener('lostpointercapture', endPointer);
+  host.addEventListener('keydown', onKeyDown);
+  host.addEventListener('keyup', onKeyUp);
+  build();
+
+  return {
+    setHeld(midi, on) {
+      const b = keys.get(midi);
+      if (b) b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    },
+    setDisabled(map) { opts = { ...opts, disabled: map || {} }; applyNames(); },
+    setBusy(busy) { opts = { ...opts, busy: !!busy }; applyBusy(); },
+    update(next) { opts = { ...opts, ...next }; build(); },
+    destroy() {
+      host.removeEventListener('pointerdown', onPointerDown);
+      host.removeEventListener('pointerup', endPointer);
+      host.removeEventListener('pointercancel', endPointer);
+      host.removeEventListener('lostpointercapture', endPointer);
+      host.removeEventListener('keydown', onKeyDown);
+      host.removeEventListener('keyup', onKeyUp);
+      if (scrollEl) scrollEl.remove();
+      if (reasonEl) reasonEl.remove();
+      keys.clear();
+      host.classList.remove('ui-keyboard');
+      host.removeAttribute('data-busy');
+    },
+  };
+}
+
+/**
+ * A key lane under a keyboard, placed with the same layout: kind 'bars' draws a value per note
+ * (bars: { midi: 0…1 }); kind 'chips' draws ranges (chips: { low, high, text, here?, empty? }).
+ * Spans ({ low, high, text }) are drawn for either kind. Returns { update(next), destroy() }, or null.
+ */
+export function mountKeyLane(host, options = {}) {
+  if (!host) return null;
+  if (!Number.isFinite(options.low) || !Number.isFinite(options.high)) return null;
+  let opts = { kind: 'chips', bars: {}, chips: [], spans: [], label: '', ...options };
+  let els = [];
+
+  function build() {
+    for (const e of els) e.remove();
+    els = [];
+    host.classList.add('ui-keylane');
+    host.classList.toggle('ui-keylane--bars', opts.kind === 'bars');
+    host.setAttribute('role', 'img');
+    host.setAttribute('aria-label', opts.label);
+    const layout = keyLayout(opts.low, opts.high);
+    if (opts.label) {
+      const l = document.createElement('span');
+      l.className = 'ui-keylane__label';
+      l.textContent = opts.label;
+      els.push(l);
+    }
+    if (opts.kind === 'bars') {
+      for (const [midi, v] of Object.entries(opts.bars)) {
+        const k = layout.find((x) => x.midi === Number(midi));
+        if (!k) continue;
+        const s = document.createElement('span');
+        s.className = 'ui-keylane__bar';
+        s.style.left = `${k.left}%`;
+        s.style.width = `${k.width}%`;
+        s.style.setProperty('--value', String(clamp(v, 0, 1)));
+        els.push(s);
+      }
+    } else {
+      for (const c of opts.chips) {
+        const sp = spanLayout(layout, c.low, c.high);
+        if (!sp) continue;
+        const el = document.createElement('span');
+        el.className = 'ui-keylane__chip';
+        el.style.left = `${sp.left}%`;
+        el.style.width = `${sp.width}%`;
+        el.textContent = c.text;
+        if (c.here) el.dataset.here = 'true';
+        if (c.empty) el.dataset.empty = 'true';
+        els.push(el);
+      }
+    }
+    for (const sn of opts.spans) {
+      const sp = spanLayout(layout, sn.low, sn.high);
+      if (!sp) continue;
+      const el = document.createElement('span');
+      el.className = 'ui-keylane__span';
+      el.style.left = `${sp.left}%`;
+      el.style.width = `${sp.width}%`;
+      el.textContent = sn.text;
+      els.push(el);
+    }
+    host.append(...els);
+  }
+
+  build();
+  return {
+    update(next) { opts = { ...opts, ...next }; build(); },
+    destroy() {
+      for (const e of els) e.remove();
+      els = [];
+      host.classList.remove('ui-keylane', 'ui-keylane--bars');
+      host.removeAttribute('role');
+      host.removeAttribute('aria-label');
+    },
+  };
+}
+
 /* ---------------------------------------------------------------- page init -- */
 
 /** Enhance every [data-ui-control] and [data-ui-hold] under `root`. Returns the handles. */
