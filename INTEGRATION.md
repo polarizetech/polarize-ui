@@ -329,9 +329,56 @@ The other pieces are CSS only: `.ui-tag--linked`, `.ui-delta`, `.ui-sync[data-st
 `.ui-glide`, `.ui-meter`, `.ui-strip`, `.ui-hazard`, `<dialog class="ui-sheet">` (a bottom
 sheet: open it with `showModal()`), `.ui-tabbar` and `.ui-night`. In React they are
 `Fader`, `Knob`, `LinkedValue`, `Delta`, `SyncPill`, `Glide`, `Meter`, `ChannelStrip`,
-`Hazard`, `HoldButton`, `SceneTimeline`, `AutomationLane`, `Panner`, `TabBar` and `NightView`;
+`Hazard`, `HoldButton`, `SceneTimeline`, `AutomationLane`, `Panner`, `TabBar`, `NightView`,
+`SegmentedButtons`, `Gauge`, `Keyboard`, `KeyLane` and `Popover`;
 the shadcn `Sheet` with `side="bottom"` stands in for the dialog. React gets the Polarize theme
 with `<html class="dark" data-theme="polarize">`.
+
+**For instruments: segmented, gauge, keyboard, key lane, popover.** A segmented control is a
+group of `.ui-btn` buttons, one pressed:
+
+```html
+<div role="group" aria-label="Mode" class="ui-segmented">
+  <button type="button" class="ui-btn" aria-pressed="true">Scene</button>
+  <button type="button" class="ui-btn" aria-pressed="false">Hold</button>
+</div>
+```
+
+`.ui-segmented` (design.css, pressed in the brand colour) is the instrument control; the filter panel's `.ui-seg` (publication.css, `Segmented` in React) is unchanged.
+
+A gauge is one magnitude as a bar. `--value` is 0…1 of the scale, set by the caller;
+`data-state="empty"` hatches the track and hides the fill, and `data-state="off"` dims it:
+
+```html
+<div class="ui-gauge" style="--value: .58">
+  <div class="ui-gauge__head">
+    <span class="ui-label">Level</span>
+    <span class="ui-gauge__num">23 <small>dB</small></span>
+  </div>
+  <div class="ui-gauge__track" role="meter" aria-label="Level" aria-valuemin="0" aria-valuemax="40" aria-valuenow="23">
+    <span class="ui-gauge__fill"></span>
+  </div>
+  <div class="ui-gauge__scale" aria-hidden="true"><span>0</span><span>20</span><span>40</span></div>
+</div>
+```
+
+A popover is a `.ui-popover` on a native `[popover]` element, opened by a button's `popovertarget`:
+
+```html
+<button type="button" popovertarget="gain">Gain</button>
+<div id="gain" popover="auto" role="dialog" aria-label="Gain" class="ui-popover">…</div>
+```
+
+The keyboard and the key lane are built by script on an empty host:
+
+```js
+mountKeyboard(host, { low: 48, high: 84, disabled: { 49: 'reason' }, onNote: (midi, on) => … })
+mountKeyLane(laneHost, { kind: 'chips', chips: [{ low: 48, high: 59, text: 'A', here: true }] })
+```
+
+`.ui-gauge` and `.ui-keylane` are new names because `.ui-meter` and `.ui-lane` already mean the
+level meter and the automation lane. A span on a key lane is drawn in the human ink, not in a
+tier colour.
 
 **The inks.** Under Polarize, clay is signal and action, ochre is what a person placed or
 owns, lichen is machine state. Other themes have no validated values for those inks, so the

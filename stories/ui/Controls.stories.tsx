@@ -1,8 +1,9 @@
 import * as React from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import {
-  AutomationLane, ChannelStrip, ChannelStrips, Delta, Fader, Glide, Hazard, HoldButton, Knob, LinkedValue,
-  Meter, NightView, Panner, SceneTimeline, SyncPill, TabBar, valueAt, type MotionPath, type Scene,
+  AutomationLane, ChannelStrip, ChannelStrips, Delta, Fader, Gauge, Glide, Hazard, HoldButton, Keyboard, KeyLane,
+  Knob, LinkedValue, Meter, NightView, Panner, Popover, SceneTimeline, SegmentedButtons, SyncPill, TabBar, valueAt,
+  type MotionPath, type Scene,
 } from "@/components/controls"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
@@ -289,4 +290,72 @@ export const OtherThemes: StoryObj = {
         endings={["met", "timeout", "met", "no_data", "open_loop"]} height={130} />
     </Panel>
   ),
+}
+
+export const SegmentedStory: StoryObj = {
+  name: "Segmented",
+  render: () => {
+    const [mode, setMode] = React.useState("scene")
+    return (
+      <Panel>
+        <SegmentedButtons label="Mode" value={mode} onChange={setMode} options={[
+          { value: "scene", label: "Scene" },
+          { value: "hold", label: "Hold" },
+          { value: "loop", label: "Loop", disabled: true },
+        ]} />
+      </Panel>
+    )
+  },
+}
+
+export const GaugeStory: StoryObj = {
+  name: "Gauge",
+  render: () => (
+    <Panel>
+      <Gauge label="Level" value={23} min={0} max={40} unit="dB" digits={0} scale={[0, 10, 20, 30, 40]} />
+      <Gauge label="Level" value={null} min={0} max={40} unit="dB" scale={[0, 10, 20, 30, 40]} state="empty" />
+      <Gauge label="Level" value={23} min={0} max={40} unit="dB" scale={[0, 10, 20, 30, 40]} state="off" />
+    </Panel>
+  ),
+}
+
+export const KeyboardStory: StoryObj = {
+  name: "Keyboard",
+  render: () => (
+    <Panel width={720}>
+      <Keyboard low={48} high={84} disabled={{ 49: "outside the tuned range", 50: "outside the tuned range" }} />
+      <Keyboard low={48} high={84} busy label="Piano keys, busy" />
+    </Panel>
+  ),
+}
+
+export const KeyLanes: StoryObj = {
+  name: "Key lanes",
+  render: () => (
+    <Panel width={720}>
+      <Keyboard low={48} high={84} />
+      <KeyLane low={48} high={84} kind="bars" label="Value per note" bars={{ 52: 0.3, 57: 0.7, 64: 0.5, 72: 0.9 }} />
+      <KeyLane low={48} high={84} kind="chips" label="Range"
+        chips={[
+          { low: 48, high: 59, text: "A", here: true },
+          { low: 60, high: 72, text: "B", empty: true },
+        ]}
+        spans={[{ low: 66, high: 81, text: "span" }]} />
+    </Panel>
+  ),
+}
+
+export const PopoverStory: StoryObj = {
+  name: "Popover",
+  render: () => {
+    const [gain, setGain] = React.useState(-6)
+    return (
+      <Panel>
+        <Button popoverTarget="controls-story-popover">Open the gain panel</Button>
+        <Popover id="controls-story-popover" label="Gain">
+          <Knob label="Gain" value={gain} min={-24} max={6} step={0.5} unit="dB" digits={1} signed onChange={setGain} />
+        </Popover>
+      </Panel>
+    )
+  },
 }

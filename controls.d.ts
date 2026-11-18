@@ -145,5 +145,45 @@ export type PannerOptions = {
 export type PannerHandle = { update(next: PannerOptions): void; setPhase(phase: number | null): void; destroy(): void }
 export function mountPanner(host: HTMLElement, options?: PannerOptions): PannerHandle | null
 
+export function isBlack(midi: number): boolean
+export function noteName(midi: number): string
+export type KeyLayoutItem = { midi: number; black: boolean; left: number; width: number }
+export function keyLayout(low: number, high: number): KeyLayoutItem[]
+export function spanLayout(layout: KeyLayoutItem[], lo: number, hi: number): { left: number; width: number } | null
+
+export type KeyboardOptions = {
+  low: number
+  high: number
+  /** MIDI note → the reason it cannot play; the key is then aria-disabled and names the reason. */
+  disabled?: Record<number, string>
+  busy?: boolean
+  /** Which white keys show their name: C keys only (default), every white key, or none. */
+  labels?: 'c' | 'all' | 'none'
+  label?: string
+  onNote?: (midi: number, on: boolean) => void
+}
+export type KeyboardHandle = {
+  /** Shows a key as held (for MIDI input from outside); no callback. */
+  setHeld(midi: number, on: boolean): void
+  setDisabled(map: Record<number, string>): void
+  setBusy(busy: boolean): void
+  update(next: KeyboardOptions): void
+  destroy(): void
+}
+export function mountKeyboard(host: HTMLElement, options: KeyboardOptions): KeyboardHandle | null
+
+export type KeyLaneOptions = {
+  low: number
+  high: number
+  kind?: 'bars' | 'chips'
+  /** MIDI note → value 0…1 (kind 'bars'). */
+  bars?: Record<number, number>
+  chips?: { low: number; high: number; text: string; here?: boolean; empty?: boolean }[]
+  spans?: { low: number; high: number; text: string }[]
+  label?: string
+}
+export type KeyLaneHandle = { update(next: KeyLaneOptions): void; destroy(): void }
+export function mountKeyLane(host: HTMLElement, options: KeyLaneOptions): KeyLaneHandle | null
+
 /** Enhance every [data-ui-control] and [data-ui-hold] under `root`. Runs once on load by itself. */
 export function init(root?: ParentNode): (ControlHandle | HoldHandle)[]

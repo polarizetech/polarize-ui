@@ -397,6 +397,9 @@ knob, a fader, a ribbon, a panner, a DAW-style clip lane and automation lane.
 - **The React Polarize theme** is new with this: `shadcn/build_shadcn.py` now emits a
   `:root[data-theme="polarize"]` block (clay on `--primary`, 4.83:1 against the ground, checked)
   and the audio inks in `system.css`. Stamp `<html class="dark" data-theme="polarize">`.
+- **The instrument names:** `.ui-gauge` and `.ui-keylane` are new because `.ui-meter` and `.ui-lane`
+  already mean the L/R level meter and the automation lane. The knob already existed (`.ui-knob`),
+  so the popover holds a normal knob. A span on a key lane is drawn in the human ink, never in a tier colour.
 - **Not built:** finger-drawing a curve on a lane (the lane draws `drawn` points but does not
   capture them), a pulley that edits two lanes at once (the lane draws a `linked` curve; the
   arithmetic linking them is the app's), and drag-to-dismiss on the sheet.

@@ -10,8 +10,9 @@
  */
 import * as React from "react"
 import {
-  initControl, initHold, mountLane, mountPanner, mountTimeline, formatValue,
-  type ControlHandle, type ControlOptions, type HoldHandle, type LaneHandle, type LaneOptions,
+  initControl, initHold, mountKeyboard, mountKeyLane, mountLane, mountPanner, mountTimeline, formatValue,
+  type ControlHandle, type ControlOptions, type HoldHandle, type KeyboardHandle, type KeyboardOptions,
+  type KeyLaneHandle, type KeyLaneOptions, type LaneHandle, type LaneOptions,
   type PannerHandle, type PannerOptions, type Scale, type TimelineHandle, type TimelineOptions,
 } from "../../controls.js"
 import { cn } from "../lib/utils"
@@ -19,7 +20,7 @@ import { cn } from "../lib/utils"
 export type {
   Scene, SceneEnding, TimelineCurve, TimelineOptions, LaneOptions, PannerOptions, MotionPath, DetentDetail, Scale,
 } from "../../controls.js"
-export { layoutScenes, valueAt, pathPoint, formatValue, toFrac, fromFrac, snap } from "../../controls.js"
+export { layoutScenes, valueAt, pathPoint, formatValue, toFrac, fromFrac, snap, isBlack, noteName, keyLayout } from "../../controls.js"
 
 /** Keep the latest callbacks without re-running an effect when a parent re-renders. */
 function useLatest<T>(value: T) {
@@ -237,6 +238,60 @@ export function Meter({ left, right, peakLeft, peakRight, height = 40, label = "
   )
 }
 
+/** One magnitude as a bar with its number, unit and scale. state "empty" or "off" shows no reading. */
+export function Gauge({ label, value, min = 0, max = 1, unit, digits = 0, scale, state, className }: {
+  label: string
+  value: number | null
+  min?: number
+  max?: number
+  unit?: string
+  digits?: number
+  /** Numbers printed under the bar. */
+  scale?: number[]
+  state?: "empty" | "off"
+  className?: string
+}) {
+  const reading = state == null && value != null ? value : null
+  const num = reading == null ? "—" : reading.toFixed(digits)
+  const frac = value == null ? 0 : Math.min(1, Math.max(0, (value - min) / (max - min)))
+  return (
+    <div className={cn("ui-gauge", className)} data-state={state} style={{ "--value": String(frac) } as React.CSSProperties}>
+      <div className="ui-gauge__head">
+        <span className="ui-label">{label}</span>
+        <span className="ui-gauge__num">{num} <small>{unit}</small></span>
+      </div>
+      <div className="ui-gauge__track" role="meter" aria-label={label} aria-valuemin={min} aria-valuemax={max}
+        aria-valuenow={reading ?? undefined}>
+        <span className="ui-gauge__fill" />
+      </div>
+      {scale && <div className="ui-gauge__scale" aria-hidden="true">{scale.map((s, i) => <span key={i}>{s}</span>)}</div>}
+    </div>
+  )
+}
+
+/* ---------- Choice ---------- */
+
+/** One choice of a few, as joined pressed-state buttons. A disabled option is shown and does not fire. Distinct from the filter panel's `Segmented` (`.ui-seg`, publication.css). */
+export function SegmentedButtons({ label, options, value, onChange, className }: {
+  label: string
+  options: { value: string; label: React.ReactNode; disabled?: boolean }[]
+  value: string
+  onChange: (value: string) => void
+  className?: string
+}) {
+  return (
+    <div role="group" aria-label={label} className={cn("ui-segmented", className)}>
+      {options.map((o) => (
+        <button key={o.value} type="button" className="ui-btn" aria-pressed={o.value === value}
+          aria-disabled={o.disabled || undefined}
+          onClick={() => { if (!o.disabled) onChange(o.value) }}>
+          {o.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 /* ---------- Mixer ---------- */
 
 /** One channel strip. Put a vertical <Fader> (and anything else) in its children. */
@@ -338,6 +393,25 @@ export function AutomationLane({ className, ...options }: LaneOptions & { classN
 export function Panner({ className, ...options }: PannerOptions & { className?: string }) {
   const host = useMounted<PannerHandle, PannerOptions>(mountPanner, options)
   return <div ref={host} className={className} />
+}
+
+/** An on-screen piano keyboard. A disabled key names its reason; onNote fires on press and release. */
+export function Keyboard({ className, ...options }: KeyboardOptions & { className?: string }) {
+  const host = useMounted<KeyboardHandle, KeyboardOptions>(mountKeyboard, options)
+  return <div ref={host} className={className} />
+}
+
+/** A lane under a keyboard: values per note (bars), or ranges (chips) and spans. */
+export function KeyLane({ className, ...options }: KeyLaneOptions & { className?: string }) {
+  const host = useMounted<KeyLaneHandle, KeyLaneOptions>(mountKeyLane, options)
+  return <div ref={host} className={className} />
+}
+
+/** A panel on the native popover element; open it with a button's popoverTarget. */
+export function Popover({ id, label, children, className }: {
+  id: string; label: string; children: React.ReactNode; className?: string
+}) {
+  return <div id={id} popover="auto" role="dialog" aria-label={label} className={cn("ui-popover", className)}>{children}</div>
 }
 
 /* ---------- Phone chrome ---------- */

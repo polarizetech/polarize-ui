@@ -260,7 +260,8 @@ def check_css():
     for cls in (".ui-card", ".ui-btn", ".ui-field", ".ui-table", ".ui-tier",
                 ".ui-marker", ".ui-tooltip", ".ui-drawer", ".ui-tabs", ".ui-rule",
                 ".ui-eyebrow", ".ui-icon", ".ui-waveform", ".ui-transport",
-                ".ui-region-marker", ".ui-spectrogram", ".ui-tag", ".ui-live-dot"):
+                ".ui-region-marker", ".ui-spectrogram", ".ui-tag", ".ui-live-dot",
+                ".ui-segmented", ".ui-popover"):
         ok(f"design.css defines {cls}", cls in CSS)
 
 
@@ -667,7 +668,8 @@ def check_controls() -> None:
            re.search(r"var\(" + ink + r",\s*var\(", body) is not None)
     for cls in (".ui-control", ".ui-fader", ".ui-fader--ribbon", ".ui-fader--vertical", ".ui-fader__stop", ".ui-fader__mark",
                 ".ui-knob", ".ui-tag--linked", ".ui-delta", ".ui-sync", ".ui-glide", ".ui-meter", ".ui-strip",
-                ".ui-hazard", ".ui-hold", ".ui-timeline", ".ui-lane", ".ui-panner", ".ui-sheet", ".ui-tabbar", ".ui-night"):
+                ".ui-hazard", ".ui-hold", ".ui-timeline", ".ui-lane", ".ui-panner", ".ui-sheet", ".ui-tabbar", ".ui-night",
+                ".ui-gauge", ".ui-keyboard", ".ui-keylane"):
         ok(f"controls.css defines {cls}", re.search(re.escape(cls) + r"[\s,.:\[{>]", body) is not None)
     ok("every sync state carries a glyph as well as its word",
        all(re.search(r'\.ui-sync\[data-state="' + st + r'"\]::before\s*\{\s*content:', body) for st in ("saved", "saving", "offline", "conflict")))
@@ -683,13 +685,15 @@ def check_controls() -> None:
     js = path.read_text()
     code = re.sub(r"/\*.*?\*/|//[^\n]*", "", js, flags=re.S)
     for name in ("toFrac", "fromFrac", "quantize", "snap", "fineGain", "formatValue", "parseEntry", "layoutScenes", "valueAt",
-                 "pathPoint", "pathSamples", "initControl", "initHold", "mountTimeline", "mountLane", "mountPanner", "init"):
+                 "pathPoint", "pathSamples", "initControl", "initHold", "mountTimeline", "mountLane", "mountPanner",
+                 "isBlack", "noteName", "keyLayout", "spanLayout", "mountKeyboard", "mountKeyLane", "init"):
         ok(f"controls.js exports {name}", re.search(rf"export (function|const) {name}\b", code) is not None)
     ok("controls.js imports, fetches and stores nothing",
        not re.search(r"^\s*import\b", code, re.M) and not re.search(r"\bfetch\(|localStorage|sessionStorage|XMLHttpRequest", code))
     ok("controls.js never uses requestAnimationFrame or setInterval (the caller moves time)",
        "requestAnimationFrame" not in code and "setInterval" not in code)
     ok("controls.js writes page text with textContent, never innerHTML", "innerHTML" not in code)
+    ok("a disabled key names its reason", "unavailable:" in code)
     ok("controls.js announces every detent with a bubbling ui-detent event",
        "new CustomEvent('ui-detent', { bubbles: true" in code)
     ok("controls.js keeps the native range input as the source of truth", "input[type=\"range\"]" in code and "aria-valuetext" in code)

@@ -907,6 +907,12 @@ b, strong { font-weight: 400; color: var(--foreground); }
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
 .ui-split { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
 @media (max-width: 560px) { .ui-split { grid-template-columns: 1fr; } }
+/* Popover: a panel on the native [popover] element (or any element; it styles the panel only). */
+.ui-popover { width: min(26rem, 100%); box-sizing: border-box; margin: auto; padding: var(--space-4);
+  display: grid; gap: var(--space-4); background: var(--card); color: var(--foreground);
+  border: 1px solid var(--border-strong); border-radius: var(--radius-lg); box-shadow: var(--shadow); }
+.ui-popover[popover]:not(:popover-open) { display: none; }
+.ui-popover::backdrop { background: transparent; }
 
 /* ------------------------------------------------------------ controls ---- */
 
@@ -923,6 +929,17 @@ b, strong { font-weight: 400; color: var(--foreground); }
 .ui-btn--ghost { background: none; border-color: transparent; color: var(--muted-foreground); }
 .ui-btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent);
   color: var(--background); }
+
+/* Segmented control: joined pressed-state buttons, one choice of a few. Each button carries
+   aria-pressed; the group is role="group" with an accessible name. */
+.ui-segmented { display: inline-flex; flex-wrap: wrap; align-self: start;
+  border: 1px solid var(--border-strong); border-radius: var(--radius-sm); overflow: hidden; }
+.ui-segmented > .ui-btn { border: 0; border-radius: 0; min-height: 44px; background: var(--card);
+  display: inline-flex; align-items: center; gap: var(--space-2); }
+.ui-segmented > .ui-btn + .ui-btn { border-left: 1px solid var(--border-strong); }
+.ui-segmented > .ui-btn[aria-pressed="true"] { background: var(--accent); color: var(--background); }
+.ui-segmented > .ui-btn[aria-disabled="true"], .ui-segmented > .ui-btn:disabled { color: var(--faint-foreground); cursor: not-allowed; }
+.ui-segmented > .ui-btn:focus-visible { outline-offset: -2px; }
 
 .ui-field { display: flex; flex-direction: column; gap: var(--space-1);
   font-size: var(--text-xs); color: var(--muted-foreground); min-width: 130px; flex: 1; }
