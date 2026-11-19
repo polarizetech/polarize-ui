@@ -70,6 +70,8 @@ def _vars(mode: str, indent: int = 2) -> str:
     out.append(f"  --foreground: {c['foreground']};")
     out.append(f"  --card: {c['surface']};")
     out.append(f"  --card-foreground: {c['foreground']};")
+    out.append(f"  --surface: {c['surface']};")
+    out.append(f"  --surface-2: {c['surface-2']};")
     out.append(f"  --popover: {c['surface-2']};")
     out.append(f"  --muted: {c['surface-2']};")
     out.append(f"  --muted-foreground: {c['muted-foreground']};")
