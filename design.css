@@ -30,6 +30,8 @@
   --foreground: #16181c;
   --card: #ffffff;
   --card-foreground: #16181c;
+  --surface: #ffffff;
+  --surface-2: #f0efeb;
   --popover: #f0efeb;
   --muted: #f0efeb;
   --muted-foreground: #4d5259;
@@ -89,6 +91,8 @@
     --foreground: #e8e9ea;
     --card: #171b20;
     --card-foreground: #e8e9ea;
+    --surface: #171b20;
+    --surface-2: #1e232a;
     --popover: #1e232a;
     --muted: #1e232a;
     --muted-foreground: #a7adb5;
@@ -148,6 +152,8 @@
   --foreground: #16181c;
   --card: #ffffff;
   --card-foreground: #16181c;
+  --surface: #ffffff;
+  --surface-2: #f0efeb;
   --popover: #f0efeb;
   --muted: #f0efeb;
   --muted-foreground: #4d5259;
@@ -206,6 +212,8 @@
   --foreground: #e8e9ea;
   --card: #171b20;
   --card-foreground: #e8e9ea;
+  --surface: #171b20;
+  --surface-2: #1e232a;
   --popover: #1e232a;
   --muted: #1e232a;
   --muted-foreground: #a7adb5;
@@ -265,6 +273,8 @@
   --foreground: #16181c;
   --card: #ffffff;
   --card-foreground: #16181c;
+  --surface: #ffffff;
+  --surface-2: #f4f3f0;
   --popover: #f4f3f0;
   --muted: #f4f3f0;
   --muted-foreground: #4d5259;
@@ -324,6 +334,8 @@
   --foreground: #e8e9ea;
   --card: #171b20;
   --card-foreground: #e8e9ea;
+  --surface: #171b20;
+  --surface-2: #1e232a;
   --popover: #1e232a;
   --muted: #1e232a;
   --muted-foreground: #a7adb5;
@@ -384,6 +396,8 @@
   --foreground: #ece2d2;
   --card: #181310;
   --card-foreground: #ece2d2;
+  --surface: #181310;
+  --surface-2: #221b16;
   --popover: #221b16;
   --muted: #221b16;
   --muted-foreground: #8f8069;
@@ -454,6 +468,8 @@
   --foreground: #12161b;
   --card: #ffffff;
   --card-foreground: #12161b;
+  --surface: #ffffff;
+  --surface-2: #f1f3f5;
   --popover: #f1f3f5;
   --muted: #f1f3f5;
   --muted-foreground: #5b6674;
@@ -512,6 +528,8 @@
   --foreground: #e6ebf2;
   --card: #161b22;
   --card-foreground: #e6ebf2;
+  --surface: #161b22;
+  --surface-2: #1c222b;
   --popover: #1c222b;
   --muted: #1c222b;
   --muted-foreground: #98a3b3;

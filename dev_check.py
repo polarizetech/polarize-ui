@@ -265,6 +265,16 @@ def check_css():
         ok(f"design.css defines {cls}", cls in CSS)
 
 
+def check_var_definitions() -> None:
+    """A var(--name) with no fallback must be defined somewhere in design.css. An undefined name
+    used bare is silently an unset colour (the --surface bug, 2026-11-19: .ui-readout cells went white)."""
+    bare = set(re.findall(r"var\((--[a-zA-Z0-9-]+)\)", CSS))
+    defined = set(re.findall(r"(--[a-zA-Z0-9-]+)\s*:", CSS))
+    missing = sorted(bare - defined)
+    ok("every var(--name) used without a fallback is defined in design.css", not missing,
+       ", ".join(missing))
+
+
 def check_js():
     for el in ("ui-tier", "ui-note", "ui-docs"):
         ok(f"design.js defines <{el}>", f"customElements.define('{el}'" in JS)
@@ -822,6 +832,7 @@ def main() -> int:
     check_epistemic()
     check_type_rule()
     check_css()
+    check_var_definitions()
     check_js()
     check_shadcn()
     check_publication()
