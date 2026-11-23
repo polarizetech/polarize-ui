@@ -18,8 +18,8 @@
  },
  "lastChange": {
   "by": "Joshua Anderton",
-  "at": "2026-11-10T13:36:05Z",
+  "at": "2026-11-23T13:30:10Z",
   "via": "Claude Code",
-  "note": "Updated from polarizetech/polarize-ui v0.6.7: stylesheet (panel stack, dashboard frames, navbar), tokens source note, Navbar component"
+  "note": "Updated from polarizetech/polarize-ui v0.6.10"
  }
 }

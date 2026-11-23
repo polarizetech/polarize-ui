@@ -301,6 +301,17 @@ def check_js():
     ok("a missing tokens.json degrades instead of failing the app",
        "degrade, never fail to start" in JS.lower() or "console.warn('design" in JS)
     ok("series colours are exposed to charts", "export function seriesColors" in JS)
+    ok("design.js turns every bare range input into a knob (no range sliders)",
+       "export function knobs" in JS and "'ui-knob'" in JS and "controls.js" in JS and "\nknobs();" in JS)
+    css = (HERE / "design.css").read_text()
+    for th in ("instrument", "instrument-dark", "fieldguide", "fieldguide-dark", "polarize", "light", "dark"):
+        ok(f"the {th} theme also applies when stamped on an element, not only <html>",
+           f':root[data-theme="{th}"],\n[data-theme="{th}"] {{' in css)
+    ok("an element carrying a theme paints its own ground (no light backdrop through a dark theme)",
+       re.search(r"\[data-theme\]:not\(:root\)\s*\{\s*background:\s*var\(--background\);", css) is not None)
+    ds = json.loads((HERE / "claude-design-system" / "project" / "tokens.json").read_text())
+    ok("the Design System artifact lists the warm-dark theme first (the canvas default)",
+       ds["color"]["themes"][0]["id"] == "polarize")
     # tokens.json + the icon sprite -- both same-folder, both degrade on failure.
     ok("no network beyond the design folder itself",
        JS.count("fetch(") == 2 and "tokens.json" in JS and "polarize-icons.svg" in JS)

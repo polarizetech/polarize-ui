@@ -19,6 +19,8 @@ Polarize UI is a design system for interfaces that show scientific data honestly
 ## Visual foundations
 
 - **Themes.** Default is `instrument` (light) with `instrument-dark` under `prefers-color-scheme`. Set `data-theme` to pin one: `instrument`, `instrument-dark`, `polarize` (warm dark, clay accent), `fieldguide` / `fieldguide-dark` (magenta accent, Geist body). Pinning `polarize` keeps the pre-Instrument look.
+- **No light backdrop in a dark theme.** A `data-theme` stamp works on any element and that element paints its own ground. On a Design canvas board the canvas re-stamps `<html>` as plain light or dark, so put `data-theme="polarize"` (or another theme) and `class="ui"` on the board's outermost element, never only on `<html>`. Never draw a white or light fill (figure, card, well, input) in a dark theme; every surface is a token.
+- **No range sliders.** A continuous value is a knob: `<span class="ui-knob" data-ui-control><input type="range" min max step value></span>`, drawn by `controls.js`. `design.js` turns any bare range input into a knob.
 - **Type: a triad.** Headings in `display-1/2/3` (Instrument Serif, regular case only, never uppercased). Running text in `text-base` (Inter 14px). Any uppercase text, any caption or eyebrow, uses `label` (IBM Plex Mono). The case rule: uppercase is always mono, the serif is never uppercased.
 - **Inter is never bold and never tracked.** Hierarchy comes from size, face, colour and case, not weight. `<strong>` is marked by `foreground` ink inside `muted-foreground` copy.
 - **Structure.** Use hairlines (`border`, `border-strong`) and whitespace, not boxes or shadows. Pad cards with `space-4`, radius `radius-base`.

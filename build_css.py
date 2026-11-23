@@ -855,15 +855,20 @@ def render() -> str:
             + "@media (prefers-color-scheme: dark) {\n"
             + "  :root:not([data-theme]) {\n" + _vars("instrument-dark", indent=4)
             + "\n    color-scheme: dark;\n  }\n}\n\n"
-            + ":root[data-theme=\"instrument\"] {\n" + _vars("instrument") + "\n  color-scheme: light;\n}\n\n"
-            + ":root[data-theme=\"instrument-dark\"] {\n" + _vars("instrument-dark") + "\n  color-scheme: dark;\n}\n\n"
+            + ":root[data-theme=\"instrument\"],\n[data-theme=\"instrument\"] {\n" + _vars("instrument") + "\n  color-scheme: light;\n}\n\n"
+            + ":root[data-theme=\"instrument-dark\"],\n[data-theme=\"instrument-dark\"] {\n" + _vars("instrument-dark") + "\n  color-scheme: dark;\n}\n\n"
             + "/* fieldguide: white and magenta, Geist for the sans (2026-10-15). Opt-in by stamp. */\n"
-            + ":root[data-theme=\"fieldguide\"] {\n" + _vars("fieldguide") + "\n  color-scheme: light;\n}\n\n"
-            + ":root[data-theme=\"fieldguide-dark\"] {\n" + _vars("fieldguide-dark") + "\n  color-scheme: dark;\n}\n\n"
+            + ":root[data-theme=\"fieldguide\"],\n[data-theme=\"fieldguide\"] {\n" + _vars("fieldguide") + "\n  color-scheme: light;\n}\n\n"
+            + ":root[data-theme=\"fieldguide-dark\"],\n[data-theme=\"fieldguide-dark\"] {\n" + _vars("fieldguide-dark") + "\n  color-scheme: dark;\n}\n\n"
             + "/* Previous defaults, kept as explicit opt-ins. */\n"
-            + ":root[data-theme=\"polarize\"] {\n" + _vars("polarize") + "\n  color-scheme: dark;\n}\n\n"
-            + ":root[data-theme=\"light\"] {\n" + _vars("light") + "\n  color-scheme: light;\n}\n\n"
-            + ":root[data-theme=\"dark\"] {\n" + _vars("dark") + "\n  color-scheme: dark;\n}\n"
+            + ":root[data-theme=\"polarize\"],\n[data-theme=\"polarize\"] {\n" + _vars("polarize") + "\n  color-scheme: dark;\n}\n\n"
+            + ":root[data-theme=\"light\"],\n[data-theme=\"light\"] {\n" + _vars("light") + "\n  color-scheme: light;\n}\n\n"
+            + ":root[data-theme=\"dark\"],\n[data-theme=\"dark\"] {\n" + _vars("dark") + "\n  color-scheme: dark;\n}\n\n"
+            + "/* A theme stamped on an ELEMENT, not <html>, works the same and paints its own ground,\n"
+            + " * so no light backdrop shows through a dark theme. Use it wherever the page does not own\n"
+            + " * <html>: a Claude Design canvas board (the canvas re-stamps <html> as plain light or\n"
+            + " * dark), an embed, a widget. Put the stamp on the outermost element you own. */\n"
+            + "[data-theme]:not(:root) {\n  background: var(--background);\n  color: var(--foreground);\n}\n"
             + _static())
 
 
