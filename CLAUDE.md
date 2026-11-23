@@ -378,6 +378,14 @@ Ported from a studio redesign for a sequence-building audio app (keyframes that 
 hold), generalised so nothing in it names that app. Everything here is a standard control: a
 knob, a fader, a ribbon, a panner, a DAW-style clip lane and automation lane.
 
+- **No range sliders (2026-11-23, the operator's rule).** A continuous value is a knob. `design.js`
+  wraps any bare `<input type="range">` in a `.ui-knob` and loads `controls.js` / `controls.css`
+  from its own folder, so a slider never shows. New work does not use the fader forms.
+- **No light backdrop in a dark theme (2026-11-23).** A theme stamp works on any element, not only
+  `<html>`, and an element carrying one paints its own ground. Where the page does not own
+  `<html>` (a Claude Design canvas board re-stamps it as plain light or dark; an embed; a widget),
+  put `data-theme` on the outermost element you own. The Design System artifact lists the warm-dark
+  theme first, because the canvas uses the first theme as its default.
 - **A fader or knob is a native `<input type="range">`.** The script draws it and adds fine
   adjust, detents and numeric entry; without the script the input still works. Do not replace
   the input with a div: keyboard and screen-reader support come from it.

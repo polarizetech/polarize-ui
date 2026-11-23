@@ -411,11 +411,36 @@ export function initNavbar(nav) {
   }, { passive: true });
 }
 
+/* ---------------------------------------------------------- no range sliders -- */
+// A continuous value is set with a KNOB, never a range slider (2026-11-23, at the operator's
+// request). Any bare <input type="range"> on the page is wrapped in a .ui-knob and drawn by
+// controls.js, loaded from this folder. The input stays the source of truth (keyboard, screen
+// reader, form value). Without controls.js the input stays native and a warning is logged.
+export function knobs(root = document) {
+  const bare = [...root.querySelectorAll('input[type="range"]')].filter((i) => !i.closest('.ui-knob, .ui-fader'));
+  if (!bare.length) return;
+  if (!document.querySelector('link[href$="controls.css"]')) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet'; link.href = DESIGN_BASE + 'controls.css';
+    document.head.append(link);
+  }
+  bare.forEach((input) => {
+    const knob = document.createElement('span');
+    knob.className = 'ui-knob';
+    knob.setAttribute('data-ui-control', '');
+    input.replaceWith(knob);
+    knob.append(input);
+  });
+  import(DESIGN_BASE + 'controls.js').then((c) => c.init(root))
+    .catch(() => console.warn('design: controls.js unavailable; range inputs stay native'));
+}
+
 customElements.define('ui-tier', UiTier);
 customElements.define('ui-note', UiNote);
 customElements.define('ui-docs', UiDocs);
 
 wireTooltips();
 document.querySelectorAll('.ui-navbar').forEach(initNavbar);
+knobs();
 await loadTokens();
 await loadIconSprite();

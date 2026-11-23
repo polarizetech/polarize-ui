@@ -264,7 +264,14 @@ Hardware-style controls for audio and instrument interfaces. Link the layer afte
 <script type="module" src="design/controls.js"></script>
 ```
 
-Add both files to the server's allow-list (§ 1). A fader or knob is a **native range input**
+Add both files to the server's allow-list (§ 1).
+
+**No range sliders.** A continuous value is a **knob** (`.ui-knob`). `design.js` wraps any bare
+`<input type="range">` in a knob and loads `controls.js` and `controls.css` from the design
+folder, so serve those two files wherever `design.js` is served. The fader forms below stay for
+existing consumers; new work uses the knob.
+
+A fader or knob is a **native range input**
 inside a marked element; without the script it still works from the keyboard and a screen
 reader, and with it it is drawn as hardware:
 
