@@ -6,8 +6,8 @@ t=json.load(open(R+'tokens.json'))
 P=os.path.join(HERE,'project')+'/'
 def w(p,s):
     os.makedirs(os.path.dirname(P+p),exist_ok=True); open(P+p,'w').write(s)
-# The Claude Design canvas takes the FIRST theme as its default, so the warm-dark theme leads (2026-11-23).
-themes=[('polarize','Polarize (warm dark)','dark'),('instrument','Instrument (light)','light'),('instrument-dark','Instrument (dark)','dark'),('fieldguide','Field guide (light)','light'),('fieldguide-dark','Field guide (dark)','dark')]
+# Polarize (warm dark) is the only theme (2026-11-24, operator: "warm dark only - no other themes").
+themes=[('polarize','Polarize (warm dark)','dark')]
 col=t['color']
 use={'background':'Page ground. Text on it: foreground, muted-foreground.','surface':'Cards and panels on background.','surface-2':'Raised panels, table headers, inset wells on surface.','border':'Hairline dividers; structure comes from these, not boxes.','border-strong':'Control outlines, emphasised dividers (not a meaning-bearing mark: pair with a label).','foreground':'Primary text on background, surface, surface-2.','muted-foreground':'Body copy and secondary text on background and surface.','faint-foreground':'Captions and disabled text; large or non-essential only (can sit under 4.5:1 on surface-2).','ring':'Focus ring colour on any surface; 2px solid.','accent':'The one brand/action colour per view: primary button fill, active tab underline, links.','overlay':'Scrim behind drawers and sheets.'}
 toks=[]

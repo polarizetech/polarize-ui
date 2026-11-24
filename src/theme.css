@@ -6,7 +6,8 @@
  *   @source "../node_modules/@polarizetech/polarize-ui/src";
  *
  * The @source line is what makes Tailwind generate the classes polarize-ui's
- * components use. Dark mode is a `.dark` class on <html>.
+ * components use. There is one theme, Polarize warm dark (2026-11-24): no `.dark`
+ * class or data-theme stamp is needed, and every `dark:` variant always applies.
  *
  * The font faces are NOT imported here: Tailwind inlines this file into the
  * app's stylesheet, which breaks relative url()s. They load from the React
@@ -22,7 +23,8 @@
 @import "../docs.css";
 @import "../controls.css";
 
-@custom-variant dark (&:is(.dark *));
+/* Warm dark is the only theme, so `dark:` variants always apply (zero added specificity). */
+@custom-variant dark (&:where(*));
 
 @theme inline {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;

@@ -376,9 +376,8 @@ export function tier(id) { return TIERS.get(String(id).toUpperCase()) || null; }
 /** Chart series colours, in fixed order. Never cycle past the end -- fold to
  *  "Other" or facet instead. */
 export function seriesColors() {
-  const dark = !matchMedia('(prefers-color-scheme: light)').matches
-    || document.documentElement.dataset.theme === 'dark';
-  return (TOKENS?.series?.[dark ? 'dark' : 'light']) || [];
+  // Warm dark is the only theme (2026-11-24), so the dark series is the only one drawn.
+  return (TOKENS?.series?.dark) || [];
 }
 
 /* ---------------------------------------------------------------- navbar -- */

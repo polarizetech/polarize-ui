@@ -5,31 +5,9 @@ import { TooltipProvider } from "../src/components/ui/tooltip";
 import { DocsProvider } from "../src/science/evidence/docs";
 
 const preview: Preview = {
-  globalTypes: {
-    theme: {
-      description: "Light / dark",
-      toolbar: {
-        title: "Theme",
-        icon: "mirror",
-        items: [
-          { value: "auto", title: "follow OS" },
-          { value: "light", title: "light" },
-          { value: "dark", title: "dark" },
-          { value: "polarize", title: "polarize (warm dark)" },
-        ],
-        dynamicTitle: true,
-      },
-    },
-  },
-  initialGlobals: { theme: "auto" },
+  // One theme: Polarize warm dark (2026-11-24). No toolbar switch, nothing follows the OS.
   decorators: [
-    (Story, ctx) => {
-      const t = ctx.globals.theme;
-      const dark = t === "dark" || t === "polarize" || (t !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-      document.documentElement.classList.toggle("dark", dark);
-      // Polarize is a dark theme with its own block (clay brand, audio inks): stamp both.
-      if (t === "polarize") document.documentElement.dataset.theme = "polarize";
-      else delete document.documentElement.dataset.theme;
+    (Story) => {
       return (
         <TooltipProvider>
           <DocsProvider>

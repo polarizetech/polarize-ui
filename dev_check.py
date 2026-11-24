@@ -48,9 +48,9 @@ def luminance(hex_):
 
 
 # EVERY theme carrying a palette, so a newly added one cannot slip past the contrast checks
-# unverified. `instrument` was added 2026-08-19 and the loops named three themes literally,
-# so it was skipped on the day it became the default.
-ALL_THEMES = ("polarize", "dark", "light", "instrument", "instrument-dark", "fieldguide", "fieldguide-dark")
+# unverified. Since 2026-11-24 there is exactly one: polarize (warm dark), at the operator's
+# request. Read from tokens.json rather than listed, so a re-added theme is checked too.
+ALL_THEMES = tuple(TOKENS["color"])
 
 from build_css import _FAMILY_BORROW  # noqa: E402  -- single source of truth for palette borrowing
 
@@ -141,7 +141,7 @@ def check_contrast():
         # was never designed to meet would just mean re-stepping a validated set.
         low = [i for i, s in enumerate(TOKENS["series"][fam_mode], 1)
                if contrast(s, bg) < 3.0]
-        if mode in ("polarize", "dark"):
+        if fam_mode == "dark":
             ok(f"{mode}: every series colour clears 3:1 on the page", not low, str(low))
         else:
             ok("light: the sub-3:1 series slots are covered by a declared relief rule",
@@ -221,31 +221,21 @@ def check_css():
            "a projector and colour-blindness",
            "italic" in p.group(1) and "italic" not in m.group(1))
 
-    # INSTRUMENT is the bare :root default from 2026-08-19 -- verified by position (its block
-    # must be the first ":root {" in the file).
-    first_root = CSS.index(":root {")
+    # POLARIZE (warm dark) is the ONLY theme from 2026-11-24 -- verified by position (its block
+    # must be the first ":root" block in the file) and by absence (no light palette, no OS switch).
+    first_root = CSS.index(":root,")
     # To the END of the block, not a fixed character window -- the token list is ~850 chars and a
     # 400-char window silently missed `color-scheme` at the bottom of it.
     head = CSS[first_root:CSS.index("}", first_root)]
-    ok("instrument is declared first, as the bare :root default",
-       TOKENS["color"]["instrument"]["background"] in head)
-    ok("...and the bare :root carries the LIGHT palette, so an un-stamped page in a light OS "
-       "is not left on a dark ground", "color-scheme: light" in head)
-
-    # The three-state rule. Unlike every previous theme here, instrument has a real light/dark
-    # pair, so it must resolve correctly in all three viewer states -- and the un-stamped
-    # default-system state is the one most viewers are in and the one most often got wrong.
-    ok("instrument auto-switches to its dark half on prefers-color-scheme: dark",
-       "@media (prefers-color-scheme: dark)" in CSS
-       and TOKENS["color"]["instrument-dark"]["background"] in CSS)
-    media = CSS[CSS.index("@media (prefers-color-scheme: dark)"):]
-    ok("...guarded with :not([data-theme]) so an explicit stamp always beats the OS preference",
-       ":root:not([data-theme])" in media[:media.index("}")+200])
-    ok("...and both halves are reachable by explicit stamp, so a toggle wins in either direction",
-       '[data-theme="instrument"]' in CSS and '[data-theme="instrument-dark"]' in CSS)
-    ok("light and dark (the pre-2026-08-04 look) remain available as explicit "
-       "opt-ins in BOTH directions", '[data-theme="light"]' in CSS and '[data-theme="dark"]' in CSS)
-    ok("polarize remains reachable by name -- the opt-out a project uses to keep its old look",
+    ok("polarize is declared first, as the bare :root default",
+       TOKENS["color"]["polarize"]["background"] in head)
+    ok("...and the bare :root carries color-scheme: dark", "color-scheme: dark" in head)
+    ok("tokens.json holds exactly one colour theme, polarize (operator, 2026-11-24)",
+       list(TOKENS["color"]) == ["polarize"], str(list(TOKENS["color"])))
+    ok("there is no light palette anywhere in design.css", "color-scheme: light" not in CSS)
+    ok("...and no prefers-color-scheme switch, so the OS setting cannot pull a page off warm dark",
+       "prefers-color-scheme" not in CSS.split("*/", 1)[1])
+    ok("polarize remains reachable by name, so a page that stamps it keeps working",
        '[data-theme="polarize"]' in CSS)
     ok("reduced motion is honoured", "prefers-reduced-motion" in CSS)
     ok("focus is always visible", CSS.count(":focus-visible") >= 4)
@@ -304,14 +294,14 @@ def check_js():
     ok("design.js turns every bare range input into a knob (no range sliders)",
        "export function knobs" in JS and "'ui-knob'" in JS and "controls.js" in JS and "\nknobs();" in JS)
     css = (HERE / "design.css").read_text()
-    for th in ("instrument", "instrument-dark", "fieldguide", "fieldguide-dark", "polarize", "light", "dark"):
+    for th in TOKENS["color"]:
         ok(f"the {th} theme also applies when stamped on an element, not only <html>",
            f':root[data-theme="{th}"],\n[data-theme="{th}"] {{' in css)
     ok("an element carrying a theme paints its own ground (no light backdrop through a dark theme)",
        re.search(r"\[data-theme\]:not\(:root\)\s*\{\s*background:\s*var\(--background\);", css) is not None)
     ds = json.loads((HERE / "claude-design-system" / "project" / "tokens.json").read_text())
-    ok("the Design System artifact lists the warm-dark theme first (the canvas default)",
-       ds["color"]["themes"][0]["id"] == "polarize")
+    ok("the Design System artifact lists only the warm-dark theme",
+       [t["id"] for t in ds["color"]["themes"]] == ["polarize"], str([t["id"] for t in ds["color"]["themes"]]))
     # tokens.json + the icon sprite -- both same-folder, both degrade on failure.
     ok("no network beyond the design folder itself",
        JS.count("fetch(") == 2 and "tokens.json" in JS and "polarize-icons.svg" in JS)
@@ -429,8 +419,8 @@ def check_shadcn() -> None:
 
     theme = (d / "theme.css").read_text()
     tokens = json.loads((Path(__file__).parent / "tokens.json").read_text())
-    brand = tokens["color"]["instrument"]["accent"]
-    surface2 = tokens["color"]["instrument"]["surface-2"]
+    brand = tokens["color"]["polarize"]["accent"]
+    surface2 = tokens["color"]["polarize"]["surface-2"]
 
     # THE collision. shadcn's --accent is a hover surface; ours is the brand teal. If these
     # ever become the same value, every hover row in a React project turns saturated teal.

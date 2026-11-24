@@ -48,14 +48,11 @@ def _font_stack(key: str) -> str:
 # dev_check.py -- borrowing the hues is allowed, assuming they still pass is not.
 _FAMILY_BORROW = {
     "polarize": "dark",
-    "instrument": "light",
-    "instrument-dark": "dark",
-    "fieldguide": "light",
-    "fieldguide-dark": "dark",
 }
 
 
-DARK_MODES = {"polarize", "dark", "instrument-dark", "fieldguide-dark"}
+#: polarize (warm dark) is the only theme since 2026-11-24.
+DARK_MODES = {"polarize"}
 
 
 def _vars(mode: str, indent: int = 2) -> str:
@@ -836,38 +833,20 @@ a {{ color: var(--accent); }}
 
 def render() -> str:
     return (BANNER
-            + "\n/* INSTRUMENT is the default as of 2026-08-19, at the operator's request that other\n"
-            + " * projects adopt the attend-to-send briefing look. Three type roles -- Instrument\n"
-            + " * Serif for headings, Inter for running text, uppercase IBM Plex Mono for labels --\n"
-            + " * and a cool bench palette with ONE saturated accent.\n"
+            + "\n/* ONE THEME: Polarize warm-dark (2026-11-24, at the operator's request: \"use the warm\n"
+            + " * dark theme only - no other themes\"). There is no light palette and no OS\n"
+            + " * colour-scheme switch; bare :root IS the theme. The light, slate-dark,\n"
+            + " * instrument and fieldguide themes were removed in the same release.\n"
             + " *\n"
-            + " * It is the first theme here with a real LIGHT AND DARK pair, so it follows the\n"
-            + " * three-state rule properly: bare :root is the full light palette; the media query\n"
-            + " * is guarded with :not([data-theme]) so an explicit stamp always beats the OS; and\n"
-            + " * both stamps re-declare the tokens so a toggle wins in either direction. The\n"
-            + " * un-stamped default-system state is the one most viewers are in and it is the one\n"
-            + " * most often got wrong.\n"
-            + " *\n"
-            + " * A PROJECT KEEPS ITS OLD LOOK BY PINNING A THEME EXPLICITLY -- data-theme=\"polarize\"\n"
-            + " * (the warm-dark 2026-08-04 default) or \"dark\" (the pre-Polarize slate). That is the\n"
-            + " * same opt-out tuning-forks used through the Polarize migration and it still works. */\n"
-            + ":root {\n" + _vars("instrument") + "\n  color-scheme: light;\n}\n\n"
-            + "@media (prefers-color-scheme: dark) {\n"
-            + "  :root:not([data-theme]) {\n" + _vars("instrument-dark", indent=4)
-            + "\n    color-scheme: dark;\n  }\n}\n\n"
-            + ":root[data-theme=\"instrument\"],\n[data-theme=\"instrument\"] {\n" + _vars("instrument") + "\n  color-scheme: light;\n}\n\n"
-            + ":root[data-theme=\"instrument-dark\"],\n[data-theme=\"instrument-dark\"] {\n" + _vars("instrument-dark") + "\n  color-scheme: dark;\n}\n\n"
-            + "/* fieldguide: white and magenta, Geist for the sans (2026-10-15). Opt-in by stamp. */\n"
-            + ":root[data-theme=\"fieldguide\"],\n[data-theme=\"fieldguide\"] {\n" + _vars("fieldguide") + "\n  color-scheme: light;\n}\n\n"
-            + ":root[data-theme=\"fieldguide-dark\"],\n[data-theme=\"fieldguide-dark\"] {\n" + _vars("fieldguide-dark") + "\n  color-scheme: dark;\n}\n\n"
-            + "/* Previous defaults, kept as explicit opt-ins. */\n"
-            + ":root[data-theme=\"polarize\"],\n[data-theme=\"polarize\"] {\n" + _vars("polarize") + "\n  color-scheme: dark;\n}\n\n"
-            + ":root[data-theme=\"light\"],\n[data-theme=\"light\"] {\n" + _vars("light") + "\n  color-scheme: light;\n}\n\n"
-            + ":root[data-theme=\"dark\"],\n[data-theme=\"dark\"] {\n" + _vars("dark") + "\n  color-scheme: dark;\n}\n\n"
-            + "/* A theme stamped on an ELEMENT, not <html>, works the same and paints its own ground,\n"
-            + " * so no light backdrop shows through a dark theme. Use it wherever the page does not own\n"
-            + " * <html>: a Claude Design canvas board (the canvas re-stamps <html> as plain light or\n"
-            + " * dark), an embed, a widget. Put the stamp on the outermost element you own. */\n"
+            + " * data-theme=\"polarize\" is still declared so a page or element that stamps it keeps\n"
+            + " * working. Any other stamp now matches no block and falls through to :root -- the same\n"
+            + " * warm-dark values. Type roles are unchanged: Instrument Serif for headings, Inter\n"
+            + " * for running text, uppercase IBM Plex Mono for labels. */\n"
+            + ":root,\n:root[data-theme=\"polarize\"],\n[data-theme=\"polarize\"] {\n" + _vars("polarize") + "\n  color-scheme: dark;\n}\n\n"
+            + "/* A theme stamped on an ELEMENT, not <html>, paints its own ground, so no light backdrop\n"
+            + " * shows through. Use it wherever the page does not own <html>: a Claude Design canvas\n"
+            + " * board (the canvas re-stamps <html> as plain light or dark), an embed, a widget. Put\n"
+            + " * the stamp on the outermost element you own. */\n"
             + "[data-theme]:not(:root) {\n  background: var(--background);\n  color: var(--foreground);\n}\n"
             + _static())
 

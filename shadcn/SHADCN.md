@@ -42,8 +42,8 @@ Map them by name and every hover state becomes saturated teal — it looks delib
 not. So the bridge sends the brand colour to **`--primary`** (where shadcn puts a brand colour)
 and gives `--accent` the subtle surface it expects.
 
-**Measured, not assumed:** with `--primary-foreground` taken from the theme background, contrast
-is **5.69:1** light and **10.04:1** dark — both clear WCAG AA.
+**Computed, not assumed:** with `--primary-foreground` taken from the Polarize ground, text on
+clay clears WCAG AA; `dev_check.py` computes the ratio on every run.
 
 **Consequence: do not load `design.css` and `theme.css` in the same document.** Both define
 `--accent` at `:root` with different meanings and the loser is silent. In practice this costs
@@ -110,13 +110,11 @@ The tier list is generated from `tokens.json`, so a badge vocabulary cannot drif
 - **Never rendered.** No project imports any of this; `npx shadcn init` has never been run
   against `components.json`, and `tier.tsx` has never been compiled or seen on a screen. The
   contrast figures are computed from hex, not sampled from a browser.
-- **Two themes are bridged**: `instrument` (light `:root`, dark `.dark`) and `polarize`
-  (`:root[data-theme="polarize"]`, used together with `.dark`). Polarize's brand colour, clay,
-  goes to `--primary` exactly as the teal does, and `system.css` adds its three audio inks
-  (`--clay`, `--ochre`, `--lichen*`) under the same names `design.css` uses. `dark` and
-  `light` are still not bridged.
-- **No dark-mode toggle.** The files define `.dark`; putting that class on `<html>` is the
-  project's job.
+- **One theme is bridged: `polarize` (warm dark), the only theme since 2026-11-24.** One
+  block covers `:root`, `.dark` and `:root[data-theme="polarize"]`, so a page renders the same
+  whichever of those it carries. Clay goes to `--primary`, and `system.css` adds the three audio
+  inks (`--clay`, `--ochre`, `--lichen*`) under the same names `design.css` uses.
+- **No dark-mode toggle**, because there is no light theme to toggle to.
 - **`components.json` pins `style: new-york` and `lucide` icons** — a default, not a decision.
   `tools/design` ships a self-hosted 15-icon Phosphor sprite, so a project that wants no network
   and no second icon set should say so before running `add`.

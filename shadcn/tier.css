@@ -2,19 +2,13 @@
  * Import alongside theme.css. Kept as plain CSS rather than Tailwind classes so the
  * three-channel rule (colour + word + glyph) lives in ONE place for both the zero-build
  * projects and the React ones. */
-:root {
-  --tier-measured: #15875e;
-  --tier-predicted: #2976d3;
-  --tier-exploring: #9f6c00;
-  --tier-spec: #4a3aa7;
-  --tier-refuted: #df3231;
-}
+:root,
 .dark {
-    --tier-measured: #199e70;
-    --tier-predicted: #3987e5;
-    --tier-exploring: #c98500;
-    --tier-spec: #9085e9;
-    --tier-refuted: #e66767;
+  --tier-measured: #199e70;
+  --tier-predicted: #3987e5;
+  --tier-exploring: #c98500;
+  --tier-spec: #9085e9;
+  --tier-refuted: #e66767;
 }
 .ui-tier {
   display: inline-flex; align-items: center; gap: .4em;

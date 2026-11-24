@@ -7,9 +7,8 @@
  * nav, content, code and API reference all render; only search, copy, tabs,
  * the theme toggle and plots need it.
  *
- *   data-ui-theme-toggle          button: flips the explicit theme stamp
- *                                 (<html data-ui-theme-light/-dark> override the
- *                                 two theme names; default instrument / instrument-dark)
+ *   data-ui-theme-toggle          DEPRECATED (2026-11-24): there is one theme, warm
+ *                                 dark, so the toggle is hidden by docs.css and inert
  *   data-ui-nav-toggle            button: opens the nav on a phone
  *   data-ui-search-open           button: opens the palette (also ⌘K / Ctrl-K and "/")
  *   data-ui-search="<url>"        the .ui-docsearch dialog; <url> is a JSON array
@@ -21,10 +20,7 @@
  *   .ui-docsite__toc a            scroll-spy
  *   .ui-pkgcard                   pointer-following grid texture
  *
- * The theme choice is remembered per viewer under localStorage "ui-theme"
- * (override with <html data-ui-theme-key>), wrapped in try/catch because storage
- * can be unavailable. Plots read colours from CSS tokens at draw time and are
- * redrawn on theme change and resize. No dependencies, no network except the
+ * Plots read colours from CSS tokens at draw time and are redrawn on resize. No dependencies, no network except the
  * search index the page names.
  */
 
@@ -35,14 +31,9 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
 
 /* ── theme ─────────────────────────────────────────────────────────────── */
 const root = document.documentElement;
-const THEME_KEY = root.dataset.uiThemeKey || 'ui-theme';
-const LIGHT = root.dataset.uiThemeLight || 'instrument';
-const DARK = root.dataset.uiThemeDark || 'instrument-dark';
-try { const t = localStorage.getItem(THEME_KEY); if (t) root.dataset.theme = t; } catch (e) { /* storage unavailable */ }
-export const isDark = () => {
-  const t = root.dataset.theme;
-  return t ? /dark|polarize/.test(t) : matchMedia('(prefers-color-scheme: dark)').matches;
-};
+/* One theme since 2026-11-24: Polarize warm dark. There is nothing to toggle or remember. */
+/** @deprecated Always true: warm dark is the only theme. Kept so existing imports work. */
+export const isDark = () => true;
 
 /* ── python highlighting ───────────────────────────────────────────────── */
 const KW = new Set('import from as def return for in if else elif with lambda None True False and or not class try except raise yield is while pass break continue async await'.split(' '));
@@ -293,12 +284,6 @@ function initSearch() {
 
 /* ── wiring ────────────────────────────────────────────────────────────── */
 export function init() {
-  $$('[data-ui-theme-toggle]').forEach((b) => b.addEventListener('click', () => {
-    const next = isDark() ? LIGHT : DARK;
-    root.dataset.theme = next;
-    try { localStorage.setItem(THEME_KEY, next); } catch (e) { /* storage unavailable */ }
-    redrawAll();
-  }));
   $$('[data-ui-nav-toggle]').forEach((b) => b.addEventListener('click', () => {
     const open = document.body.classList.toggle('is-nav-open');
     b.setAttribute('aria-expanded', open);
@@ -334,7 +319,6 @@ export function init() {
   redrawAll();
   let rt;
   addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(redrawAll, 150); });
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redrawAll);
   initSearch();
 }
 
