@@ -3,7 +3,7 @@
 // Plots and syntax highlighting reuse docs.js itself (loaded lazily, auto-init off), so
 // there is one renderer. Guide: DOCS-SITES.md.
 import * as React from "react"
-import { Menu, Moon, Search, Sun } from "lucide-react"
+import { Menu, Search } from "lucide-react"
 import { cn } from "../lib/utils"
 import type { PlotSpec } from "../../docs.js"
 
@@ -65,13 +65,12 @@ export function DocsShell({ brand, sub = "docs", nav, toc, wide = false, flag, a
   )
 }
 
-/** The theme toggle button for DocsShell's actions: `dark` and `onToggle` are the app's. */
-export function DocsThemeToggle({ dark, onToggle }: { dark: boolean; onToggle: () => void }) {
-  return (
-    <button className="ui-docsite__iconbtn" aria-label="Toggle colour theme" onClick={onToggle}>
-      {dark ? <Moon /> : <Sun />}
-    </button>
-  )
+/**
+ * @deprecated Warm dark is the only theme (2026-11-24), so there is nothing to toggle.
+ * Renders nothing; kept so existing imports compile. Remove it from your DocsShell actions.
+ */
+export function DocsThemeToggle(_props: { dark: boolean; onToggle: () => void }) {
+  return null
 }
 
 /** Eyebrow, display title and lead for a page. */

@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button"
 
 const meta: Meta = {
   title: "General UI/Controls",
-  globals: { theme: "polarize" },
   parameters: {
     docs: {
       description: {
@@ -273,23 +272,6 @@ export const Night: StoryObj = {
     const [playing, setPlaying] = React.useState(true)
     return <NightView time="12:04" sub="−29:56 · scene 2 of 5" progress={0.29} playing={playing} onToggle={() => setPlaying(!playing)} hint="tap to pause" />
   },
-}
-
-export const OtherThemes: StoryObj = {
-  name: "Fallback · instrument theme",
-  globals: { theme: "light" },
-  parameters: {
-    docs: { description: { story: "Outside Polarize there are no audio inks: signal falls back to the brand colour, the human ink to plain ink. The dashed border still marks a linked value." } },
-  },
-  render: () => (
-    <Panel width={720}>
-      <Fader variant="ribbon" label="Interaural time" value={120} min={-660} max={660} step={1} unit="µs" digits={0} signed detents={[0]} mark={-40} markLabel="mine −40"
-        adornment={<LinkedValue formula="my centre + 160 µs" />} />
-      <div className="ui-deltas"><SyncPill state="saved" /><SyncPill state="saving" /><SyncPill state="offline" /><SyncPill state="conflict" /></div>
-      <SceneTimeline scenes={SCENES} selected={1} editable time={724} curves={[{ label: "rate", values: RATE, scale: "log", series: 2 }]}
-        endings={["met", "timeout", "met", "no_data", "open_loop"]} height={130} />
-    </Panel>
-  ),
 }
 
 export const SegmentedStory: StoryObj = {

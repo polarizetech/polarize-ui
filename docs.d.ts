@@ -15,7 +15,7 @@ export function renderPlot(spec: PlotSpec, host: HTMLElement): HTMLElement
 export function highlight(code: string): string
 /** Redraw every [data-ui-plots] element (after a theme change). */
 export function redrawAll(): void
-/** True when the page is showing a dark theme. */
+/** @deprecated Always true: Polarize warm dark is the only theme (2026-11-24). */
 export function isDark(): boolean
 /** Wire every data-ui-* hook on the page. Runs on import unless window.__uiDocsNoAutoInit is set. */
 export function init(): void

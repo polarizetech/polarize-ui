@@ -54,7 +54,24 @@
 > After a breaking release, check the consumers' daily `polarize-ui` workflow runs. A
 > failed run means that repo needs a migration commit. It is not something to retry.
 
-> ## ⭐ THE DEFAULT IS **INSTRUMENT** (2026-08-19)
+> ## ⭐ ONE THEME: **POLARIZE WARM DARK** (2026-11-24)
+>
+> Operator: *"Use the warm dark theme only - no other themes."* `tokens.json` `color` holds one
+> palette, `polarize`, and bare `:root` is it. The `light`, `dark` (slate), `instrument`,
+> `instrument-dark`, `fieldguide` and `fieldguide-dark` palettes were removed, with the
+> `prefers-color-scheme` switch, the Storybook theme toolbar and the docs-site theme toggle
+> (`DocsThemeToggle` renders nothing; `isDark()` is always true; both kept, deprecated, so imports
+> still compile). `data-theme="polarize"` still matches; any other stamp falls through to `:root`.
+> The React bridge emits one block for `:root, .dark, :root[data-theme="polarize"]`, and
+> `src/theme.css` makes Tailwind's `dark:` variant always apply. `dev_check.py` fails if a second
+> colour theme, a `color-scheme: light` or a `prefers-color-scheme` rule appears.
+>
+> **Not removed:** the `light` steps inside `epistemic.families`, `series` and `diverging`. They
+> are validated palette data (see "The palette" below), not a theme, and nothing renders them.
+> **The type triad below is unchanged**: Instrument Serif / Inter / IBM Plex Mono. Wherever the
+> text below says light, `instrument-dark`, three-state or "pin a theme", it is history.
+>
+> ## (history) THE DEFAULT WAS **INSTRUMENT** (2026-08-19 to 2026-11-24)
 >
 > Set at the operator's request after the `attend-to-send` briefing page: *"require other projects
 > to implement this design."* A project that links `design.css` and sets `<body class="ui">` gets

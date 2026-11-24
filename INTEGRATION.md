@@ -54,14 +54,10 @@ needs them (a `@font-face` `src`, or your own `<use href="design/icons/...">`)
 `design.js` is a module and is safe to load in `<head>`; it defines the elements
 and creates the drawer on demand.
 
-**Theme.** Nothing else needed — a new project is **Polarize** (warm-dark,
-serif) automatically. To keep the older gold-accent-on-slate look instead
-(e.g. an existing project migrating in that doesn't want to change its
-palette this trip), set it explicitly:
-
-```html
-<html data-theme="dark">   <!-- pre-2026-08-04 look, opt-in only -->
-```
+**Theme.** Nothing else needed. There is one theme, **Polarize warm dark**
+(2026-11-24), and every page gets it. There is no light theme, no
+`prefers-color-scheme` switch and no toggle. `data-theme="polarize"` still works;
+any other `data-theme` value is ignored and renders warm dark.
 
 ## 3. Markup
 
@@ -107,9 +103,7 @@ palette this trip), set it explicitly:
 | audio-ink tag | `.ui-tag--clay` / `--ochre` / `--lichen` (never a tier colour — see CLAUDE.md) |
 
 Audio-ink colours (`--clay`, `--ochre`, `--lichen`, and their tint/hover/press
-steps) are only defined under the Polarize theme — they're absent if a project
-opts into `data-theme="dark"` or `="light"`. Don't reference them from a
-project that might run under the classic theme.
+steps) are always defined, since Polarize is the only theme.
 
 ## 4. The part that matters: hide the prose
 
@@ -258,7 +252,6 @@ Hardware-style controls for audio and instrument interfaces. Link the layer afte
 `design.css`, and the module once:
 
 ```html
-<html data-theme="polarize">   <!-- the controls are drawn for Polarize; other themes fall back -->
 <link rel="stylesheet" href="design/design.css">
 <link rel="stylesheet" href="design/controls.css">
 <script type="module" src="design/controls.js"></script>
@@ -339,7 +332,7 @@ sheet: open it with `showModal()`), `.ui-tabbar` and `.ui-night`. In React they 
 `Hazard`, `HoldButton`, `SceneTimeline`, `AutomationLane`, `Panner`, `TabBar`, `NightView`,
 `SegmentedButtons`, `Gauge`, `Keyboard`, `KeyLane` and `Popover`;
 the shadcn `Sheet` with `side="bottom"` stands in for the dialog. React gets the Polarize theme
-with `<html class="dark" data-theme="polarize">`.
+from `theme.css` with no class or stamp.
 
 **For instruments: segmented, gauge, keyboard, key lane, popover.** A segmented control is a
 group of `.ui-btn` buttons, one pressed:
@@ -387,9 +380,9 @@ mountKeyLane(laneHost, { kind: 'chips', chips: [{ low: 48, high: 59, text: 'A', 
 level meter and the automation lane. A span on a key lane is drawn in the human ink, not in a
 tier colour.
 
-**The inks.** Under Polarize, clay is signal and action, ochre is what a person placed or
-owns, lichen is machine state. Other themes have no validated values for those inks, so the
-controls fall back to the brand colour and plain ink there. A limit is never drawn in a tier
+**The inks.** Clay is signal and action, ochre is what a person placed or owns, lichen is
+machine state. `controls.css` still reads them with fallbacks, so a page that loads it without
+`design.css` falls back to the brand colour and plain ink. A limit is never drawn in a tier
 colour: the epistemic palette is reserved for evidence.
 
 ## 7. Check it
@@ -461,12 +454,11 @@ which does have an opsz axis).
 Values are mono and `tabular-nums`, so columns of digits line up. The `<small>` says where the
 number came from — which is the repo's standing habit, not decoration.
 
-### Keeping an older look
+### Older looks were removed
 
-```html
-<html data-theme="polarize">   <!-- warm-dark, the 2026-08-04 default -->
-<html data-theme="dark">       <!-- the pre-Polarize slate -->
-```
+The `light`, `dark` (slate), `instrument`, `instrument-dark`, `fieldguide` and
+`fieldguide-dark` themes were removed on 2026-11-24. A page that stamps one of them now
+renders Polarize warm dark. Pin a release from before that date to keep one.
 
 ---
 

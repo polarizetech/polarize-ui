@@ -81,14 +81,11 @@ html:has(.ui-docsite) { scroll-padding-top: calc(var(--docsite-bar-h, 64px) + 24
   color: var(--refuted); border: 1px solid color-mix(in oklab, var(--refuted) 45%, transparent);
   border-radius: 2px; padding: 3px 9px; margin-right: 6px;
 }
-/* Theme-toggle icons: sun in light, moon in dark, following the three-state rule. */
-.ui-docsite__moon { display: none; }
-:root[data-theme$="dark"] .ui-docsite__sun, :root[data-theme="polarize"] .ui-docsite__sun { display: none; }
-:root[data-theme$="dark"] .ui-docsite__moon, :root[data-theme="polarize"] .ui-docsite__moon { display: block; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) .ui-docsite__sun { display: none; }
-  :root:not([data-theme]) .ui-docsite__moon { display: block; }
-}
+/* Theme toggle: there is one theme (warm dark, 2026-11-24), so a toggle has nothing to
+   switch and is hidden. The classes stay so existing markup does not break. */
+.ui-docsite__sun { display: none; }
+.ui-docsite__moon { display: block; }
+[data-ui-theme-toggle] { display: none; }
 
 /* ---------- Three-column shell ---------- */
 .ui-docsite__shell {

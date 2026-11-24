@@ -4,10 +4,9 @@ import tokens from "../tokens.json";
 import pkg from "../package.json";
 
 // The Storybook UI, white-labelled with the same tokens as the components.
-// Light or dark follows the viewer's system setting, like the sites built on this.
+// Polarize warm dark is the only theme (2026-11-24), for the manager chrome as well.
 type Palette = Record<string, string>;
-const light = tokens.color["instrument"] as Palette;
-const dark = tokens.color["instrument-dark"] as Palette;
+const warm = tokens.color["polarize"] as Palette;
 
 const brandTitle = (accent: string, ink: string) => `
   <span style="display:inline-flex;align-items:center;gap:10px">
@@ -24,8 +23,7 @@ function theme(base: "light" | "dark", c: Palette) {
     brandTarget: "_blank",
 
     colorPrimary: c.accent,
-    // Selected sidebar rows put white text on this, so it is the deep teal in both themes.
-    colorSecondary: light.accent,
+    colorSecondary: c.accent,
 
     appBg: c.background,
     appContentBg: c.background,
@@ -57,8 +55,7 @@ function theme(base: "light" | "dark", c: Palette) {
   });
 }
 
-const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
 addons.setConfig({
-  theme: prefersDark ? theme("dark", dark) : theme("light", light),
+  theme: theme("dark", warm),
   sidebar: { showRoots: true },
 });

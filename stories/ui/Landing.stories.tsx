@@ -1,4 +1,3 @@
-import * as React from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Brand } from "@/components/publication"
 import {
@@ -182,28 +181,17 @@ const footer = (
     fine={<><span className="ui-label">© 2026 Polarize · Victoria, BC</span><span className="ui-label">Falsification-first · citation-gated</span></>} />
 )
 
-// The homepage in the fieldguide look sets data-theme on the document while it is shown.
-const fieldguide = (Story: () => React.ReactElement) => {
-  React.useEffect(() => {
-    const root = document.documentElement, was = root.dataset.theme
-    root.dataset.theme = "fieldguide"
-    return () => { if (was) root.dataset.theme = was; else delete root.dataset.theme }
-  }, [])
-  return <Story />
-}
-
 const page = () => (
   <div>{nav}{hero}{stats}{process}{projects}{changelog}{findings}{speculations}{principle}{footer}</div>
 )
 
 /** The whole homepage, as it ships on polarize.tech. */
-export const Homepage: StoryObj = { name: "Homepage", render: page, decorators: [fieldguide] }
+export const Homepage: StoryObj = { name: "Homepage", render: page }
 
 /** The same page at phone width. */
 export const HomepageMobile: StoryObj = {
   name: "Homepage (phone)",
   render: page,
-  decorators: [fieldguide],
   parameters: { viewport: { defaultViewport: "mobile1" } },
   globals: { viewport: { value: "mobile1", isRotated: false } },
 }

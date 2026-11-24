@@ -154,9 +154,8 @@
 .ui-plate { margin: 0; display: flex; flex-direction: column; min-height: 0; background: var(--background); }
 .ui-plate__frame { flex: 1; min-height: 0; overflow: hidden; background: var(--background); }
 .ui-plate__img { display: block; width: 100%; height: 100%; object-fit: cover; }
-/* The plates are cream line on near-black: on a dark page the black drops out. */
-:root[data-theme$="dark"] .ui-plate__img, :root[data-theme="polarize"] .ui-plate__img, .dark .ui-plate__img { mix-blend-mode: lighten; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme]) .ui-plate__img { mix-blend-mode: lighten; } }
+/* The plates are cream line on near-black: on the (only, warm-dark) page the black drops out. */
+.ui-plate__img { mix-blend-mode: lighten; }
 .ui-plate__img--photo { filter: grayscale(1) contrast(1.05) brightness(.9); mix-blend-mode: normal !important; }
 .ui-plate__caption { padding: var(--space-3) var(--space-5); border-top: 1px solid var(--border); font-size: var(--text-sm); line-height: 1.45; color: var(--faint-foreground); }
 .ui-plate__caption a { color: inherit; }
@@ -378,11 +377,14 @@ a.ui-story:hover { border-color: var(--pub-accent, var(--accent)); }
 }
 
 /* ============================================================
-   fieldguide (2026-10-15): the first homepage design, in magenta.
-   Everything below is additive. The card look is opt-in through two
-   custom properties that only the fieldguide theme sets.
+   From the fieldguide homepage design (2026-10-15). Everything below is
+   additive. The card look is opt-in through two custom properties,
+   --landing-radius and --landing-fill. The fieldguide theme that set them
+   was removed 2026-11-24; the defaults below are the flat warm-dark look.
+   For the card look set --landing-radius: var(--radius-base) and
+   --landing-fill: var(--card) on the page or a section.
    ============================================================ */
-:root[data-theme^="fieldguide"] { --landing-radius: var(--radius-base); --landing-fill: var(--card); }
+:root { --landing-radius: var(--radius-xs); --landing-fill: transparent; }
 
 /* ---------- Actions: plain buttons in the sans, sentence case ---------- */
 .ui-action {

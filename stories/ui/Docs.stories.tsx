@@ -1,9 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import * as React from "react"
 import { Brand } from "@/components/publication"
 import { Cta } from "@/components/landing"
 import {
-  ApiEntry, Callout, Chip, Chips, CodeWindow, DatasetCard, DocsPageHead, DocsSection, DocsShell, DocsThemeToggle,
+  ApiEntry, Callout, Chip, Chips, CodeWindow, DatasetCard, DocsPageHead, DocsSection, DocsShell,
   Example, ExampleFailed, HowTo, PkgCard, PkgCards, StatRow, type PlotSpec,
 } from "@/components/docs"
 import { linearFit, type Pair } from "@/science/stats/regression"
@@ -58,7 +57,7 @@ const outputPlots: PlotSpec[] = [
   },
 ]
 
-function Page({ dark, setDark }: { dark: boolean; setDark: (d: boolean) => void }) {
+function Page() {
   return (
     <DocsShell
       brand={<Brand word="polarize-ui" href="#" />}
@@ -75,7 +74,6 @@ function Page({ dark, setDark }: { dark: boolean; setDark: (d: boolean) => void 
         { label: "Fit a line to noisy data", href: "#ex-linearfit", sub: true },
         { label: "API reference", href: "#api" }, { label: "Datasets", href: "#datasets" },
       ]}
-      actions={<DocsThemeToggle dark={dark} onToggle={() => setDark(!dark)} />}
     >
       <DocsPageHead eyebrow="Statistics" title="linearFit" lead="Least-squares line with its intervals printed, fitted only over the measured range." />
       <Chips>
@@ -122,11 +120,7 @@ function Page({ dark, setDark }: { dark: boolean; setDark: (d: boolean) => void 
 }
 
 export const ReferencePage: StoryObj = {
-  render: () => {
-    const [dark, setDark] = React.useState(document.documentElement.classList.contains("dark"))
-    React.useEffect(() => { document.documentElement.classList.toggle("dark", dark) }, [dark])
-    return <Page dark={dark} setDark={setDark} />
-  },
+  render: () => <Page />,
 }
 
 export const HomePage: StoryObj = {

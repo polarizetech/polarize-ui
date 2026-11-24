@@ -25,7 +25,7 @@ The shape is the familiar docs site (Tailwind's Syntax and Protocol templates ar
 a top bar with search, a left nav, an "on this page" column, a home page with a hero and package
 cards, and per-package pages with examples and an API reference. The surface is polarize-ui's
 landing style: hairline `--border-strong` rules, `--radius-xs` cards, 2px chips, no shadows, and a
-code window that is dark in both themes.
+code window that is always dark.
 
 ## The principle: generated, not maintained
 
@@ -81,7 +81,7 @@ automatic-documentation-site's `docs/ONBOARDING.md`. This is what a generator wr
 ```html
 <body class="ui ui-docsite">
   <header class="ui-docsite__bar">…brand (.ui-brand), search button [data-ui-search-open],
-    theme toggle [data-ui-theme-toggle], nav toggle [data-ui-nav-toggle]…</header>
+    nav toggle [data-ui-nav-toggle]…</header>
   <div class="ui-docsite__shell">           <!-- add --wide on pages with no TOC -->
     <nav class="ui-docsite__nav">…</nav>
     <main class="ui-docsite__main">…</main>

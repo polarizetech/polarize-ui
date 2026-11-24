@@ -3,3 +3,4 @@ storybook-static/
 *.log
 .DS_Store
 stories/datasets/*/data.json
+__pycache__/

@@ -74,7 +74,8 @@ import { Heatmap, NullDistribution, LineChart, Tier, Button } from "@polarizetec
 - The package ships TypeScript source and your bundler compiles it; there is no build step
   here. It is type-checked with `noUnusedLocals`/`noUnusedParameters` on, so it compiles
   under strict app settings.
-- Dark mode is a `.dark` class on `<html>`.
+- There is one theme, Polarize warm dark. No `.dark` class or `data-theme` stamp is needed,
+  and Tailwind's `dark:` variants always apply.
 - Importing from `/react` also loads the self-hosted fonts.
 
 ### In a plain HTML page
@@ -152,8 +153,7 @@ Edit `tokens.json`, never `design.css`; regenerate with `python3 build_css.py` a
 resolve against the consuming app's alias, and `dev_check.py` rejects it. The shadcn CLI writes
 `@/` imports, so rewrite them after `npx shadcn add`.
 
-The Storybook's own interface follows the viewer's light or dark setting, and so does its
-**Theme** toolbar button. The MCP add-on (`@storybook/addon-mcp`) lets coding agents find the
+The Storybook, its own interface included, is warm dark only. The MCP add-on (`@storybook/addon-mcp`) lets coding agents find the
 components and their stories.
 
 ### Where it is used
