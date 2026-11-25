@@ -3,7 +3,7 @@ import * as React from "react"
 import { Surface3D, Trajectory3D, Waterfall3D } from "@/science/space/views"
 import { Heatmap } from "@/science/signals/Heatmap"
 import { LineChart } from "@/science/charts/LineChart"
-import { Slider } from "@/components/ui/slider"
+import { Fader, PlayKnob } from "@/components/controls"
 import { Button } from "@/components/ui/button"
 import { mountTrajectory3D, type Trajectory3DHandle } from "../../trajectory3d.js"
 import { mountNetwork3D, type Network3DHandle, type Network3DNode, type Network3DEdge } from "../../network3d.js"
@@ -79,7 +79,7 @@ function HodogramStory() {
         <span className="whitespace-nowrap font-mono text-[length:var(--text-xs)] text-muted-foreground tabular-nums">
           window {minute(start * per)}–{minute((start + span) * per)}
         </span>
-        <Slider min={0} max={total - span} step={1} value={[start]} onValueChange={([s]) => setStart(s)} aria-label="Window start" />
+        <Fader label="Window start" value={start} min={0} max={total - span} step={1} onChange={setStart} format={(s) => minute(s * per)} />
       </div>
       <Trajectory3D
         title="Pc5-band magnetic field vector, 15 minutes"
@@ -140,8 +140,8 @@ function TimeMarkerStory() {
   return (
     <div className="grid max-w-3xl gap-3">
       <div className="flex items-center gap-3">
-        <Button size="sm" variant="outline" aria-pressed={playing} onClick={() => setPlaying((p) => !p)}>{playing ? "Pause" : "Play"}</Button>
-        <Slider min={0} max={LORENZ_S} step={0.05} value={[time]} onValueChange={([t]) => setTime(t)} aria-label="Time" />
+        <PlayKnob size="sm" label="Lorenz" playing={playing} onChange={setPlaying} />
+        <Fader label="Time" value={time} min={0} max={LORENZ_S} step={0.05} onChange={setTime} format={(t) => `${t.toFixed(1)} s`} />
         <span className="whitespace-nowrap font-mono text-[length:var(--text-xs)] text-muted-foreground tabular-nums">{time.toFixed(1)} / {LORENZ_S} s</span>
         <Button size="sm" variant="ghost" onClick={() => view.current?.resetView()}>Reset view</Button>
       </div>

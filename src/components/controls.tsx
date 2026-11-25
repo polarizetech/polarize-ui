@@ -16,6 +16,7 @@ import {
   type PannerHandle, type PannerOptions, type Scale, type TimelineHandle, type TimelineOptions,
 } from "../../controls.js"
 import { cn } from "../lib/utils"
+import { Pause, Play } from "lucide-react"
 
 export type {
   Scene, SceneEnding, TimelineCurve, TimelineOptions, LaneOptions, PannerOptions, MotionPath, DetentDetail, Scale,
@@ -152,6 +153,36 @@ export function Knob({ size = "md", ...p }: RangeProps & { size?: "sm" | "md" | 
         <input id={id} type="range" min={p.min} max={p.max} step={p.step || "any"} defaultValue={p.value} disabled={p.disabled} />
       </div>
     </RangeShell>
+  )
+}
+
+/** A round play / pause toggle, sized like a Knob and set beside one. aria-pressed carries the state. */
+export function PlayKnob({ label, playing, onChange, size = "md", disabled, className }: {
+  label: string
+  playing: boolean
+  onChange: (playing: boolean) => void
+  size?: "sm" | "md" | "lg"
+  disabled?: boolean
+  className?: string
+}) {
+  return (
+    <div className={cn("ui-control", className)}>
+      <div className="ui-control__head">
+        <span className="ui-control__name">{label}</span>
+      </div>
+      <button
+        type="button"
+        className={cn("ui-playknob", `ui-playknob--${size}`)}
+        aria-pressed={playing}
+        aria-label={playing ? `Pause ${label}` : `Play ${label}`}
+        disabled={disabled}
+        onClick={() => onChange(!playing)}
+      >
+        {playing
+          ? <Pause className="ui-playknob__icon" aria-hidden="true" />
+          : <Play className="ui-playknob__icon" aria-hidden="true" />}
+      </button>
+    </div>
   )
 }
 

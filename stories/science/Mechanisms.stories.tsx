@@ -5,7 +5,7 @@ import { computeComodulogram } from "@/science/stats/pac"
 import { LineChart } from "@/science/charts/LineChart"
 import { Readout } from "@/science/evidence/value"
 import { Tier } from "@/science/evidence/tier"
-import { Slider } from "@/components/ui/slider"
+import { Fader } from "@/components/controls"
 import { Eyebrow } from "@/components/typography"
 import { sharpSignal } from "../data"
 import { contrastResponse, population, type NormParams } from "../models/normalization"
@@ -29,14 +29,7 @@ function Control({ label, value, min, max, step, onCommit, format = (v: number) 
   onCommit: (v: number) => void; format?: (v: number) => string
 }) {
   const [v, setV] = React.useState(value)
-  return (
-    <label className="grid gap-1.5">
-      <span className="flex justify-between font-mono text-[length:var(--text-xs)] text-muted-foreground">
-        <span>{label}</span><span className="tabular-nums">{format(v)}</span>
-      </span>
-      <Slider min={min} max={max} step={step} value={[v]} onValueChange={([x]) => setV(x)} onValueCommit={([x]) => onCommit(x)} aria-label={label} />
-    </label>
-  )
+  return <Fader label={label} value={v} min={min} max={max} step={step} onChange={setV} onCommit={onCommit} format={format} />
 }
 
 // ── 1. False coupling from a sharp waveform ─────────────────────────────────────────

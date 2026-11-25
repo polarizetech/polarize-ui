@@ -2,7 +2,7 @@ import * as React from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import {
   AutomationLane, ChannelStrip, ChannelStrips, Delta, Fader, Gauge, Glide, Hazard, HoldButton, Keyboard, KeyLane,
-  Knob, LinkedValue, Meter, NightView, Panner, Popover, SceneTimeline, SegmentedButtons, SyncPill, TabBar, valueAt,
+  Knob, LinkedValue, Meter, NightView, Panner, PlayKnob, Popover, SceneTimeline, SegmentedButtons, SyncPill, TabBar, valueAt,
   type MotionPath, type Scene,
 } from "@/components/controls"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
@@ -325,6 +325,24 @@ export const KeyLanes: StoryObj = {
         spans={[{ low: 66, high: 81, text: "span" }]} />
     </Panel>
   ),
+}
+
+export const PlayKnobStory: StoryObj = {
+  name: "Play knob",
+  render: () => {
+    const [playing, setPlaying] = React.useState(false)
+    const [rate, setRate] = React.useState(6)
+    const [depth, setDepth] = React.useState(0.5)
+    return (
+      <Panel>
+        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+          <PlayKnob label="Playback" playing={playing} onChange={setPlaying} />
+          <Knob label="Rate" value={rate} min={0} max={12} step={0.1} unit="Hz" digits={1} onChange={setRate} />
+          <Knob label="Depth" value={depth} min={0} max={1} step={0.01} digits={2} onChange={setDepth} />
+        </div>
+      </Panel>
+    )
+  },
 }
 
 export const PopoverStory: StoryObj = {
