@@ -291,6 +291,7 @@ reader, and with it it is drawn as hardware:
 | `data-ticks="10"` | minor ticks across the travel |
 | `.ui-fader--vertical`, `.ui-fader--ribbon`, `.ui-knob` (`--sm`, `--lg`) | the other forms |
 | `data-ui-hold` on a `.ui-hold` button | switches on only after a held press, off with a tap |
+| `data-ui-toggle` on a `.ui-toggle` button | an on/off switch: `<button type="button" class="ui-toggle" data-ui-toggle aria-pressed="true"><span class="ui-toggle__track"><span class="ui-toggle__thumb"></span></span>Label</button>`; flips with a click and fires `change`. React: `Toggle` |
 
 **Fine adjust**: drag away from the control's axis and the gain falls, down to 1/20.
 **Numeric entry**: tap the printed value, or long-press the control. **Hard limits** are

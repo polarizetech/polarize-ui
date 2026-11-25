@@ -2,7 +2,7 @@ import * as React from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import {
   AutomationLane, ChannelStrip, ChannelStrips, Delta, Fader, Gauge, Glide, Hazard, HoldButton, Keyboard, KeyLane,
-  Knob, LinkedValue, Meter, NightView, Panner, PlayKnob, Popover, SceneTimeline, SegmentedButtons, SyncPill, TabBar, valueAt,
+  Knob, LinkedValue, Meter, NightView, Panner, PlayKnob, Popover, SceneTimeline, SegmentedButtons, SyncPill, TabBar, Toggle, valueAt,
   type MotionPath, type Scene,
 } from "@/components/controls"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
@@ -244,6 +244,21 @@ export const Experimental: StoryObj = {
         </Hazard>
         <p className="ui-control__note">Switching on needs a held press; switching off is a tap.</p>
       </Panel>
+    )
+  },
+}
+
+export const ToggleStory: StoryObj = {
+  name: "Toggle",
+  render: () => {
+    const [a, setA] = React.useState(true)
+    const [b, setB] = React.useState(false)
+    return (
+      <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
+        <Toggle on={a} onChange={setA}>Spikes {a ? "on" : "off"}</Toggle>
+        <Toggle on={b} onChange={setB}>Mixer {b ? "on" : "off"}</Toggle>
+        <Toggle on={false} onChange={() => {}} disabled>Unavailable</Toggle>
+      </div>
     )
   },
 }
