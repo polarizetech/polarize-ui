@@ -69,6 +69,10 @@ export type HoldHandle = { readonly value: boolean; set(on: boolean): void; dest
 /** A button that switches ON only after a held press, and OFF with a tap. State is aria-pressed. */
 export function initHold(btn: HTMLElement | null, opts?: { ms?: number; onChange?: (on: boolean) => void }): HoldHandle | null
 
+export type ToggleHandle = { readonly value: boolean; set(on: boolean): void; destroy(): void }
+/** An on/off switch: a real button, its state in aria-pressed; a click flips it and fires `change`. */
+export function initToggle(btn: HTMLElement | null, opts?: { onChange?: (on: boolean) => void }): ToggleHandle | null
+
 /** How a scene ended, as a marker log records it. Always drawn with its word. */
 export type SceneEnding = "met" | "timeout" | "no_data" | "open_loop"
 export type TimelineCurve = { label: string; values: number[]; domain?: [number, number]; scale?: Scale; series?: 1 | 2 | 3 | 4 }
@@ -186,4 +190,4 @@ export type KeyLaneHandle = { update(next: KeyLaneOptions): void; destroy(): voi
 export function mountKeyLane(host: HTMLElement, options: KeyLaneOptions): KeyLaneHandle | null
 
 /** Enhance every [data-ui-control] and [data-ui-hold] under `root`. Runs once on load by itself. */
-export function init(root?: ParentNode): (ControlHandle | HoldHandle)[]
+export function init(root?: ParentNode): (ControlHandle | HoldHandle | ToggleHandle)[]

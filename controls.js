@@ -22,6 +22,7 @@
           always drawn and the control is marked [data-at-limit] when it sits on one.
       A hold-to-confirm button ([data-ui-hold]) switches on only after a press is
       held, and switches off with a tap.
+      An on/off switch ([data-ui-toggle] on a .ui-toggle button) flips with a click.
 
    2. Mount functions for three SVG views: a scene timeline (mountTimeline), an
       automation lane (mountLane) and a polar panner (mountPanner). Each returns a
@@ -522,6 +523,33 @@ export function initHold(btn, { ms, onChange } = {}) {
       btn.removeEventListener('click', swallow);
       HANDLES.delete(btn);
     },
+  };
+  HANDLES.set(btn, handle);
+  return handle;
+}
+
+/* ------------------------------------------------------------------ toggle -- */
+
+/**
+ * An on/off switch: a real button whose state is aria-pressed. A click (or Space / Enter,
+ * which a button turns into a click) flips it, fires a bubbling `change` event and calls
+ * onChange(on).
+ */
+export function initToggle(btn, { onChange } = {}) {
+  if (!btn || HANDLES.has(btn)) return HANDLES.get(btn) || null;
+  if (!btn.hasAttribute('aria-pressed')) btn.setAttribute('aria-pressed', 'false');
+  const on = () => btn.getAttribute('aria-pressed') === 'true';
+  const click = () => {
+    const v = !on();
+    btn.setAttribute('aria-pressed', String(v));
+    btn.dispatchEvent(new Event('change', { bubbles: true }));
+    onChange?.(v);
+  };
+  btn.addEventListener('click', click);
+  const handle = {
+    get value() { return on(); },
+    set(v) { btn.setAttribute('aria-pressed', String(Boolean(v))); },
+    destroy() { btn.removeEventListener('click', click); HANDLES.delete(btn); },
   };
   HANDLES.set(btn, handle);
   return handle;
@@ -1219,11 +1247,12 @@ export function mountKeyLane(host, options = {}) {
 
 /* ---------------------------------------------------------------- page init -- */
 
-/** Enhance every [data-ui-control] and [data-ui-hold] under `root`. Returns the handles. */
+/** Enhance every [data-ui-control], [data-ui-hold] and [data-ui-toggle] under `root`. Returns the handles. */
 export function init(root = document) {
   const out = [];
   root.querySelectorAll('[data-ui-control]').forEach((el) => { const h = initControl(el); if (h) out.push(h); });
   root.querySelectorAll('[data-ui-hold]').forEach((el) => { const h = initHold(el); if (h) out.push(h); });
+  root.querySelectorAll('[data-ui-toggle]').forEach((el) => { const h = initToggle(el); if (h) out.push(h); });
   return out;
 }
 

@@ -31,7 +31,7 @@
    ============================================================ */
 
 :where(.ui-control, .ui-fader, .ui-knob, .ui-playknob, .ui-panner, .ui-lane, .ui-timeline, .ui-strip,
-       .ui-meter, .ui-glide, .ui-tag--linked, .ui-delta, .ui-sync, .ui-hold, .ui-hazard,
+       .ui-meter, .ui-glide, .ui-tag--linked, .ui-delta, .ui-sync, .ui-hold, .ui-toggle, .ui-hazard,
        .ui-sheet, .ui-tabbar, .ui-night, .ui-gauge, .ui-keyboard, .ui-keylane) {
   --ctl-signal: var(--clay, var(--pub-accent, var(--accent)));
   --ctl-signal-tint: var(--clay-tint, color-mix(in oklab, var(--pub-accent, var(--accent)) 14%, transparent));
@@ -393,6 +393,27 @@ a.ui-sync:focus-visible, button.ui-sync:focus-visible { outline: 2px solid var(-
 .ui-hold[aria-pressed="true"] { background: var(--ctl-signal); border-color: var(--ctl-signal); color: var(--background); }
 .ui-hold:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 
+/* ---------- Toggle: an on/off switch ---------- */
+/* A real <button> whose state is aria-pressed; the track and thumb are drawn, the label is its text. */
+.ui-toggle {
+  display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding: 0 var(--space-1);
+  background: none; border: 0; color: var(--foreground); font: inherit; font-size: var(--text-sm); cursor: pointer;
+}
+.ui-toggle__track {
+  position: relative; flex: none; width: 36px; height: 20px; border-radius: 999px;
+  background: var(--muted); border: 1px solid var(--border-strong);
+  transition: background 120ms var(--ctl-ease), border-color 120ms var(--ctl-ease);
+}
+.ui-toggle__thumb {
+  position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--muted-foreground);
+  transition: transform 120ms var(--ctl-ease), background 120ms var(--ctl-ease);
+}
+.ui-toggle[aria-pressed="true"] .ui-toggle__track { background: var(--ctl-signal); border-color: var(--ctl-signal); }
+.ui-toggle[aria-pressed="true"] .ui-toggle__thumb { transform: translateX(16px); background: var(--background); }
+.ui-toggle:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: var(--radius-sm); }
+.ui-toggle:disabled { opacity: .5; cursor: not-allowed; }
+
 /* ---------- SVG views drawn by controls.js ---------- */
 .ui-timeline, .ui-lane, .ui-panner { position: relative; user-select: none; }
 .ui-timeline svg, .ui-lane svg, .ui-panner svg { display: block; width: 100%; height: auto; overflow: visible; }
@@ -521,5 +542,5 @@ a.ui-sync:focus-visible, button.ui-sync:focus-visible { outline: 2px solid var(-
 
 @media (prefers-reduced-motion: reduce) {
   .ui-sheet[open] { animation: none; }
-  .ui-hold::before, .ui-fader__thumb { transition: none; }
+  .ui-hold::before, .ui-fader__thumb, .ui-toggle__track, .ui-toggle__thumb { transition: none; }
 }

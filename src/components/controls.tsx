@@ -10,8 +10,8 @@
  */
 import * as React from "react"
 import {
-  initControl, initHold, mountKeyboard, mountKeyLane, mountLane, mountPanner, mountTimeline, formatValue,
-  type ControlHandle, type ControlOptions, type HoldHandle, type KeyboardHandle, type KeyboardOptions,
+  initControl, initHold, initToggle, mountKeyboard, mountKeyLane, mountLane, mountPanner, mountTimeline, formatValue,
+  type ControlHandle, type ControlOptions, type HoldHandle, type ToggleHandle, type KeyboardHandle, type KeyboardOptions,
   type KeyLaneHandle, type KeyLaneOptions, type LaneHandle, type LaneOptions,
   type PannerHandle, type PannerOptions, type Scale, type TimelineHandle, type TimelineOptions,
 } from "../../controls.js"
@@ -382,6 +382,26 @@ export function HoldButton({ on, onChange, ms, children, className, label }: {
     <button ref={el} type="button" className={cn("ui-hold", className)} aria-pressed={on} aria-label={label}
       title={on ? "Tap to switch off" : "Press and hold to switch on"}>
       <span>{children}</span>
+    </button>
+  )
+}
+
+/** An on/off switch. State is aria-pressed on a real button; `children` is its label. */
+export function Toggle({ on, onChange, children, className, disabled }: {
+  on: boolean; onChange: (on: boolean) => void; children?: React.ReactNode; className?: string; disabled?: boolean
+}) {
+  const el = React.useRef<HTMLButtonElement>(null)
+  const cb = useLatest(onChange)
+  const h = React.useRef<ToggleHandle | null>(null)
+  React.useEffect(() => {
+    h.current = initToggle(el.current, { onChange: (v) => cb.current(v) })
+    return () => { h.current?.destroy(); h.current = null }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  React.useEffect(() => { h.current?.set(on) }, [on])
+  return (
+    <button ref={el} type="button" className={cn("ui-toggle", className)} aria-pressed={on} disabled={disabled}>
+      <span className="ui-toggle__track" aria-hidden="true"><span className="ui-toggle__thumb" /></span>
+      {children != null && <span className="ui-toggle__label">{children}</span>}
     </button>
   )
 }
