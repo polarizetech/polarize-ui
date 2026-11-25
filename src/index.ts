@@ -26,6 +26,8 @@ export { computeComodulogram, modulationIndex, type Comodulogram as Comodulogram
 export * from "./science/evidence/tier"
 export * from "./science/evidence/value"
 export * from "./science/evidence/docs"
+// Spatial (VR): components placed in 3-D with CSS transforms
+export * from "./spatial/Spatial"
 
 // ── General UI ──────────────────────────────────────────────────────────────────
 export * from "./components/typography"
