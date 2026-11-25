@@ -394,11 +394,17 @@ export function initControl(root, opts = {}) {
       const near = Math.abs(pos - thumbFrac) * (vertical ? box.height : box.width) < 18;
       if (!near) { startFrac = clamp(pos, 0, 1); set(fromFrac(startFrac, cfg), { emit: true }); }
     }
-    drag = { x: e.clientX, y: e.clientY, frac: startFrac, box, last: -1, moved: false };
+    drag = { x: e.clientX, y: e.clientY, frac: startFrac, box, last: -1, moved: false, id: e.pointerId };
+    // Follow the pointer anywhere on the page until it is released, not only while it is over the control.
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
     press = setTimeout(() => { if (drag && !drag.moved) { drag = null; openEntry(); } }, 550);
   };
   const onMove = (e) => {
-    if (!drag) return;
+    if (!drag || e.pointerId !== drag.id) return;
+    // The button was released where no pointerup reached us: end the drag at the value it had.
+    if (e.pointerType === 'mouse' && e.buttons === 0) { onUp(); return; }
     const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
     if (Math.hypot(dx, dy) > 4) { drag.moved = true; clearTimeout(press); }
     let delta, off;
@@ -419,6 +425,9 @@ export function initControl(root, opts = {}) {
   };
   const onUp = () => {
     clearTimeout(press);
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+    window.removeEventListener('pointercancel', onUp);
     if (!drag) return;
     drag = null;
     el.removeAttribute('data-fine');
@@ -454,9 +463,6 @@ export function initControl(root, opts = {}) {
   input.addEventListener('change', onNativeChange);
   input.addEventListener('keydown', onKey);
   el.addEventListener('pointerdown', onDown);
-  el.addEventListener('pointermove', onMove);
-  el.addEventListener('pointerup', onUp);
-  el.addEventListener('pointercancel', onUp);
   out?.addEventListener('click', onOut);
 
   const handle = {
@@ -469,9 +475,9 @@ export function initControl(root, opts = {}) {
       input.removeEventListener('change', onNativeChange);
       input.removeEventListener('keydown', onKey);
       el.removeEventListener('pointerdown', onDown);
-      el.removeEventListener('pointermove', onMove);
-      el.removeEventListener('pointerup', onUp);
-      el.removeEventListener('pointercancel', onUp);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
       out?.removeEventListener('click', onOut);
       deco.splice(0).forEach((n) => n.remove());
       HANDLES.delete(el);
