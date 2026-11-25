@@ -30,7 +30,7 @@
    in a tier colour: the epistemic palette is reserved.
    ============================================================ */
 
-:where(.ui-control, .ui-fader, .ui-knob, .ui-panner, .ui-lane, .ui-timeline, .ui-strip,
+:where(.ui-control, .ui-fader, .ui-knob, .ui-playknob, .ui-panner, .ui-lane, .ui-timeline, .ui-strip,
        .ui-meter, .ui-glide, .ui-tag--linked, .ui-delta, .ui-sync, .ui-hold, .ui-hazard,
        .ui-sheet, .ui-tabbar, .ui-night, .ui-gauge, .ui-keyboard, .ui-keylane) {
   --ctl-signal: var(--clay, var(--pub-accent, var(--accent)));
@@ -194,6 +194,26 @@
 .ui-knob--sm { --size: 56px; }
 .ui-knob--lg { --size: 112px; }
 
+/* ---------- Play knob (a round play / pause toggle, sized like a knob) ---------- */
+.ui-playknob {
+  --size: 88px;
+  position: relative; width: var(--size); height: var(--size); flex: none; padding: 0;
+  display: grid; place-items: center; border-radius: 50%;
+  background: var(--background); border: 1px solid var(--border-strong); color: var(--foreground);
+  cursor: pointer; touch-action: manipulation; user-select: none;
+}
+.ui-playknob::before {
+  content: ""; position: absolute; inset: 4%; border-radius: 50%; pointer-events: none;
+  background: var(--muted); border: 1px solid var(--border-strong);
+}
+.ui-playknob__icon { position: relative; z-index: 1; width: 42%; height: 42%; }
+.ui-playknob[aria-pressed="true"] { border-color: var(--ctl-signal); }
+.ui-playknob[aria-pressed="true"]::before { border-color: var(--ctl-signal); }
+.ui-playknob:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.ui-playknob:disabled { opacity: .4; cursor: not-allowed; }
+.ui-playknob--sm { --size: 56px; }
+.ui-playknob--lg { --size: 112px; }
+
 /* ---------- Chips: linked value, delta, sync state ---------- */
 /* A value resolved from what a person owns (their calibration). Dashed, so it reads as a
    link in any theme; the resolved number always sits beside the formula. */
@@ -292,12 +312,13 @@ a.ui-sync:focus-visible, button.ui-sync:focus-visible { outline: 2px solid var(-
   border: 1px solid var(--border-strong); background: var(--card); color: var(--faint-foreground);
   border-radius: 0 0 var(--radius-xs) var(--radius-xs); display: flex; align-items: flex-end; justify-content: center;
   font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 500; line-height: 1; cursor: pointer; touch-action: none; }
-.ui-keyboard__key--black { height: 62%; background: var(--foreground); border-color: var(--foreground); z-index: 2; }
+.ui-keyboard__key--black { height: 62%; background: var(--foreground); border: 1px solid var(--background); box-shadow: 0 0 0 1px var(--border-strong); z-index: 2; }
+.ui-keyboard__key--black[aria-pressed="true"] { border-color: var(--background); }
 .ui-keyboard__key:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px; z-index: 3; }
 .ui-keyboard__key[aria-pressed="true"] { background: var(--ctl-signal); border-color: var(--ctl-signal); color: var(--background); }
 .ui-keyboard__key[aria-disabled="true"] { cursor: not-allowed; background-color: var(--muted);
   background-image: repeating-linear-gradient(135deg, var(--border-strong) 0 1px, transparent 1px 6px); color: var(--faint-foreground); }
-.ui-keyboard__key--black[aria-disabled="true"] { background-color: var(--muted-foreground); border-color: var(--muted-foreground);
+.ui-keyboard__key--black[aria-disabled="true"] { background-color: var(--muted-foreground); border-color: var(--background);
   background-image: repeating-linear-gradient(135deg, var(--muted) 0 1px, transparent 1px 6px); }
 .ui-keyboard[data-busy="true"] .ui-keyboard__key { opacity: .45; pointer-events: none; }
 .ui-keyboard__reason { margin: 0; color: var(--muted-foreground); font-size: var(--text-sm); display: flex; gap: var(--space-2); align-items: baseline; }

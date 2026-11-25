@@ -1,9 +1,8 @@
+import { useState } from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { Play } from "lucide-react"
+import { Knob, PlayKnob } from "@/components/controls"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label as FieldLabel } from "@/components/ui/label"
-import { Slider } from "@/components/ui/slider"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tier } from "@/science/evidence/tier"
@@ -25,21 +24,24 @@ export const Buttons: StoryObj = {
 
 export const StimulusCard: StoryObj = {
   name: "Card with controls",
-  render: () => (
-    <Card className="max-w-md">
-      <CardHeader>
-        <CardTitle className="font-display text-2xl">Stimulus</CardTitle>
-        <CardDescription>40 Hz AM on a 500 Hz carrier.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <FieldLabel>Carrier (Hz)</FieldLabel>
-          <Slider defaultValue={[500]} min={120} max={1000} step={10} />
-        </div>
-        <Button><Play /> Play</Button>
-      </CardContent>
-    </Card>
-  ),
+  render: () => {
+    const [carrier, setCarrier] = useState(500)
+    const [playing, setPlaying] = useState(false)
+    return (
+      <Card className="max-w-md">
+        <CardHeader>
+          <CardTitle className="font-display text-2xl">Stimulus</CardTitle>
+          <CardDescription>40 Hz AM on a 500 Hz carrier.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-4">
+            <Knob label="Carrier" value={carrier} min={120} max={1000} step={10} unit="Hz" digits={0} onChange={setCarrier} />
+            <PlayKnob label="Stimulus" size="md" playing={playing} onChange={setPlaying} />
+          </div>
+        </CardContent>
+      </Card>
+    )
+  },
 }
 
 export const TableStory: StoryObj = {
