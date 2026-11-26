@@ -161,11 +161,14 @@ function Graticule({ ox, oy, w, h, z }: { ox: number; oy: number; w: number; h: 
   const step = STEPS.find((st) => st * ppd >= 80) ?? 30
   const dec = Math.max(0, -Math.floor(Math.log10(step) + 1e-9))
   const meridians: { x: number; label: string; main: boolean }[] = []
+  const seen = new Set<string>()
   const lonL = (ox / s) * 360 - 180
   const lonR = ((ox + w) / s) * 360 - 180
   for (let k = Math.ceil(lonL / step); k <= Math.floor(lonR / step); k++) {
     const lon = wrapLon(k * step)
-    meridians.push({ x: (((k * step + 180) / 360) * s) - ox, label: fmtDeg(lon, dec, "E", "W"), main: Math.abs(lon) < 1e-9 })
+    const label = fmtDeg(lon, dec, "E", "W")
+    meridians.push({ x: (((k * step + 180) / 360) * s) - ox, label: seen.has(label) ? "" : label, main: Math.abs(lon) < 1e-9 })
+    seen.add(label)
   }
   const parallels: { y: number; label: string; main: boolean }[] = []
   const latT = unproject(0, Math.max(0, oy), z).lat
@@ -218,6 +221,8 @@ export type MapSearchProps = {
   maxZoom?: number
   /** Zoom used when a search result has no bounding box. Default 12. */
   zoomOnSelect?: number
+  /** Highest zoom used to fit a search result's bounding box, so a tiny place does not zoom to street level. Default 16. */
+  maxFitZoom?: number
   /** Map height in px. Default 320. */
   height?: number
   /** Decimal places kept and shown. Default 6. */
@@ -235,7 +240,7 @@ export type MapSearchProps = {
 
 export function MapSearch({
   value: controlled, defaultValue = null, onChange, search, tileUrl, attribution, tileFilter = "dark",
-  defaultCenter = { lat: 20, lon: 0 }, defaultZoom, maxZoom = 18, zoomOnSelect = 12, height = 320,
+  defaultCenter = { lat: 20, lon: 0 }, defaultZoom, maxZoom = 18, zoomOnSelect = 12, maxFitZoom = 16, height = 320,
   digits = 6, showLocate = true, placeholder = "Search a place, or type 48.4284, -123.3656",
   latName, lonName, disabled, className, "aria-label": ariaLabel = "Location",
 }: MapSearchProps) {
@@ -398,7 +403,7 @@ export function MapSearch({
   const pick = (r: GeocodeResult) => {
     const v = { lat: r.lat, lon: r.lon }
     set(v)
-    go(v, r.bbox && size.w > 0 ? fitZoom(r.bbox, size.w, size.h, maxZoom) : (typed ? Math.max(zoom, zoomOnSelect) : zoomOnSelect))
+    go(v, r.bbox && size.w > 0 ? fitZoom(r.bbox, size.w, size.h, Math.min(maxZoom, maxFitZoom)) : (typed ? Math.max(zoom, zoomOnSelect) : zoomOnSelect))
     if (!typed) setText(r.label)
     setOpen(false)
   }
@@ -438,6 +443,11 @@ export function MapSearch({
   const lonNum = Number(lonText)
   const latBad = latText.trim() !== "" && !(Number.isFinite(latNum) && Math.abs(latNum) <= 90)
   const lonBad = lonText.trim() !== "" && !(Number.isFinite(lonNum) && Math.abs(lonNum) <= 180)
+  const fieldsRef = React.useRef<HTMLDivElement>(null)
+  const onFieldBlur = (e: React.FocusEvent) => {
+    if (fieldsRef.current?.contains(e.relatedTarget as Node | null)) return
+    commitFields()
+  }
   const commitFields = () => {
     if (latText.trim() === "" && lonText.trim() === "") { if (value) set(null); return }
     if (latText.trim() === "" || lonText.trim() === "" || latBad || lonBad) return
@@ -464,7 +474,7 @@ export function MapSearch({
     )
   }
 
-  const ctl = "inline-flex size-7 items-center justify-center rounded-md border border-border bg-popover/90 text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-30"
+  const ctl = "inline-flex size-7 items-center justify-center rounded-md border border-border bg-popover text-muted-foreground shadow-sm outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:text-(--faint-foreground)"
   const labelCls = "font-mono text-[10px] font-medium tracking-[.14em] text-muted-foreground uppercase"
   const fieldCls = "h-9 w-36 rounded-md border border-input bg-input/30 px-3 font-mono text-sm text-foreground tabular-nums shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive"
 
@@ -557,7 +567,7 @@ export function MapSearch({
             </button>
           )}
         </div>
-        <span aria-hidden className="pointer-events-none absolute bottom-2 left-2 font-mono text-[10px] text-(--faint-foreground) tabular-nums">z{zoom}</span>
+        <span aria-hidden className="pointer-events-none absolute bottom-1.5 left-1.5 rounded bg-popover px-1 py-0.5 font-mono text-[10px] text-muted-foreground tabular-nums">z{zoom}</span>
         {tileUrl && attribution && (
           <div className="absolute right-0 bottom-0 rounded-tl bg-background/80 px-1.5 py-0.5 text-[10px] text-muted-foreground [&_a]:underline">
             {attribution}
@@ -566,11 +576,12 @@ export function MapSearch({
       </div>
 
       <div className="flex flex-wrap items-end gap-3">
+        <div ref={fieldsRef} className="flex flex-wrap items-end gap-3">
         <label className="flex flex-col gap-1">
           <span className={labelCls}>Latitude</span>
           <input type="text" inputMode="decimal" disabled={disabled} value={latText} placeholder="−90 to 90"
             aria-invalid={latBad || undefined}
-            onChange={(e) => setLatText(e.target.value)} onBlur={commitFields}
+            onChange={(e) => setLatText(e.target.value)} onBlur={onFieldBlur}
             onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); commitFields() } }}
             className={fieldCls} />
         </label>
@@ -578,10 +589,11 @@ export function MapSearch({
           <span className={labelCls}>Longitude</span>
           <input type="text" inputMode="decimal" disabled={disabled} value={lonText} placeholder="−180 to 180"
             aria-invalid={lonBad || undefined}
-            onChange={(e) => setLonText(e.target.value)} onBlur={commitFields}
+            onChange={(e) => setLonText(e.target.value)} onBlur={onFieldBlur}
             onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); commitFields() } }}
             className={fieldCls} />
         </label>
+        </div>
         {value && !disabled && (
           <button type="button" aria-label="Clear location" onClick={() => set(null)}
             className="mb-1 inline-flex size-7 items-center justify-center rounded text-muted-foreground outline-none hover:bg-foreground/8 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">
